@@ -1,0 +1,113 @@
+export const mockExploreData = [
+  {
+    id: 1,
+    title: "好想婆宝宝怎么办啊啊啊?",
+    user: "大狗",
+    likes: 520,
+    image: "",
+  },
+
+  {
+    id: 10,
+    title: "刚刚试了一下新开的健身房",
+    user: "小赵",
+    likes: 322,
+    image: "", // Add URL if needed
+  },
+  {
+    id: 2,
+    title: "今天天气真好啊，适合出去玩！",
+    user: "小猫",
+    likes: 310,
+    image: "",
+  },
+  {
+    id: 3,
+    title: "昨天看了部超好看的电影",
+    user: "小明",
+    likes: 432,
+    image: "",
+  },
+  {
+    id: 4,
+    title: "这个新的餐厅真不错，菜品特别好吃！",
+    user: "小红",
+    likes: 289,
+    image: "",
+  },
+  {
+    id: 5,
+    title: "今天学到了很多新知识，感觉很充实！",
+    user: "阿强",
+    likes: 678,
+    image: "",
+  },
+  {
+    id: 6,
+    title: "看到这个新闻真是太震惊了",
+    user: "小李",
+    likes: 254,
+    image: "",
+  },
+  {
+    id: 7,
+    title: "刚刚完成了一个大项目，心情特别好！",
+    user: "小张",
+    likes: 514,
+    image: "",
+  },
+];
+
+export const mockCommentData = [
+  {
+    id: 1,
+    profilePicture: "",
+    profileId: 1,
+    userName: "JohnDoe123",
+    comment: "This is an interesting post! Thanks for sharing.",
+    likes: 15,
+    dislikes: 2,
+    timeStamp: "1h",
+  },
+  {
+    id: 2,
+    profilePicture: "",
+    profileId: 2,
+    userName: "JaneSmith456",
+    comment: "I completely agree with your points. Well said!",
+    likes: 10,
+    dislikes: 0,
+    timeStamp: "2h",
+  },
+  {
+    id: 3,
+    profilePicture: "",
+    profileId: 3,
+    userName: "TechGuru99",
+    comment: "Great insights! This helped me a lot.",
+    likes: 8,
+    dislikes: 1,
+    timeStamp: "3h",
+  },
+  {
+    id: 4,
+    profilePicture: "",
+    profileId: 4,
+    userName: "TravelLover",
+    comment:
+      "I’ve had similar experiences, totally relatable! I’ve had similar experiences, totally relatable!I’ve had similar experiences, totally relatable!I’ve had similar experiences, totally relatable!I’ve had similar experiences, totally relatable!",
+    likes: 20,
+    dislikes: 666,
+    timeStamp: "4h",
+  },
+  {
+    id: 5,
+    profilePicture: "",
+    profileId: 5,
+    userName: "FoodieQueen",
+    comment: "This recipe is amazing! Can't wait to try it out.",
+    likes: 12,
+    dislikes: 0,
+    timeStamp: "5h",
+  },
+];
