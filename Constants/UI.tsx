@@ -8,3 +8,9 @@ export enum HomeStackScreens {
   Home = "home",
   Post = "post",
 }
+
+export enum ProfileStackScreens {
+  Login = "login",
+  Register = "register",
+  Profile = "profile",
+}
