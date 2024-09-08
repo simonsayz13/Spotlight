@@ -15,7 +15,10 @@ const Post = ({ navigation }: any) => {
   useFocusEffect(
     React.useCallback(() => {
       navigation.getParent()?.setOptions({ tabBarStyle: { display: "none" } });
-      return () => navigation.getParent()?.setOptions({ tabBarStyle: null });
+      return () =>
+        navigation
+          .getParent()
+          ?.setOptions({ tabBarStyle: { display: "flex" } });
     }, [navigation])
   );
 

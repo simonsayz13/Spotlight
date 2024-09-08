@@ -19,7 +19,7 @@ const Contents = (props: any) => {
     }, 2000); // Simulating a 2-second fetch time
   }, [data]);
 
-  //Hook for loading
+  // Hook for loading data
   useEffect(() => {
     console.log(content);
   }, [content]);

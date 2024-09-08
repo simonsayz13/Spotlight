@@ -5,7 +5,7 @@ import Entypo from "@expo/vector-icons/Entypo";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { ShopScreen } from "../Screens/Shop/Shop";
-import { PostScreen } from "../Screens/Post/Post";
+import { Camera } from "../Screens/Post/Camera";
 import { MessagesScreen } from "../Screens/Messages/Messages";
 import { ProfileScreen } from "../Screens/Profile/Profile";
 
@@ -52,7 +52,7 @@ const TabNavigation = () => {
       />
       <Tab.Screen
         name="Post"
-        component={PostScreen}
+        component={Camera}
         options={{
           // tabBarLabelStyle: { display: "none" },
           tabBarIcon: ({ focused }) => {
@@ -62,6 +62,7 @@ const TabNavigation = () => {
               <FontAwesome name="plus-square-o" size={32} color="black" />
             );
           },
+          tabBarStyle: { display: "none" },
         }}
       />
       <Tab.Screen
@@ -78,7 +79,7 @@ const TabNavigation = () => {
         }}
       />
       <Tab.Screen
-        name="Profiles"
+        name="Me"
         component={ProfileScreen}
         options={{
           tabBarIcon: ({ focused }) => {
