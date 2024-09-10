@@ -6,10 +6,11 @@ import {
   Animated,
   TextInput,
   Keyboard,
+  Platform,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRef, useState } from "react";
-import { TopNavigationHomeButtons } from "../Constants/UI";
+import { ThemeColours, TopNavigationHomeButtons } from "../Constants/UI";
 
 const TopNavigationBar = (props: any) => {
   const { setContent, drawerHandler } = props;
@@ -62,11 +63,19 @@ const TopNavigationBar = (props: any) => {
     <View style={styles.container}>
       {showSearchBar ? (
         <TouchableOpacity onPress={toggleSearchBar}>
-          <Ionicons name="chevron-back" size={32} color="black" />
+          <Ionicons
+            name="chevron-back"
+            size={32}
+            color={ThemeColours.SecondaryColour}
+          />
         </TouchableOpacity>
       ) : (
         <TouchableOpacity onPress={drawerHandler}>
-          <Ionicons name="menu" size={32} color="black" />
+          <Ionicons
+            name="menu"
+            size={32}
+            color={ThemeColours.SecondaryColour}
+          />
         </TouchableOpacity>
       )}
 
@@ -103,7 +112,11 @@ const TopNavigationBar = (props: any) => {
       <TouchableOpacity
         onPress={showSearchBar ? fetchNewItem : toggleSearchBar}
       >
-        <Ionicons name="search" size={32} color="black" />
+        <Ionicons
+          name="search"
+          size={32}
+          color={ThemeColours.SecondaryColour}
+        />
       </TouchableOpacity>
     </View>
   );
@@ -125,16 +138,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row",
     justifyContent: "space-around",
-    borderBottomWidth: 1,
-    borderBottomColor: "#D3D3D3",
   },
   menuButton: {
-    fontSize: 17,
+    fontSize: 20,
     fontWeight: "normal",
+    color: ThemeColours.SecondaryColour,
   },
   menuButtonClicked: {
-    fontSize: 17,
+    fontSize: 20,
     fontWeight: "bold",
+    color: ThemeColours.SecondaryColour,
   },
   textWrapper: {
     position: "relative",
@@ -145,7 +158,7 @@ const styles = StyleSheet.create({
     bottom: -4, // Adjust this value to control the gap between the text and underline
     height: 3,
     width: "70%",
-    backgroundColor: "red", // Set the underline color
+    backgroundColor: ThemeColours.ThirdColour, // Set the underline color
     borderRadius: 18,
   },
   searchBar: {
@@ -154,8 +167,8 @@ const styles = StyleSheet.create({
     position: "absolute",
     backgroundColor: "#f1f1f1",
     borderRadius: 20,
-    borderColor: "black",
-    borderWidth: 1.5,
+    borderColor: ThemeColours.PrimaryColour,
+    borderWidth: 1.0,
   },
   input: {
     height: 36,

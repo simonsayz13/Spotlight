@@ -14,3 +14,13 @@ export enum ProfileStackScreens {
   Register = "register",
   Profile = "profile",
 }
+
+export enum MessagingStackScreens {
+  Contacts = "contacts",
+}
+
+export enum ThemeColours {
+  PrimaryColour = "#ef6e6e",
+  SecondaryColour = "#ffffff",
+  ThirdColour = "#feea00",
+}

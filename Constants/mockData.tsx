@@ -111,3 +111,78 @@ export const mockCommentData = [
     timeStamp: "5h",
   },
 ];
+
+export const mockContactsList = [
+  {
+    userId: "12412312",
+    userName: "Simon",
+    lastMessage: "Hello, how are you?",
+    lastMessageTimeStamp: "10 Sep",
+  },
+  {
+    userId: "12412313",
+    userName: "Alice",
+    lastMessage: "Hey, what’s up?",
+    lastMessageTimeStamp: "9 Sep",
+  },
+  {
+    userId: "12412314",
+    userName: "John",
+    lastMessage: "See you tomorrow!",
+    lastMessageTimeStamp: "8 Sep",
+  },
+  {
+    userId: "12412315",
+    userName: "Emily",
+    lastMessage: "I’m running late.",
+    lastMessageTimeStamp: "7 Sep",
+  },
+  {
+    userId: "12412316",
+    userName: "Michael",
+    lastMessage: "Let’s grab lunch.",
+    lastMessageTimeStamp: "6 Sep",
+  },
+  {
+    userId: "12412317",
+    userName: "Sarah",
+    lastMessage: "Can you send me the files?",
+    lastMessageTimeStamp: "5 Sep",
+  },
+  {
+    userId: "12412318",
+    userName: "David",
+    lastMessage: "I’ll call you later.",
+    lastMessageTimeStamp: "4 Sep",
+  },
+  {
+    userId: "12412319",
+    userName: "Sophia",
+    lastMessage: "Don’t forget the meeting!",
+    lastMessageTimeStamp: "3 Sep",
+  },
+  {
+    userId: "12412320",
+    userName: "James",
+    lastMessage: "It’s been a while!",
+    lastMessageTimeStamp: "2 Sep",
+  },
+  {
+    userId: "12412321",
+    userName: "Isabella",
+    lastMessage: "Happy Birthday!",
+    lastMessageTimeStamp: "1 Sep",
+  },
+  {
+    userId: "12412322",
+    userName: "Liam",
+    lastMessage: "Got your message, thanks.",
+    lastMessageTimeStamp: "31 Aug",
+  },
+  {
+    userId: "12412323",
+    userName: "Olivia",
+    lastMessage: "Let me know if you’re free.",
+    lastMessageTimeStamp: "30 Aug",
+  },
+];

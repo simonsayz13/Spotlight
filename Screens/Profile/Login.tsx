@@ -3,16 +3,30 @@ import { View, Text, StyleSheet, SafeAreaView, TextInput } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import AntDesign from "@expo/vector-icons/AntDesign";
-const Login = () => {
+import { ThemeColours } from "../../Constants/UI";
+const Login = ({ navigation }: any) => {
+  const backButton = () => {
+    navigation.goBack();
+  };
   return (
     <SafeAreaView style={styles.container}>
+      <View style={styles.backButtonContainer}>
+        <TouchableOpacity onPress={backButton}>
+          <AntDesign name="arrowleft" size={42} color="white" />
+        </TouchableOpacity>
+      </View>
+
       <View style={styles.titleContainer}>
-        <Text style={styles.loginTitle}>Login</Text>
-        <Text style={styles.loginDescription}>Please sign in to continue.</Text>
+        <Text style={styles.loginTitle}>Sign in</Text>
+        <Text style={styles.loginDescription}>Please login to continue.</Text>
       </View>
 
       <View style={styles.inputContainer}>
-        <MaterialIcons name="email" size={42} color="#ffffff" />
+        <MaterialIcons
+          name="email"
+          size={42}
+          color={ThemeColours.SecondaryColour}
+        />
         <TextInput
           style={styles.textInput}
           placeholder="Email"
@@ -21,7 +35,11 @@ const Login = () => {
       </View>
 
       <View style={styles.inputContainer}>
-        <MaterialIcons name="password" size={42} color="#ffffff" />
+        <MaterialIcons
+          name="password"
+          size={42}
+          color={ThemeColours.SecondaryColour}
+        />
         <TextInput
           style={styles.textInput}
           placeholder="Password"
@@ -34,7 +52,11 @@ const Login = () => {
       <View style={styles.loginButtonContainer}>
         <TouchableOpacity style={styles.loginButton}>
           <Text style={styles.loginButtonText}>Login</Text>
-          <AntDesign name="arrowright" size={30} color="#ffffff" />
+          <AntDesign
+            name="arrowright"
+            size={42}
+            color={ThemeColours.SecondaryColour}
+          />
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -43,41 +65,38 @@ const Login = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#ef6e6e",
-    justifyContent: "center",
-    // alignItems: "center",
-    // paddingHorizontal: 50,
+    backgroundColor: ThemeColours.PrimaryColour,
   },
+  backButtonContainer: { marginLeft: 14, marginBottom: "22%", marginTop: 10 },
   titleContainer: {
-    marginHorizontal: 16,
-    marginVertical: 10,
+    marginLeft: 16,
+    marginBottom: 10,
   },
   loginTitle: {
-    fontSize: 60,
+    fontSize: 52,
     fontWeight: "bold",
     marginBottom: 8,
-    color: "#ffffff",
+    color: ThemeColours.SecondaryColour,
   },
   loginDescription: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "bold",
     opacity: 0.7,
-    color: "#ffffff",
+    color: ThemeColours.SecondaryColour,
   },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginHorizontal: 40,
+    marginHorizontal: 30,
     height: 48,
     borderBottomWidth: 0.4,
-    borderBottomColor: "#ffffff",
-    // borderWidth: 2,
+    borderBottomColor: ThemeColours.SecondaryColour,
     marginTop: 12,
   },
   textInput: {
     flex: 1,
     paddingLeft: 6,
-    color: "#ffffff",
+    color: ThemeColours.SecondaryColour,
     fontSize: 18,
   },
   loginButtonContainer: {
@@ -91,6 +110,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 4,
   },
-  loginButtonText: { fontWeight: "bold", color: "#ffffff", fontSize: 18 },
+  loginButtonText: {
+    fontWeight: "bold",
+    color: ThemeColours.SecondaryColour,
+    fontSize: 20,
+  },
 });
+
 export default Login;

@@ -1,12 +1,13 @@
-import { Button, SafeAreaView, StyleSheet, Text, View } from "react-native";
-import HexagonIcon from "../../Components/Logo";
-import Logo from "../../Components/Logo";
+import { SafeAreaView, StyleSheet, Text, View } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import { ProfileStackScreens } from "../../Constants/UI";
+import { ProfileStackScreens, ThemeColours } from "../../Constants/UI";
 
 const ProfileScreen = ({ navigation }: any) => {
   const onClickLogin = () => {
     navigation.navigate(ProfileStackScreens.Login);
+  };
+  const onClickRegister = () => {
+    navigation.navigate(ProfileStackScreens.Register);
   };
   return (
     <SafeAreaView style={styles.container}>
@@ -19,7 +20,7 @@ const ProfileScreen = ({ navigation }: any) => {
         <TouchableOpacity style={styles.signInButton} onPress={onClickLogin}>
           <Text style={styles.buttonText}>Sign In</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.signInButton}>
+        <TouchableOpacity style={styles.signInButton} onPress={onClickRegister}>
           <Text style={styles.buttonText}>Sign Up</Text>
         </TouchableOpacity>
       </View>
@@ -30,7 +31,7 @@ const ProfileScreen = ({ navigation }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#ef6e6e",
+    backgroundColor: ThemeColours.PrimaryColour,
   },
   logoContainer: {
     height: "65%",
@@ -38,7 +39,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   textContainer: {
-    backgroundColor: "#fff", // Background color for the text container
+    backgroundColor: ThemeColours.SecondaryColour, // Background color for the text container
     paddingHorizontal: 16, // Padding around the text
     paddingVertical: 8, // Padding around the text
     borderRadius: 20, // Rounded corners
@@ -46,7 +47,7 @@ const styles = StyleSheet.create({
   logoText: {
     fontWeight: "bold",
     fontSize: 66,
-    color: "#ef6e6e", // Same color as background
+    color: ThemeColours.PrimaryColour, // Same color as background
     padding: 20,
   },
   bottomView: {
@@ -59,13 +60,13 @@ const styles = StyleSheet.create({
     height: 40,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#ffffff",
+    backgroundColor: ThemeColours.SecondaryColour,
     borderRadius: 30,
   },
   buttonText: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#ef6e6e",
+    color: ThemeColours.PrimaryColour,
   },
 });
 

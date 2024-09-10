@@ -6,9 +6,11 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { ShopScreen } from "../Screens/Shop/Shop";
 import { Camera } from "../Screens/Post/Camera";
-import { MessagesScreen } from "../Screens/Messages/Messages";
+import { Contacts } from "../Screens/Messages/Contacts";
 import ProfileStack from "./Stacks/ProfileStack";
 import { Platform } from "react-native";
+import { ThemeColours } from "../Constants/UI";
+import MessagingStackScreen from "./Stacks/MessagingStack";
 
 const Tab = createBottomTabNavigator();
 
@@ -18,14 +20,14 @@ const TabNavigation = () => {
       initialRouteName="Home"
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: "#feea00",
-        tabBarInactiveTintColor: "white",
+        tabBarActiveTintColor: ThemeColours.ThirdColour,
+        tabBarInactiveTintColor: ThemeColours.SecondaryColour,
         tabBarLabelStyle: {
           fontWeight: "bold",
-          backgroundColor: "#ef6e6e",
+          backgroundColor: ThemeColours.PrimaryColour,
         },
         tabBarStyle: {
-          backgroundColor: "#ef6e6e",
+          backgroundColor: ThemeColours.PrimaryColour,
           borderTopWidth: 0,
           ...Platform.select({
             ios: {
@@ -47,9 +49,13 @@ const TabNavigation = () => {
         options={{
           tabBarIcon: ({ focused }) => {
             return focused ? (
-              <Feather name="home" size={32} color="#feea00" />
+              <Feather name="home" size={32} color={ThemeColours.ThirdColour} />
             ) : (
-              <Feather name="home" size={32} color="#ffffff" />
+              <Feather
+                name="home"
+                size={32}
+                color={ThemeColours.SecondaryColour}
+              />
             );
           },
         }}
@@ -60,9 +66,13 @@ const TabNavigation = () => {
         options={{
           tabBarIcon: ({ focused }) => {
             return focused ? (
-              <Entypo name="shop" size={32} color="#feea00" />
+              <Entypo name="shop" size={32} color={ThemeColours.ThirdColour} />
             ) : (
-              <Entypo name="shop" size={32} color="#ffffff" />
+              <Entypo
+                name="shop"
+                size={32}
+                color={ThemeColours.SecondaryColour}
+              />
             );
           },
         }}
@@ -74,9 +84,17 @@ const TabNavigation = () => {
           // tabBarLabelStyle: { display: "none" },
           tabBarIcon: ({ focused }) => {
             return focused ? (
-              <FontAwesome name="plus-square-o" size={32} color="#feea00" />
+              <FontAwesome
+                name="plus-square-o"
+                size={32}
+                color={ThemeColours.ThirdColour}
+              />
             ) : (
-              <FontAwesome name="plus-square-o" size={32} color="#ffffff" />
+              <FontAwesome
+                name="plus-square-o"
+                size={32}
+                color={ThemeColours.SecondaryColour}
+              />
             );
           },
           tabBarStyle: { display: "none" },
@@ -84,13 +102,21 @@ const TabNavigation = () => {
       />
       <Tab.Screen
         name="Messages"
-        component={MessagesScreen}
+        component={MessagingStackScreen}
         options={{
           tabBarIcon: ({ focused }) => {
             return focused ? (
-              <Ionicons name="chatbubble-ellipses" size={32} color="#feea00" />
+              <Ionicons
+                name="chatbubble-ellipses"
+                size={32}
+                color={ThemeColours.ThirdColour}
+              />
             ) : (
-              <Ionicons name="chatbubble-ellipses" size={32} color="#ffffff" />
+              <Ionicons
+                name="chatbubble-ellipses"
+                size={32}
+                color={ThemeColours.SecondaryColour}
+              />
             );
           },
         }}
@@ -101,9 +127,17 @@ const TabNavigation = () => {
         options={{
           tabBarIcon: ({ focused }) => {
             return focused ? (
-              <Ionicons name="person-circle-sharp" size={32} color="#feea00" />
+              <Ionicons
+                name="person-circle-sharp"
+                size={32}
+                color={ThemeColours.ThirdColour}
+              />
             ) : (
-              <Ionicons name="person-circle-sharp" size={32} color="#ffffff" />
+              <Ionicons
+                name="person-circle-sharp"
+                size={32}
+                color={ThemeColours.SecondaryColour}
+              />
             );
           },
         }}

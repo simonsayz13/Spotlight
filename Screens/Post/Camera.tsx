@@ -13,6 +13,7 @@ import { CameraType } from "expo-camera/legacy";
 import { useRef, useState } from "react";
 import React from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { ThemeColours } from "../../Constants/UI";
 const Camera = ({ navigation }: any) => {
   const [facing, setFacing] = useState<CameraType>(CameraType.front);
   const [permission, requestPermission] = useCameraPermissions();
@@ -72,11 +73,15 @@ const Camera = ({ navigation }: any) => {
       >
         <View style={styles.topButtonsContainer}>
           <TouchableOpacity onPress={handleBackButton}>
-            <Ionicons name="arrow-back" size={38} color="black" />
+            <Ionicons name="arrow-back" size={38} color="#ef6e6e" />
           </TouchableOpacity>
           <View>
             <TouchableOpacity onPress={toggleCameraFacing}>
-              <Ionicons name="camera-reverse-outline" size={38} color="black" />
+              <Ionicons
+                name="camera-reverse-outline"
+                size={38}
+                color="#ef6e6e"
+              />
             </TouchableOpacity>
           </View>
         </View>
@@ -95,6 +100,7 @@ const Camera = ({ navigation }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: ThemeColours.PrimaryColour,
   },
   message: {
     textAlign: "center",
@@ -130,11 +136,12 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     justifyContent: "center",
     alignItems: "center",
+    borderColor: "#ef6e6e",
   },
   captureButton: {
     height: 60,
     width: 60,
-    backgroundColor: "black",
+    backgroundColor: "#ef6e6e",
     borderRadius: 100,
   },
 });

@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Dimensions,
 } from "react-native";
+import { ThemeColours } from "../Constants/UI";
 
 const { width } = Dimensions.get("window");
 
@@ -96,7 +97,7 @@ const styles = StyleSheet.create({
     left: 0,
     top: 0,
     bottom: 0,
-    backgroundColor: "#333",
+    backgroundColor: ThemeColours.PrimaryColour,
     zIndex: 2, // Ensure drawer is above main content
     paddingVertical: 20,
   },
