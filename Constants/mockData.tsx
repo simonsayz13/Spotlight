@@ -1,3 +1,5 @@
+import { useDerivedValue } from "react-native-reanimated";
+
 export const mockExploreData = [
   {
     id: 1,
@@ -184,5 +186,108 @@ export const mockContactsList = [
     userName: "Olivia",
     lastMessage: "Let me know if you’re free.",
     lastMessageTimeStamp: "30 Aug",
+  },
+];
+
+export const mockChatData = [
+  {
+    userId: "11",
+    message: "Hello",
+    messageTimeStamp: "10:00",
+  },
+  {
+    userId: "1337",
+    message: "Hey, how are you?",
+    messageTimeStamp: "10:01",
+  },
+  {
+    userId: "11",
+    message: "I'm good, thanks! How about you?",
+    messageTimeStamp: "10:02",
+  },
+  {
+    userId: "1337",
+    message: "Doing well, just a bit busy with work.",
+    messageTimeStamp: "10:03",
+  },
+  {
+    userId: "11",
+    message: "I understand. Anything interesting going on?",
+    messageTimeStamp: "10:04",
+  },
+  {
+    userId: "1337",
+    message: "Not much, just trying to meet deadlines. You?",
+    messageTimeStamp: "10:05",
+  },
+  {
+    userId: "11",
+    message: "Same here. Lots of tasks piling up.",
+    messageTimeStamp: "10:06",
+  },
+  {
+    userId: "1337",
+    message: "It’s that time of the year, I guess!",
+    messageTimeStamp: "10:07",
+  },
+  {
+    userId: "11",
+    message: "Yeah, always hectic towards the end.",
+    messageTimeStamp: "10:08",
+  },
+  {
+    userId: "1337",
+    message: "Exactly. What are you working on right now?",
+    messageTimeStamp: "10:09",
+  },
+  {
+    userId: "11",
+    message: "A new project in React Native, actually.",
+    messageTimeStamp: "10:10",
+  },
+  {
+    userId: "1337",
+    message: "Nice! I’ve heard good things about it.",
+    messageTimeStamp: "10:11",
+  },
+  {
+    userId: "11",
+    message: "It’s pretty cool, but there’s a lot to learn.",
+    messageTimeStamp: "10:12",
+  },
+  {
+    userId: "1337",
+    message: "I can imagine. Front-end frameworks are evolving fast.",
+    messageTimeStamp: "10:13",
+  },
+  {
+    userId: "11",
+    message: "Exactly, sometimes hard to keep up.",
+    messageTimeStamp: "10:14",
+  },
+  {
+    userId: "1337",
+    message: "Tell me about it! Any interesting challenges so far?",
+    messageTimeStamp: "10:15",
+  },
+  {
+    userId: "11",
+    message: "Yeah, customizing components can be tricky.",
+    messageTimeStamp: "10:16",
+  },
+  {
+    userId: "1337",
+    message: "That sounds challenging. But I’m sure you’ll figure it out!",
+    messageTimeStamp: "10:17",
+  },
+  {
+    userId: "11",
+    message: "Thanks! I’ll keep pushing through.",
+    messageTimeStamp: "10:18",
+  },
+  {
+    userId: "1337",
+    message: "That’s the spirit!",
+    messageTimeStamp: "10:19",
   },
 ];

@@ -1,9 +1,10 @@
 import React from "react";
-import { createStackNavigator } from "@react-navigation/stack";
 import { MessagingStackScreens } from "../../Constants/UI";
 import { Contacts } from "../../Screens/Messages/Contacts";
+import Chat from "../../Screens/Messages/Chat";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-const MessagingStack = createStackNavigator();
+const MessagingStack = createNativeStackNavigator();
 
 const MessagingStackScreen = () => (
   <MessagingStack.Navigator screenOptions={{ headerShown: false }}>
@@ -11,6 +12,7 @@ const MessagingStackScreen = () => (
       name={MessagingStackScreens.Contacts}
       component={Contacts}
     />
+    <MessagingStack.Screen name={MessagingStackScreens.Chat} component={Chat} />
   </MessagingStack.Navigator>
 );
 

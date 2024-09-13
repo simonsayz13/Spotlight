@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   View,
   StyleSheet,
@@ -13,29 +13,29 @@ import { useFocusEffect } from "@react-navigation/native";
 import { ThemeColours } from "../../Constants/UI";
 
 const Post = ({ navigation }: any) => {
-  useFocusEffect(
-    React.useCallback(() => {
-      navigation.getParent()?.setOptions({ tabBarStyle: { display: "none" } });
-      return () =>
-        navigation.getParent()?.setOptions({
-          tabBarStyle: {
-            backgroundColor: ThemeColours.PrimaryColour,
-            borderTopWidth: 0,
-            ...Platform.select({
-              ios: {
-                shadowColor: "#000", // Shadow color
-                shadowOffset: { width: 0, height: 1 }, // Offset for the shadow
-                shadowOpacity: 0.2, // Shadow opacity
-                shadowRadius: 4, // Radius of the shadow
-              },
-              android: {
-                elevation: 20, // Elevation for Android shadow
-              },
-            }),
-          },
-        });
-    }, [navigation])
-  );
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     navigation.getParent()?.setOptions({ tabBarStyle: { display: "none" } });
+  //     return () =>
+  //       navigation.getParent()?.setOptions({
+  //         tabBarStyle: {
+  //           backgroundColor: ThemeColours.PrimaryColour,
+  //           borderTopWidth: 0,
+  //           ...Platform.select({
+  //             ios: {
+  //               shadowColor: "#000", // Shadow color
+  //               shadowOffset: { width: 0, height: 1 }, // Offset for the shadow
+  //               shadowOpacity: 0.2, // Shadow opacity
+  //               shadowRadius: 4, // Radius of the shadow
+  //             },
+  //             android: {
+  //               elevation: 20, // Elevation for Android shadow
+  //             },
+  //           }),
+  //         },
+  //       });
+  //   }, [navigation])
+  // );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -56,6 +56,7 @@ const Post = ({ navigation }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: ThemeColours.PrimaryColour,
   },
   bottomView: {
     height: 60,

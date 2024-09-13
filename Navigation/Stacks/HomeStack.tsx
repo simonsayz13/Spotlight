@@ -1,10 +1,10 @@
 import React from "react";
-import { createStackNavigator } from "@react-navigation/stack";
 import Post from "../../Screens/Home/Post";
 import { HomeScreen } from "../../Screens/Home/Home";
 import { HomeStackScreens } from "../../Constants/UI";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-const HomeStack = createStackNavigator();
+const HomeStack = createNativeStackNavigator();
 
 const HomeStackScreen = () => (
   <HomeStack.Navigator screenOptions={{ headerShown: false }}>

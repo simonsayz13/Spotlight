@@ -1,19 +1,8 @@
 import React from "react";
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  ScrollView,
-  TextInput,
-  TouchableOpacity,
-} from "react-native";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-import Ionicons from "@expo/vector-icons/Ionicons";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import Octicons from "@expo/vector-icons/Octicons";
-import CommentSection from "./CommentSection";
+import { View, Text, Image, StyleSheet, ScrollView } from "react-native";
 import { mockCommentData } from "../Constants/mockData";
+import { ThemeColours } from "../Constants/UI";
+import CommentCard from "./CommentCard";
 
 const MainPost = () => {
   return (
@@ -45,39 +34,21 @@ const MainPost = () => {
 
       {/* Comment Count */}
       <View style={styles.commentCountContainer}>
-        <Text>{mockCommentData.length} Comments</Text>
+        <Text style={{ color: ThemeColours.SecondaryColour }}>
+          {mockCommentData.length} Comments
+        </Text>
       </View>
-
-      {/* Comment bar */}
-      {/* <View style={styles.commentContainer}>
-        <Ionicons name="person-circle-outline" size={44} color="black" />
-        <View style={styles.searchBar}>
-          <View style={styles.commentStyle}>
-            <FontAwesome name="pencil-square-o" size={20} color="black" />
-            <TextInput style={styles.input} placeholder="Comment..." />
-          </View>
-          <View style={styles.iconContainer}>
-            <TouchableOpacity>
-              <MaterialIcons name="alternate-email" size={22} color="black" />
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <Octicons name="smiley" size={20} color="black" />
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <FontAwesome name="image" size={20} color="black" />
-            </TouchableOpacity>
-          </View>
-        </View>
-      </View> */}
 
       {/* Comment Section */}
-      {/* <View> */}
-      <CommentSection commentData={mockCommentData} />
-      <View style={{ alignItems: "center", paddingTop: 15, paddingBottom: 40 }}>
-        <Text>- The end -</Text>
+      <View>
+        {mockCommentData.map((comment: any) => (
+          <CommentCard key={comment.id} commentData={comment} />
+        ))}
       </View>
 
-      {/* </View> */}
+      <View style={{ alignItems: "center", paddingTop: 15, paddingBottom: 40 }}>
+        <Text style={{ color: ThemeColours.SecondaryColour }}>- The end -</Text>
+      </View>
     </ScrollView>
   );
 };
@@ -100,6 +71,7 @@ const styles = StyleSheet.create({
   postTitleText: {
     fontSize: 20,
     fontWeight: "bold",
+    color: ThemeColours.SecondaryColour,
   },
   postDescriptionContainer: {
     marginHorizontal: 8,
@@ -107,6 +79,7 @@ const styles = StyleSheet.create({
   postDescriptionText: {
     fontSize: 16,
     fontWeight: "500",
+    color: ThemeColours.SecondaryColour,
   },
   userMetaDataContainer: {
     marginVertical: 6,
@@ -115,6 +88,7 @@ const styles = StyleSheet.create({
   userMetaDataText: {
     fontSize: 11,
     opacity: 0.6,
+    color: ThemeColours.SecondaryColour,
   },
   postContentContainer: {
     borderBottomWidth: 1,

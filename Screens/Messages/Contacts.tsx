@@ -7,10 +7,14 @@ import {
   TouchableOpacity,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { ThemeColours } from "../../Constants/UI";
+import { MessagingStackScreens, ThemeColours } from "../../Constants/UI";
 import { mockContactsList } from "../../Constants/mockData";
 import { ScrollView } from "react-native-gesture-handler";
-const Contacts = () => {
+const Contacts = ({ navigation }: any) => {
+  const goToChat = (userId: string, userName: string) => {
+    navigation.navigate(MessagingStackScreens.Chat, { userId, userName });
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.searchBar}>
@@ -24,7 +28,12 @@ const Contacts = () => {
       <ScrollView style={styles.scrollViewContainer}>
         {mockContactsList.map((contact) => {
           return (
-            <TouchableOpacity key={`key_${contact.userId}`}>
+            <TouchableOpacity
+              key={`key_${contact.userId}`}
+              onPress={() => {
+                goToChat(contact.userId, contact.userName);
+              }}
+            >
               <View style={styles.messageCardContainer}>
                 <Ionicons
                   name="person-circle-outline"

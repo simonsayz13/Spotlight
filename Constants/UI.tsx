@@ -17,6 +17,7 @@ export enum ProfileStackScreens {
 
 export enum MessagingStackScreens {
   Contacts = "contacts",
+  Chat = "chat",
 }
 
 export enum ThemeColours {

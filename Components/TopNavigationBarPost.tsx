@@ -3,6 +3,7 @@ import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
+import { ThemeColours } from "../Constants/UI";
 const TopNavigationBarPost = ({ navigation }: any) => {
   return (
     <View style={styles.container}>
@@ -12,20 +13,36 @@ const TopNavigationBarPost = ({ navigation }: any) => {
             navigation.goBack();
           }}
         >
-          <Ionicons name="chevron-back" size={32} color="black" />
+          <Ionicons
+            name="chevron-back"
+            size={32}
+            color={ThemeColours.SecondaryColour}
+          />
         </TouchableOpacity>
         <View style={styles.userWrapper}>
-          <Ionicons name="person-circle-outline" size={32} color="black" />
-          <Text>User</Text>
+          <Ionicons
+            name="person-circle-outline"
+            size={34}
+            color={ThemeColours.SecondaryColour}
+          />
+          <Text style={{ color: ThemeColours.SecondaryColour }}>User</Text>
         </View>
       </View>
       <View style={styles.followShareWrapper}>
         <TouchableOpacity>
-          <SimpleLineIcons name="user-follow" size={28} color="black" />
+          <SimpleLineIcons
+            name="user-follow"
+            size={28}
+            color={ThemeColours.SecondaryColour}
+          />
         </TouchableOpacity>
 
         <TouchableOpacity>
-          <FontAwesome name="share-square-o" size={28} color="black" />
+          <FontAwesome
+            name="share-square-o"
+            size={28}
+            color={ThemeColours.SecondaryColour}
+          />
         </TouchableOpacity>
       </View>
     </View>
@@ -34,15 +51,11 @@ const TopNavigationBarPost = ({ navigation }: any) => {
 
 const styles = StyleSheet.create({
   container: {
-    top: 0,
-    left: 0,
-    right: 0,
     padding: 8,
     alignItems: "center",
     flexDirection: "row",
     justifyContent: "space-between",
-    borderBottomWidth: 1,
-    borderBottomColor: "#D3D3D3",
+    backgroundColor: ThemeColours.PrimaryColour,
   },
   leftWrapper: {
     flexDirection: "row", // Align children in a row
