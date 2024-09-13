@@ -4,7 +4,7 @@ import Feather from "@expo/vector-icons/Feather";
 import Entypo from "@expo/vector-icons/Entypo";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { ShopScreen } from "../Screens/Shop/Shop";
+import { Map } from "../Screens/Map/Map";
 import { Camera } from "../Screens/Post/Camera";
 import ProfileStack from "./Stacks/ProfileStack";
 import { Platform } from "react-native";
@@ -61,15 +61,15 @@ const TabNavigation = () => {
         }}
       />
       <Tab.Screen
-        name="Shop"
-        component={ShopScreen}
+        name="Map"
+        component={Map}
         options={{
           tabBarIcon: ({ focused }) => {
             return focused ? (
-              <Entypo name="shop" size={32} color={ThemeColours.ThirdColour} />
+              <Entypo name="map" size={32} color={ThemeColours.ThirdColour} />
             ) : (
               <Entypo
-                name="shop"
+                name="map"
                 size={32}
                 color={ThemeColours.SecondaryColour}
               />
