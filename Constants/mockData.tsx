@@ -291,3 +291,31 @@ export const mockChatData = [
     messageTimeStamp: "10:19",
   },
 ];
+
+export const mockUserBio =
+  "🌟 Explorer of life’s quirky corners | Coffee enthusiast ☕ | Coding wizard 💻 | Spreading good vibes and occasional memes 😄 | Always ready for an adventure 🚀 | Let’s connect and make the world a bit brighter 🌈";
+
+export const mockUserPostsData = [
+  {
+    id: 1,
+    title: "好想婆宝宝怎么办啊啊啊?",
+    user: "大狗",
+    likes: 520,
+    image: "",
+  },
+
+  {
+    id: 10,
+    title: "刚刚试了一下新开的健身房",
+    user: "小赵",
+    likes: 322,
+    image: "", // Add URL if needed
+  },
+  {
+    id: 2,
+    title: "今天天气真好啊，适合出去玩！",
+    user: "小猫",
+    likes: 310,
+    image: "",
+  },
+];

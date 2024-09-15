@@ -1,28 +1,107 @@
-import { SafeAreaView, StyleSheet, Text, View } from "react-native";
-import { TouchableOpacity } from "react-native-gesture-handler";
-import { ProfileStackScreens, ThemeColours } from "../../Constants/UI";
+import React, { useState } from "react";
+import { View, Text, StyleSheet } from "react-native";
+import { useSelector } from "react-redux";
+import { RootState } from "../../Redux/store";
+import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  ProfileStackScreens,
+  ThemeColours,
+  userContentSelectorButtons,
+} from "../../Constants/UI";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { mockUserBio, mockUserPostsData } from "../../Constants/mockData";
+import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
+import { logOut } from "../../Firebase/firebaseAuth";
+import PostCard from "../../Components/PostCard";
 
-const ProfileScreen = ({ navigation }: any) => {
-  const onClickLogin = () => {
-    navigation.navigate(ProfileStackScreens.Login);
-  };
-  const onClickRegister = () => {
-    navigation.navigate(ProfileStackScreens.Register);
+const Profile = ({ navigation }: any) => {
+  const [buttonStates, setButtonStates] = useState(userContentSelectorButtons);
+  const { userId, userDisplayName, userProfilePhotoURL } = useSelector(
+    (state: RootState) => state.user
+  );
+  const handlePress = (id: number) => {
+    setButtonStates((prevStates) =>
+      prevStates.map((button) =>
+        button.id === id
+          ? button.clicked
+            ? button
+            : { ...button, clicked: true }
+          : { ...button, clicked: false }
+      )
+    );
+    const clickedScreen = buttonStates.find((item) => id == item.id)?.label;
   };
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.logoContainer}>
-        <View style={styles.textContainer}>
-          <Text style={styles.logoText}>Linkify</Text>
-        </View>
+      <View style={styles.profileDetails}>
+        <Ionicons
+          name="person-circle-outline"
+          size={88}
+          color={ThemeColours.SecondaryColour}
+        />
+        <Text style={styles.userNameFont}>{userDisplayName}</Text>
+        <Text style={styles.metaDataFont}>ID: {userId}</Text>
+        <Text style={styles.metaDataFont}>IP Address: United Kingdom</Text>
       </View>
-      <View style={styles.bottomView}>
-        <TouchableOpacity style={styles.signInButton} onPress={onClickLogin}>
-          <Text style={styles.buttonText}>Sign In</Text>
+      <View style={styles.description}>
+        <Text style={styles.descriptionTitle}>Bio</Text>
+        <Text style={styles.descriptionText}>{mockUserBio}</Text>
+      </View>
+      <View style={styles.userStatsContainer}>
+        <View style={styles.statsView}>
+          <Text style={styles.statsCount}>4</Text>
+          <Text style={styles.statsFont}>Following</Text>
+        </View>
+        <View style={styles.statsView}>
+          <Text style={styles.statsCount}>5</Text>
+          <Text style={styles.statsFont}>Followers</Text>
+        </View>
+        <View style={styles.statsView}>
+          <Text style={styles.statsCount}>666</Text>
+          <Text style={styles.statsFont}>Likes & Favs</Text>
+        </View>
+        <TouchableOpacity
+          style={styles.signOutButton}
+          onPress={() => {
+            logOut();
+            navigation.replace(ProfileStackScreens.LoginSignUp);
+          }}
+        >
+          <Text style={styles.buttonText}>Sign out</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.signInButton} onPress={onClickRegister}>
-          <Text style={styles.buttonText}>Sign Up</Text>
-        </TouchableOpacity>
+      </View>
+      {/* Posts */}
+      <View style={styles.userContentContainer}>
+        <View style={styles.contentContainerSelectorBar}>
+          {buttonStates.map((button: any) => (
+            <TouchableOpacity
+              key={button.id}
+              onPress={() => handlePress(button.id)}
+            >
+              {button.clicked ? (
+                <View style={styles.textWrapper}>
+                  <Text style={styles.menuButtonClicked}>{button.label}</Text>
+                  <View style={styles.customUnderline} />
+                </View>
+              ) : (
+                <Text style={styles.menuButton}>{button.label}</Text>
+              )}
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        <ScrollView contentContainerStyle={styles.scrollView}>
+          {mockUserPostsData.map((data) => {
+            return (
+              <PostCard
+                key={data.id}
+                title={data.title}
+                user={data.user}
+                likes={data.likes}
+              />
+            );
+          })}
+        </ScrollView>
       </View>
     </SafeAreaView>
   );
@@ -33,41 +112,115 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: ThemeColours.PrimaryColour,
   },
-  logoContainer: {
-    height: "65%",
-    justifyContent: "center",
+  profileDetails: {
     alignItems: "center",
+    marginBottom: 10,
+    marginHorizontal: 8,
   },
-  textContainer: {
-    backgroundColor: ThemeColours.SecondaryColour, // Background color for the text container
-    paddingHorizontal: 16, // Padding around the text
-    paddingVertical: 8, // Padding around the text
-    borderRadius: 20, // Rounded corners
-  },
-  logoText: {
+  userNameFont: {
+    color: ThemeColours.SecondaryColour,
     fontWeight: "bold",
-    fontSize: 66,
-    color: ThemeColours.PrimaryColour, // Same color as background
-    padding: 20,
+    fontSize: 22,
   },
-  bottomView: {
-    flex: 1,
-    alignItems: "center",
-    gap: 20,
+  metaDataFont: {
+    fontSize: 10,
+    color: ThemeColours.SecondaryColour,
+    opacity: 0.6,
   },
-  signInButton: {
-    width: 240,
-    height: 40,
-    justifyContent: "center",
+  description: {
+    marginHorizontal: 8,
+    gap: 6,
+    marginBottom: 12,
+  },
+  descriptionTitle: {
+    color: ThemeColours.SecondaryColour,
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  descriptionText: {
+    color: ThemeColours.SecondaryColour,
+  },
+  userStatsContainer: {
+    flexDirection: "row",
+    marginHorizontal: 8,
     alignItems: "center",
+    justifyContent: "space-between",
+  },
+  statsView: {
+    alignItems: "center",
+  },
+  statsCount: {
+    color: ThemeColours.SecondaryColour,
+    fontWeight: "bold",
+  },
+  statsFont: {
+    color: ThemeColours.SecondaryColour,
+  },
+  signOutButton: {
+    padding: 8,
     backgroundColor: ThemeColours.SecondaryColour,
-    borderRadius: 30,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
   },
   buttonText: {
     fontSize: 16,
     fontWeight: "bold",
     color: ThemeColours.PrimaryColour,
   },
+  userContentContainer: {
+    flex: 1,
+    marginTop: 12,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    elevation: 5, // For Android shadow
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    marginHorizontal: 4,
+    backgroundColor: ThemeColours.PrimaryColour,
+  },
+  contentContainerSelectorBar: {
+    height: "10%",
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    marginBottom: 4,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 12,
+  },
+  scrollView: {
+    flexGrow: 1,
+    flexWrap: "wrap",
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: 2,
+    gap: 4,
+  },
+  menuButton: {
+    fontSize: 16,
+    fontWeight: "normal",
+    color: ThemeColours.SecondaryColour,
+  },
+  menuButtonClicked: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: ThemeColours.SecondaryColour,
+  },
+  textWrapper: {
+    position: "relative",
+    alignItems: "center",
+  },
+  customUnderline: {
+    position: "absolute",
+    bottom: -4, // Adjust this value to control the gap between the text and underline
+    height: 3,
+    width: "70%",
+    backgroundColor: ThemeColours.ThirdColour, // Set the underline color
+    borderRadius: 18,
+  },
 });
 
-export { ProfileScreen };
+export default Profile;

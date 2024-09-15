@@ -1,24 +1,42 @@
 import React from "react";
 import { ProfileStackScreens } from "../../Constants/UI";
-import { ProfileScreen } from "../../Screens/Profile/Profile";
+import { LoginSignUpScreen } from "../../Screens/Profile/LoginSignUp";
 import Login from "../../Screens/Profile/Login";
 import Register from "../../Screens/Profile/Register";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import Profile from "../../Screens/Profile/Profile";
+import { useSelector } from "react-redux";
+import { RootState } from "../../Redux/store";
 
 const ProfileStack = createNativeStackNavigator();
 
-const ProfileStackScreen = () => (
-  <ProfileStack.Navigator screenOptions={{ headerShown: false }}>
-    <ProfileStack.Screen
-      name={ProfileStackScreens.Profile}
-      component={ProfileScreen}
-    />
-    <ProfileStack.Screen name={ProfileStackScreens.Login} component={Login} />
-    <ProfileStack.Screen
-      name={ProfileStackScreens.Register}
-      component={Register}
-    />
-  </ProfileStack.Navigator>
-);
+const ProfileStackScreen = () => {
+  const userId = useSelector((state: RootState) => state.user.userId);
+  console.log(userId);
+  const initialRouteName = userId
+    ? ProfileStackScreens.Profile
+    : ProfileStackScreens.LoginSignUp;
+
+  return (
+    <ProfileStack.Navigator
+      initialRouteName={initialRouteName}
+      screenOptions={{ headerShown: false }}
+    >
+      <ProfileStack.Screen
+        name={ProfileStackScreens.LoginSignUp}
+        component={LoginSignUpScreen}
+      />
+      <ProfileStack.Screen name={ProfileStackScreens.Login} component={Login} />
+      <ProfileStack.Screen
+        name={ProfileStackScreens.Register}
+        component={Register}
+      />
+      <ProfileStack.Screen
+        name={ProfileStackScreens.Profile}
+        component={Profile}
+      />
+    </ProfileStack.Navigator>
+  );
+};
 
 export default ProfileStackScreen;

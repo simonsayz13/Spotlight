@@ -1,10 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, StyleSheet, SafeAreaView, TextInput } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { ThemeColours } from "../../Constants/UI";
+import { ProfileStackScreens, ThemeColours } from "../../Constants/UI";
+import { signUpWithEmail } from "../../Firebase/firebaseAuth";
 const Register = ({ navigation }: any) => {
+  const [email, setEmail] = useState<string>("");
+  const [username, setUsername] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+
   const backButton = () => {
     navigation.goBack();
   };
@@ -32,6 +37,7 @@ const Register = ({ navigation }: any) => {
           style={styles.textInput}
           placeholder="Email"
           placeholderTextColor="#d3d3d3"
+          onChangeText={(text: string) => setEmail(text)}
         />
       </View>
 
@@ -41,6 +47,7 @@ const Register = ({ navigation }: any) => {
           style={styles.textInput}
           placeholder="Username"
           placeholderTextColor="#d3d3d3"
+          onChangeText={(text: string) => setUsername(text)}
         />
       </View>
 
@@ -56,11 +63,18 @@ const Register = ({ navigation }: any) => {
           placeholderTextColor="#d3d3d3"
           secureTextEntry={true}
           returnKeyType="done"
+          onChangeText={(text: string) => setPassword(text)}
         />
       </View>
 
       <View style={styles.registrationButtonContainer}>
-        <TouchableOpacity style={styles.registrationButton}>
+        <TouchableOpacity
+          style={styles.registrationButton}
+          onPress={() => {
+            signUpWithEmail(email, username, password);
+            navigation.replace(ProfileStackScreens.Profile);
+          }}
+        >
           <Text style={styles.registrationButtonText}>Register</Text>
           <AntDesign
             name="arrowright"
