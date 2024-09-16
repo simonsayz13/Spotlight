@@ -1,15 +1,16 @@
-import App from "./FirebaseApp";
+import app from "./FirebaseApp";
 import {
-  getAuth,
   createUserWithEmailAndPassword,
   updateProfile,
   signInWithEmailAndPassword,
   signOut,
+  getAuth,
 } from "firebase/auth";
-import { clearUser, setUser } from "../Redux/Slices/userSlice";
+import { clearUser, setLoadingLogin, setUser } from "../Redux/Slices/userSlice";
 import store from "../Redux/store";
+import { LoginStatus } from "../Constants/UI";
 
-const auth = getAuth(App);
+const auth = getAuth(app);
 
 export const signUpWithEmail = async (
   email: string,
@@ -17,41 +18,61 @@ export const signUpWithEmail = async (
   password: string
 ) => {
   try {
-    await createUserWithEmailAndPassword(auth, email, password)
+    store.dispatch(setLoadingLogin({ loginStatus: LoginStatus.Loading }));
+    return await createUserWithEmailAndPassword(auth, email, password)
       .then(async (userCredential) => {
-        await updateProfile(auth.currentUser!, { displayName: username }).then(
-          () => {
-            const userData = {
-              userId: auth.currentUser?.uid,
-              displayName: auth.currentUser?.displayName,
-              profileURL: auth.currentUser?.photoURL,
-            };
-            store.dispatch(setUser(userData));
-          }
-        );
+        return await updateProfile(auth.currentUser!, {
+          displayName: username,
+        }).then(() => {
+          const userData = {
+            userId: auth.currentUser?.uid,
+            displayName: auth.currentUser?.displayName,
+            profileURL: auth.currentUser?.photoURL,
+          };
+          store.dispatch(setUser(userData));
+          store.dispatch(setLoadingLogin({ loginStatus: LoginStatus.Success }));
+          return { success: true, errorMessage: null };
+        });
       })
       .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.log(`Error ${errorCode}: ${errorMessage}`);
-        // ..
+        store.dispatch(setLoadingLogin({ loginStatus: LoginStatus.Failed }));
+        return {
+          success: false,
+          errorMessage: error.code,
+        };
       });
-  } catch (error) {
-    console.log(`signUpWithEmail Error: ${error}`);
+  } catch (error: any) {
+    return {
+      success: false,
+      errorMessage: "Error attempting to sign up",
+    };
   }
 };
 
 export const signInWithEmail = async (email: string, password: string) => {
-  signInWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      // Signed up
-      const user = userCredential.user;
-    })
-    .catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      console.log(`Error ${errorCode}: ${errorMessage}`);
-    });
+  try {
+    store.dispatch(setLoadingLogin({ loginStatus: LoginStatus.Loading }));
+    return await signInWithEmailAndPassword(auth, email, password)
+      .then(() => {
+        const userData = {
+          userId: auth.currentUser?.uid,
+          displayName: auth.currentUser?.displayName,
+          profileURL: auth.currentUser?.photoURL,
+        };
+        store.dispatch(setUser(userData));
+        store.dispatch(setLoadingLogin({ loginStatus: LoginStatus.Success }));
+        return { success: true, errorMessage: null };
+      })
+      .catch((error) => {
+        store.dispatch(setLoadingLogin({ loginStatus: LoginStatus.Failed }));
+        return {
+          success: false,
+          errorMessage: error.code,
+        };
+      });
+  } catch (error) {
+    return { success: false, errorMessage: error };
+  }
 };
 
 export const logOut = async () => {

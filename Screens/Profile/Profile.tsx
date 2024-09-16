@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { useSelector } from "react-redux";
 import { RootState } from "../../Redux/store";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -10,13 +10,13 @@ import {
 } from "../../Constants/UI";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { mockUserBio, mockUserPostsData } from "../../Constants/mockData";
-import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
+import { ScrollView } from "react-native-gesture-handler";
 import { logOut } from "../../Firebase/firebaseAuth";
 import PostCard from "../../Components/PostCard";
 
 const Profile = ({ navigation }: any) => {
   const [buttonStates, setButtonStates] = useState(userContentSelectorButtons);
-  const { userId, userDisplayName, userProfilePhotoURL } = useSelector(
+  const { userId, userDisplayName } = useSelector(
     (state: RootState) => state.user
   );
   const handlePress = (id: number) => {

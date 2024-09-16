@@ -12,7 +12,6 @@ const ProfileStack = createNativeStackNavigator();
 
 const ProfileStackScreen = () => {
   const userId = useSelector((state: RootState) => state.user.userId);
-  console.log(userId);
   const initialRouteName = userId
     ? ProfileStackScreens.Profile
     : ProfileStackScreens.LoginSignUp;
@@ -34,6 +33,7 @@ const ProfileStackScreen = () => {
       <ProfileStack.Screen
         name={ProfileStackScreens.Profile}
         component={Profile}
+        options={{ gestureEnabled: false }}
       />
     </ProfileStack.Navigator>
   );

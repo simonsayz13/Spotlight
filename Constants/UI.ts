@@ -32,3 +32,9 @@ export enum ThemeColours {
   SecondaryColour = "#ffffff",
   ThirdColour = "#feea00",
 }
+
+export enum LoginStatus {
+  Success = "success",
+  Loading = "loading",
+  Failed = "failed",
+}

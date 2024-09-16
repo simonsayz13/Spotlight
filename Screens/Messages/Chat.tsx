@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -7,12 +7,11 @@ import {
   TextInput,
   SafeAreaView,
   KeyboardAvoidingView,
-  Platform,
   Keyboard,
+  TouchableOpacity,
 } from "react-native";
 import { ThemeColours } from "../../Constants/UI";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { TouchableOpacity } from "react-native-gesture-handler";
 import { mockChatData } from "../../Constants/mockData";
 const Chat = ({ route, navigation }: any) => {
   const { userId, userName } = route.params;

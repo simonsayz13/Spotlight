@@ -12,12 +12,12 @@ import {
   Modal,
   Animated,
   PanResponder,
+  TouchableOpacity,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MapView, { Marker } from "react-native-maps";
 import Geolocation from "@react-native-community/geolocation";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
-import { TouchableOpacity } from "react-native-gesture-handler";
 import { ThemeColours } from "../../Constants/UI";
 const Map = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);

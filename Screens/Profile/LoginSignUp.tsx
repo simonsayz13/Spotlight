@@ -1,5 +1,10 @@
-import { SafeAreaView, StyleSheet, Text, View } from "react-native";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import {
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+} from "react-native";
 import { ProfileStackScreens, ThemeColours } from "../../Constants/UI";
 
 const LoginSignUpScreen = ({ navigation }: any) => {

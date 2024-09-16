@@ -6,6 +6,7 @@ export const userSlice = createSlice({
     userId: null,
     userDisplayName: null,
     userProfilePhotoURL: null,
+    loginStatus: null,
   },
   reducers: {
     setUser: (state, action) => {
@@ -18,11 +19,16 @@ export const userSlice = createSlice({
       state.userId = null;
       state.userDisplayName = null;
       state.userProfilePhotoURL = null;
+      state.loginStatus = null;
+    },
+    setLoadingLogin: (state, action) => {
+      const { loginStatus } = action.payload;
+      state.loginStatus = loginStatus;
     },
   },
 });
 
 // Action creators are generated for each case reducer function
-export const { setUser, clearUser } = userSlice.actions;
+export const { setUser, clearUser, setLoadingLogin } = userSlice.actions;
 
 export default userSlice.reducer;

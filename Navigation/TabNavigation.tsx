@@ -46,6 +46,14 @@ const TabNavigation = () => {
       <Tab.Screen
         name="Home"
         component={HomeStack}
+        listeners={({ navigation }) => ({
+          tabPress: (e) => {
+            // Prevent default action if tab is already focused
+            if (navigation.isFocused()) {
+              e.preventDefault();
+            }
+          },
+        })}
         options={{
           tabBarIcon: ({ focused }) => {
             return focused ? (
@@ -63,6 +71,14 @@ const TabNavigation = () => {
       <Tab.Screen
         name="Map"
         component={Map}
+        listeners={({ navigation }) => ({
+          tabPress: (e) => {
+            // Prevent default action if tab is already focused
+            if (navigation.isFocused()) {
+              e.preventDefault();
+            }
+          },
+        })}
         options={{
           tabBarIcon: ({ focused }) => {
             return focused ? (
@@ -80,6 +96,14 @@ const TabNavigation = () => {
       <Tab.Screen
         name="Post"
         component={Camera}
+        listeners={({ navigation }) => ({
+          tabPress: (e) => {
+            // Prevent default action if tab is already focused
+            if (navigation.isFocused()) {
+              e.preventDefault();
+            }
+          },
+        })}
         options={{
           // tabBarLabelStyle: { display: "none" },
           tabBarIcon: ({ focused }) => {
@@ -103,6 +127,14 @@ const TabNavigation = () => {
       <Tab.Screen
         name="Messages"
         component={MessagingStackScreen}
+        listeners={({ navigation }) => ({
+          tabPress: (e) => {
+            // Prevent default action if tab is already focused
+            if (navigation.isFocused()) {
+              e.preventDefault();
+            }
+          },
+        })}
         options={{
           tabBarIcon: ({ focused }) => {
             return focused ? (
@@ -124,6 +156,14 @@ const TabNavigation = () => {
       <Tab.Screen
         name="Me"
         component={ProfileStack}
+        listeners={({ navigation }) => ({
+          tabPress: (e) => {
+            // Prevent default action if tab is already focused
+            if (navigation.isFocused()) {
+              e.preventDefault();
+            }
+          },
+        })}
         options={{
           tabBarIcon: ({ focused }) => {
             return focused ? (
