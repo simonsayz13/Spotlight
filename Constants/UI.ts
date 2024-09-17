@@ -29,7 +29,7 @@ export enum MessagingStackScreens {
 }
 
 export enum ThemeColours {
-  PrimaryColour = "#ef6e6e",
+  PrimaryColour = "#ec5050",
   SecondaryColour = "#ffffff",
   ThirdColour = "#feea00",
 }
@@ -38,4 +38,19 @@ export enum LoginStatus {
   Success = "success",
   Loading = "loading",
   Failed = "failed",
+}
+
+export enum EditProfileType {
+  Name = "Name",
+  Bio = "Bio",
+  Gender = "Gender",
+  Age = "Age",
+  Education = "Education",
+  Location = "Location",
+}
+
+export enum Gender {
+  Male = "Male",
+  Female = "Female",
+  Other = "Other",
 }

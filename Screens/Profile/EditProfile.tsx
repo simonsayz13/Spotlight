@@ -13,23 +13,25 @@ import {
   KeyboardAvoidingView,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { ThemeColours } from "../../Constants/UI";
+import { EditProfileType, Gender, ThemeColours } from "../../Constants/UI";
 import { useSelector } from "react-redux";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { RootState } from "../../Redux/store";
 import { mockUserBio } from "../../Constants/mockData";
 import { TextInput } from "react-native-gesture-handler";
+
 const EditProfile = ({ navigation }: any) => {
   const { userDisplayName } = useSelector((state: RootState) => state.user);
-  const slideAnim = useRef(new Animated.Value(300)).current;
+  const slideAnim = useRef(new Animated.Value(400)).current;
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editType, setEditType] = useState<string>("");
-  console.log(isModalVisible);
+  const [selectedGender, setSelectedGender] = useState<Gender>(Gender.Male);
   const handleEditPress = (editType: string) => {
     setEditType(editType);
     setIsModalVisible(true);
     showModal();
   };
+
   const goBack = () => {
     navigation.goBack();
   };
@@ -43,7 +45,7 @@ const EditProfile = ({ navigation }: any) => {
 
   const hideModal = () => {
     Animated.spring(slideAnim, {
-      toValue: 300, // Offscreen position
+      toValue: 400, // Offscreen position
       useNativeDriver: true,
     }).start(() => {
       setIsModalVisible(false); // Hide modal after animation
@@ -73,22 +75,140 @@ const EditProfile = ({ navigation }: any) => {
     })
   ).current;
 
-  const modalBodyDom = (type: string) => {
-    if (type === "displayName")
+  const modalBodyDom = (type: EditProfileType) => {
+    if (type === EditProfileType.Name) {
       return (
         <View style={{ alignItems: "center" }}>
           <View style={styles.textInputContainer}>
             <TextInput
-              style={styles.textInput}
+              style={styles.nameTextInput}
               placeholder={userDisplayName!}
             />
+          </View>
+          <TouchableOpacity style={styles.saveButton} onPress={hideModal}>
+            <Text style={styles.saveButtonText}>Save</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    } else if (type === EditProfileType.Bio) {
+      return (
+        <View style={{ alignItems: "center" }}>
+          <View style={styles.bioTextInputContainer}>
+            <TextInput style={styles.nameTextInput} multiline={true}>
+              {mockUserBio}
+            </TextInput>
           </View>
           <TouchableOpacity style={styles.saveButton}>
             <Text style={styles.saveButtonText}>Save</Text>
           </TouchableOpacity>
         </View>
       );
-
+    } else if (type === EditProfileType.Gender) {
+      return (
+        <View style={{ alignItems: "center" }}>
+          <View
+            style={{
+              alignSelf: "flex-start",
+              paddingLeft: 30,
+              marginBottom: 10,
+            }}
+          >
+            <Text style={{ color: ThemeColours.SecondaryColour }}>
+              Choose Gender
+            </Text>
+          </View>
+          <View style={styles.optionPickerContainer}>
+            <TouchableOpacity
+              style={styles.optionPicker}
+              activeOpacity={1}
+              onPress={() => setSelectedGender(Gender.Male)}
+            >
+              <Text style={styles.optionText}>Male</Text>
+              {selectedGender === Gender.Male && (
+                <AntDesign
+                  name="check"
+                  size={24}
+                  color={ThemeColours.PrimaryColour}
+                />
+              )}
+            </TouchableOpacity>
+            <View style={styles.divider} />
+            <TouchableOpacity
+              style={styles.optionPicker}
+              activeOpacity={1}
+              onPress={() => setSelectedGender(Gender.Female)}
+            >
+              <Text style={styles.optionText}>Female</Text>
+              {selectedGender === Gender.Female && (
+                <AntDesign
+                  name="check"
+                  size={26}
+                  color={ThemeColours.PrimaryColour}
+                />
+              )}
+            </TouchableOpacity>
+            <View style={styles.divider} />
+            <TouchableOpacity
+              style={styles.optionPicker}
+              activeOpacity={1}
+              onPress={() => setSelectedGender(Gender.Other)}
+            >
+              <Text style={styles.optionText}>Other</Text>
+              {selectedGender === Gender.Other && (
+                <AntDesign
+                  name="check"
+                  size={26}
+                  color={ThemeColours.PrimaryColour}
+                />
+              )}
+            </TouchableOpacity>
+          </View>
+          <TouchableOpacity style={styles.saveButton}>
+            <Text style={styles.saveButtonText}>Save</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    } else if (type === EditProfileType.Age) {
+      return (
+        <View style={{ alignItems: "center" }}>
+          <View style={styles.ageInputContainer}>
+            <TextInput
+              style={styles.ageTextInput}
+              placeholder="29"
+              keyboardType="numeric"
+            />
+          </View>
+          <TouchableOpacity style={styles.saveButton} onPress={hideModal}>
+            <Text style={styles.saveButtonText}>Save</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    } else if (type === EditProfileType.Location) {
+      return (
+        <View style={{ alignItems: "center" }}>
+          <View style={styles.textInputContainer}>
+            <TextInput style={styles.nameTextInput} placeholder="Liverpool" />
+          </View>
+          <TouchableOpacity style={styles.saveButton} onPress={hideModal}>
+            <Text style={styles.saveButtonText}>Save</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    } else if (type === EditProfileType.Education) {
+      return (
+        <View style={{ alignItems: "center" }}>
+          <View style={styles.textInputContainer}>
+            <TextInput
+              style={styles.nameTextInput}
+              placeholder="Unversity of Liverpool"
+            />
+          </View>
+          <TouchableOpacity style={styles.saveButton} onPress={hideModal}>
+            <Text style={styles.saveButtonText}>Save</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    }
     return <></>;
   };
 
@@ -119,22 +239,19 @@ const EditProfile = ({ navigation }: any) => {
                   resizeMode="contain"
                 />
                 <TouchableOpacity style={styles.iconContainer}>
-                  <Ionicons
-                    name="camera-sharp"
-                    size={18}
-                    color="black"
-                    // style={styles.cameraIcon}
-                  />
+                  <Ionicons name="camera-sharp" size={18} color="black" />
                 </TouchableOpacity>
               </View>
             </View>
             <View style={styles.detailSection}>
-              <Text style={styles.detailSectionTitle}>Name</Text>
+              <Text style={styles.detailSectionTitle}>
+                {EditProfileType.Name}
+              </Text>
               <View style={styles.detailSectionTextView}>
                 <Text style={styles.detailSectionText}>{userDisplayName}</Text>
                 <TouchableOpacity
                   onPress={() => {
-                    handleEditPress("displayName");
+                    handleEditPress(EditProfileType.Name);
                   }}
                 >
                   <AntDesign
@@ -146,7 +263,9 @@ const EditProfile = ({ navigation }: any) => {
               </View>
             </View>
             <View style={styles.detailSection}>
-              <Text style={styles.detailSectionTitle}>Bio</Text>
+              <Text style={styles.detailSectionTitle}>
+                {EditProfileType.Bio}
+              </Text>
               <View style={styles.detailSectionTextView}>
                 <Text
                   style={[styles.detailSectionText, { width: 260 }]}
@@ -157,7 +276,7 @@ const EditProfile = ({ navigation }: any) => {
                 </Text>
                 <TouchableOpacity
                   onPress={() => {
-                    handleEditPress("bio");
+                    handleEditPress(EditProfileType.Bio);
                   }}
                 >
                   <AntDesign
@@ -169,7 +288,9 @@ const EditProfile = ({ navigation }: any) => {
               </View>
             </View>
             <View style={styles.detailSection}>
-              <Text style={styles.detailSectionTitle}>Gender</Text>
+              <Text style={styles.detailSectionTitle}>
+                {EditProfileType.Gender}
+              </Text>
               <View style={styles.detailSectionTextView}>
                 <Text
                   style={styles.detailSectionText}
@@ -180,7 +301,7 @@ const EditProfile = ({ navigation }: any) => {
                 </Text>
                 <TouchableOpacity
                   onPress={() => {
-                    handleEditPress("gender");
+                    handleEditPress(EditProfileType.Gender);
                   }}
                 >
                   <AntDesign
@@ -192,18 +313,20 @@ const EditProfile = ({ navigation }: any) => {
               </View>
             </View>
             <View style={styles.detailSection}>
-              <Text style={styles.detailSectionTitle}>Birth Date</Text>
+              <Text style={styles.detailSectionTitle}>
+                {EditProfileType.Age}
+              </Text>
               <View style={styles.detailSectionTextView}>
                 <Text
                   style={styles.detailSectionText}
                   numberOfLines={1}
                   ellipsizeMode="tail"
                 >
-                  -
+                  29
                 </Text>
                 <TouchableOpacity
                   onPress={() => {
-                    handleEditPress("birthDate");
+                    handleEditPress(EditProfileType.Age);
                   }}
                 >
                   <AntDesign
@@ -215,7 +338,9 @@ const EditProfile = ({ navigation }: any) => {
               </View>
             </View>
             <View style={styles.detailSection}>
-              <Text style={styles.detailSectionTitle}>Location</Text>
+              <Text style={styles.detailSectionTitle}>
+                {EditProfileType.Location}
+              </Text>
               <View style={styles.detailSectionTextView}>
                 <Text
                   style={styles.detailSectionText}
@@ -226,7 +351,7 @@ const EditProfile = ({ navigation }: any) => {
                 </Text>
                 <TouchableOpacity
                   onPress={() => {
-                    handleEditPress("location");
+                    handleEditPress(EditProfileType.Location);
                   }}
                 >
                   <AntDesign
@@ -238,18 +363,20 @@ const EditProfile = ({ navigation }: any) => {
               </View>
             </View>
             <View style={styles.detailSection}>
-              <Text style={styles.detailSectionTitle}>Education</Text>
+              <Text style={styles.detailSectionTitle}>
+                {EditProfileType.Education}
+              </Text>
               <View style={styles.detailSectionTextView}>
                 <Text
                   style={styles.detailSectionText}
                   numberOfLines={1}
                   ellipsizeMode="tail"
                 >
-                  -
+                  Unviersity of Liverpool
                 </Text>
                 <TouchableOpacity
                   onPress={() => {
-                    handleEditPress("education");
+                    handleEditPress(EditProfileType.Education);
                   }}
                 >
                   <AntDesign
@@ -262,6 +389,7 @@ const EditProfile = ({ navigation }: any) => {
             </View>
           </View>
         </ScrollView>
+
         {/* Pop up modal */}
         {isModalVisible && (
           <Animated.View
@@ -272,8 +400,8 @@ const EditProfile = ({ navigation }: any) => {
             {...modalPanResponder.panHandlers}
           >
             <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Edit {"Name"}</Text>
-              {modalBodyDom(editType)}
+              <Text style={styles.modalTitle}>Edit {editType}</Text>
+              {modalBodyDom(editType as EditProfileType)}
             </View>
           </Animated.View>
         )}
@@ -346,7 +474,6 @@ const styles = StyleSheet.create({
     color: ThemeColours.SecondaryColour,
   },
   detailSectionTextView: {
-    // flex: 1,
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
@@ -368,16 +495,17 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.2,
     shadowRadius: 10,
-    height: "35%",
+    height: 300,
   },
   modalContent: {
-    alignItems: "center",
+    // alignItems: "center",
   },
   modalTitle: {
     fontSize: 18,
     fontWeight: "bold",
     color: ThemeColours.SecondaryColour,
     paddingVertical: 8,
+    alignSelf: "center",
   },
   modalDescription: {
     marginVertical: 10,
@@ -393,23 +521,66 @@ const styles = StyleSheet.create({
     paddingLeft: 6,
     marginBottom: 10,
   },
-  textInput: {
+  nameTextInput: {
     fontSize: 16,
+    color: ThemeColours.PrimaryColour,
   },
   saveButton: {
-    // width: "100%",
-    // height: 50,
     backgroundColor: ThemeColours.SecondaryColour,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 10,
     padding: 10,
-    // padding: 20
   },
   saveButtonText: {
     color: ThemeColours.PrimaryColour,
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "bold",
+  },
+  bioTextInputContainer: {
+    width: 300,
+    height: 160,
+    backgroundColor: ThemeColours.SecondaryColour,
+    borderRadius: 10,
+    paddingLeft: 8,
+    paddingTop: 6,
+    marginBottom: 10,
+  },
+  optionPickerContainer: {
+    width: 360,
+    backgroundColor: ThemeColours.SecondaryColour,
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    justifyContent: "center",
+    marginBottom: 10,
+  },
+  optionPicker: {
+    height: 30,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginVertical: 6,
+  },
+  optionText: { fontSize: 18, color: ThemeColours.PrimaryColour },
+  divider: {
+    height: 1,
+    width: "100%", // Same width as the TouchableOpacity
+    backgroundColor: ThemeColours.PrimaryColour, // Gray line color
+    alignSelf: "center",
+    opacity: 0.2,
+  },
+  ageInputContainer: {
+    width: 100,
+    height: 50,
+    backgroundColor: ThemeColours.SecondaryColour,
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  ageTextInput: {
+    fontSize: 22,
+    color: ThemeColours.PrimaryColour,
   },
 });
 

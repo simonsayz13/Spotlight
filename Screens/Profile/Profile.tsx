@@ -20,6 +20,7 @@ import { ScrollView } from "react-native-gesture-handler";
 import { logOut } from "../../Firebase/firebaseAuth";
 import PostCard from "../../Components/PostCard";
 import AntDesign from "@expo/vector-icons/AntDesign";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 const Profile = ({ navigation }: any) => {
   const [buttonStates, setButtonStates] = useState(userContentSelectorButtons);
@@ -55,8 +56,17 @@ const Profile = ({ navigation }: any) => {
           style={styles.image}
           resizeMode="contain"
         />
-        <Text style={styles.userNameFont}>{userDisplayName}</Text>
-        <Text style={styles.metaDataFont}>ID: {userId}</Text>
+        <View
+          style={{
+            flexDirection: "row",
+            gap: 4,
+            alignItems: "center",
+            marginBottom: 2,
+          }}
+        >
+          <Text style={styles.userNameFont}>{userDisplayName}</Text>
+          <Ionicons name="male" size={20} color="#4bb9f3" />
+        </View>
         <Text style={styles.metaDataFont}>IP Address: United Kingdom</Text>
       </View>
       <View style={styles.description}>
