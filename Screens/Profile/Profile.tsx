@@ -6,10 +6,10 @@ import {
   TouchableOpacity,
   Image,
   Platform,
+  SafeAreaView,
 } from "react-native";
 import { useSelector } from "react-redux";
 import { RootState } from "../../Redux/store";
-import { SafeAreaView } from "react-native-safe-area-context";
 import {
   ProfileStackScreens,
   ThemeColours,
@@ -200,7 +200,6 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
     elevation: 5, // For Android shadow
-    shadowColor: "#000",
     shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
@@ -208,7 +207,7 @@ const styles = StyleSheet.create({
     backgroundColor: ThemeColours.PrimaryColour,
   },
   contentContainerSelectorBar: {
-    height: "10%",
+    height: 34,
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
     marginBottom: 4,
