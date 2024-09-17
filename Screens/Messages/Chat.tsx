@@ -124,7 +124,6 @@ const styles = StyleSheet.create({
     backgroundColor: ThemeColours.PrimaryColour,
   },
   topBarContainer: {
-    marginTop: 6,
     flexDirection: "row",
     alignItems: "center",
   },

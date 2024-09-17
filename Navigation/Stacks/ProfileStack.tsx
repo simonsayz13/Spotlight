@@ -7,6 +7,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Profile from "../../Screens/Profile/Profile";
 import { useSelector } from "react-redux";
 import { RootState } from "../../Redux/store";
+import EditProfile from "../../Screens/Profile/EditProfile";
 
 const ProfileStack = createNativeStackNavigator();
 
@@ -34,6 +35,10 @@ const ProfileStackScreen = () => {
         name={ProfileStackScreens.Profile}
         component={Profile}
         options={{ gestureEnabled: false }}
+      />
+      <ProfileStack.Screen
+        name={ProfileStackScreens.EditProfile}
+        component={EditProfile}
       />
     </ProfileStack.Navigator>
   );

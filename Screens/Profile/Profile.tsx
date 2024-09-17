@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  Platform,
+} from "react-native";
 import { useSelector } from "react-redux";
 import { RootState } from "../../Redux/store";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -8,11 +15,11 @@ import {
   ThemeColours,
   userContentSelectorButtons,
 } from "../../Constants/UI";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import { mockUserBio, mockUserPostsData } from "../../Constants/mockData";
 import { ScrollView } from "react-native-gesture-handler";
 import { logOut } from "../../Firebase/firebaseAuth";
 import PostCard from "../../Components/PostCard";
+import AntDesign from "@expo/vector-icons/AntDesign";
 
 const Profile = ({ navigation }: any) => {
   const [buttonStates, setButtonStates] = useState(userContentSelectorButtons);
@@ -29,22 +36,46 @@ const Profile = ({ navigation }: any) => {
           : { ...button, clicked: false }
       )
     );
-    const clickedScreen = buttonStates.find((item) => id == item.id)?.label;
+    // const clickedScreen = buttonStates.find((item) => id == item.id)?.label;
+  };
+
+  const handleLogout = () => {
+    logOut();
+    navigation.replace(ProfileStackScreens.LoginSignUp);
+  };
+
+  const handleEdit = () => {
+    navigation.navigate(ProfileStackScreens.EditProfile);
   };
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.profileDetails}>
-        <Ionicons
-          name="person-circle-outline"
-          size={88}
-          color={ThemeColours.SecondaryColour}
+        <Image
+          source={require("../../assets/test_data/mock_profile_picture.png")}
+          style={styles.image}
+          resizeMode="contain"
         />
         <Text style={styles.userNameFont}>{userDisplayName}</Text>
         <Text style={styles.metaDataFont}>ID: {userId}</Text>
         <Text style={styles.metaDataFont}>IP Address: United Kingdom</Text>
       </View>
       <View style={styles.description}>
-        <Text style={styles.descriptionTitle}>Bio</Text>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <Text style={styles.descriptionTitle}>Bio</Text>
+          <TouchableOpacity onPress={handleEdit}>
+            <AntDesign
+              name="edit"
+              size={24}
+              color={ThemeColours.SecondaryColour}
+            />
+          </TouchableOpacity>
+        </View>
         <Text style={styles.descriptionText}>{mockUserBio}</Text>
       </View>
       <View style={styles.userStatsContainer}>
@@ -60,13 +91,7 @@ const Profile = ({ navigation }: any) => {
           <Text style={styles.statsCount}>666</Text>
           <Text style={styles.statsFont}>Likes & Favs</Text>
         </View>
-        <TouchableOpacity
-          style={styles.signOutButton}
-          onPress={() => {
-            logOut();
-            navigation.replace(ProfileStackScreens.LoginSignUp);
-          }}
-        >
+        <TouchableOpacity style={styles.signOutButton} onPress={handleLogout}>
           <Text style={styles.buttonText}>Sign out</Text>
         </TouchableOpacity>
       </View>
@@ -111,6 +136,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: ThemeColours.PrimaryColour,
+    paddingTop: Platform.OS === "android" ? 8 : 0,
   },
   profileDetails: {
     alignItems: "center",
@@ -134,7 +160,7 @@ const styles = StyleSheet.create({
   },
   descriptionTitle: {
     color: ThemeColours.SecondaryColour,
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "bold",
   },
   descriptionText: {
@@ -220,6 +246,11 @@ const styles = StyleSheet.create({
     width: "70%",
     backgroundColor: ThemeColours.ThirdColour, // Set the underline color
     borderRadius: 18,
+  },
+  image: {
+    width: 100, // Width and height should be the same
+    height: 100,
+    borderRadius: 50, // Half of the width or height for a perfect circle
   },
 });
 

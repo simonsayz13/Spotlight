@@ -20,6 +20,7 @@ export enum ProfileStackScreens {
   Register = "register",
   Profile = "profile",
   LoginSignUp = "loginsignup",
+  EditProfile = "editprofile",
 }
 
 export enum MessagingStackScreens {

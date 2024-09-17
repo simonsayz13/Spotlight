@@ -16,7 +16,6 @@ import {
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MapView, { Marker } from "react-native-maps";
-import Geolocation from "@react-native-community/geolocation";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { ThemeColours } from "../../Constants/UI";
 const Map = () => {
