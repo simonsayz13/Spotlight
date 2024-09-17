@@ -15,7 +15,9 @@ const PostCard = ({ title, imageUrl, user, likes, openPost }: any) => {
   return (
     <TouchableOpacity style={styles.card} activeOpacity={1} onPress={openPost}>
       <Image
-        source={require("../assets/test_data/image_placeholder.jpg")}
+        source={{
+          uri: "https://archive.org/download/placeholder-image/placeholder-image.jpg",
+        }}
         style={styles.image}
       />
       {/* <Image

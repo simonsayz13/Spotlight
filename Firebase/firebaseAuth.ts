@@ -78,7 +78,6 @@ export const signInWithEmail = async (email: string, password: string) => {
 export const logOut = async () => {
   try {
     await signOut(auth).then(() => {
-      console.log("signed out");
       store.dispatch(clearUser());
     });
   } catch (error) {

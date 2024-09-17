@@ -13,7 +13,7 @@ const MainPost = () => {
     >
       <View style={styles.imageContainer}>
         <Image
-          source={require("../assets/test_data/image_laopobaobao.jpg")}
+          source={require("../assets/test_image/image_laopobaobao.jpg")}
           style={styles.image}
           resizeMode="contain"
         />

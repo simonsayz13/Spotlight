@@ -51,7 +51,7 @@ const Profile = ({ navigation }: any) => {
     <SafeAreaView style={styles.container}>
       <View style={styles.profileDetails}>
         <Image
-          source={require("../../assets/test_data/mock_profile_picture.png")}
+          source={require("../../assets/test_image/mock_profile_picture.png")}
           style={styles.image}
           resizeMode="contain"
         />

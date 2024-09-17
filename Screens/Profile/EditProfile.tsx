@@ -26,7 +26,6 @@ const EditProfile = ({ navigation }: any) => {
   const [editType, setEditType] = useState<string>("");
   console.log(isModalVisible);
   const handleEditPress = (editType: string) => {
-    console.log(isModalVisible);
     setEditType(editType);
     setIsModalVisible(true);
     showModal();
@@ -115,7 +114,7 @@ const EditProfile = ({ navigation }: any) => {
             <View style={styles.imageSection}>
               <View style={styles.imageContainer}>
                 <Image
-                  source={require("../../assets/test_data/mock_profile_picture.png")}
+                  source={require("../../assets/test_image/mock_profile_picture.png")}
                   style={styles.image}
                   resizeMode="contain"
                 />
