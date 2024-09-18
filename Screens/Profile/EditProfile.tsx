@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   StyleSheet,
   TouchableOpacity,
@@ -19,13 +19,43 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import { RootState } from "../../Redux/store";
 import { mockUserBio } from "../../Constants/mockData";
 import { TextInput } from "react-native-gesture-handler";
-
+import { updateProfileField } from "../../Firebase/firebaseFireStore";
+import { FireStoreUsersField } from "../../Constants/dbReference";
+import {
+  updateAge,
+  updateBio,
+  updateDisplayName,
+  updateEducation,
+  updateGender,
+  updateLocation,
+} from "../../Redux/Slices/userSlice";
+import store from "../../Redux/store";
 const EditProfile = ({ navigation }: any) => {
-  const { userDisplayName } = useSelector((state: RootState) => state.user);
+  const {
+    userId,
+    userDisplayName,
+    userProfilePhotoURL,
+    userAge,
+    userBio,
+    userGender,
+    userLocation,
+    userEducation,
+  } = useSelector((state: RootState) => state.user);
   const slideAnim = useRef(new Animated.Value(400)).current;
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editType, setEditType] = useState<string>("");
-  const [selectedGender, setSelectedGender] = useState<Gender>(Gender.Male);
+
+  const [displayName, setDisplayName] = useState<string | null>(
+    userDisplayName
+  );
+  const [bio, setBio] = useState<string | null>(userBio);
+  const [selectedGender, setSelectedGender] = useState<Gender | null>(
+    userGender
+  );
+  const [age, setAge] = useState<number | null>(userAge);
+  const [location, setLocation] = useState<string | null>(userLocation);
+  const [education, setEducation] = useState<string | null>(userEducation);
+
   const handleEditPress = (editType: string) => {
     setEditType(editType);
     setIsModalVisible(true);
@@ -75,6 +105,49 @@ const EditProfile = ({ navigation }: any) => {
     })
   ).current;
 
+  const handleSaveDisplayName = async () => {
+    await updateProfileField(userId!, {
+      [FireStoreUsersField.DisplayName]: displayName,
+    });
+    store.dispatch(updateDisplayName(displayName));
+    hideModal();
+  };
+  const handleSaveBio = async () => {
+    await updateProfileField(userId!, {
+      [FireStoreUsersField.Bio]: bio,
+    });
+    store.dispatch(updateBio(bio));
+    hideModal();
+  };
+  const handleSaveGender = async () => {
+    await updateProfileField(userId!, {
+      [FireStoreUsersField.Gender]: selectedGender,
+    });
+    store.dispatch(updateGender(selectedGender));
+    hideModal();
+  };
+  const handleSaveAge = async () => {
+    await updateProfileField(userId!, {
+      [FireStoreUsersField.Age]: age,
+    });
+    store.dispatch(updateAge(age));
+    hideModal();
+  };
+  const handleSaveLocation = async () => {
+    await updateProfileField(userId!, {
+      [FireStoreUsersField.Location]: location,
+    });
+    store.dispatch(updateLocation(location));
+    hideModal();
+  };
+  const handleSaveEducation = async () => {
+    await updateProfileField(userId!, {
+      [FireStoreUsersField.Education]: education,
+    });
+    store.dispatch(updateEducation(education));
+    hideModal();
+  };
+
   const modalBodyDom = (type: EditProfileType) => {
     if (type === EditProfileType.Name) {
       return (
@@ -82,10 +155,15 @@ const EditProfile = ({ navigation }: any) => {
           <View style={styles.textInputContainer}>
             <TextInput
               style={styles.nameTextInput}
-              placeholder={userDisplayName!}
-            />
+              onChangeText={(text) => setDisplayName(text)}
+            >
+              {userDisplayName!}
+            </TextInput>
           </View>
-          <TouchableOpacity style={styles.saveButton} onPress={hideModal}>
+          <TouchableOpacity
+            style={styles.saveButton}
+            onPressIn={handleSaveDisplayName}
+          >
             <Text style={styles.saveButtonText}>Save</Text>
           </TouchableOpacity>
         </View>
@@ -94,11 +172,15 @@ const EditProfile = ({ navigation }: any) => {
       return (
         <View style={{ alignItems: "center" }}>
           <View style={styles.bioTextInputContainer}>
-            <TextInput style={styles.nameTextInput} multiline={true}>
-              {mockUserBio}
+            <TextInput
+              style={styles.nameTextInput}
+              multiline={true}
+              onChangeText={(text) => setBio(text)}
+            >
+              {userBio}
             </TextInput>
           </View>
-          <TouchableOpacity style={styles.saveButton}>
+          <TouchableOpacity style={styles.saveButton} onPressIn={handleSaveBio}>
             <Text style={styles.saveButtonText}>Save</Text>
           </TouchableOpacity>
         </View>
@@ -121,7 +203,9 @@ const EditProfile = ({ navigation }: any) => {
             <TouchableOpacity
               style={styles.optionPicker}
               activeOpacity={1}
-              onPress={() => setSelectedGender(Gender.Male)}
+              onPressIn={() => {
+                setSelectedGender(Gender.Male);
+              }}
             >
               <Text style={styles.optionText}>Male</Text>
               {selectedGender === Gender.Male && (
@@ -136,7 +220,7 @@ const EditProfile = ({ navigation }: any) => {
             <TouchableOpacity
               style={styles.optionPicker}
               activeOpacity={1}
-              onPress={() => setSelectedGender(Gender.Female)}
+              onPressIn={() => setSelectedGender(Gender.Female)}
             >
               <Text style={styles.optionText}>Female</Text>
               {selectedGender === Gender.Female && (
@@ -151,7 +235,7 @@ const EditProfile = ({ navigation }: any) => {
             <TouchableOpacity
               style={styles.optionPicker}
               activeOpacity={1}
-              onPress={() => setSelectedGender(Gender.Other)}
+              onPressIn={() => setSelectedGender(Gender.Other)}
             >
               <Text style={styles.optionText}>Other</Text>
               {selectedGender === Gender.Other && (
@@ -163,7 +247,10 @@ const EditProfile = ({ navigation }: any) => {
               )}
             </TouchableOpacity>
           </View>
-          <TouchableOpacity style={styles.saveButton}>
+          <TouchableOpacity
+            style={styles.saveButton}
+            onPressIn={handleSaveGender}
+          >
             <Text style={styles.saveButtonText}>Save</Text>
           </TouchableOpacity>
         </View>
@@ -174,11 +261,13 @@ const EditProfile = ({ navigation }: any) => {
           <View style={styles.ageInputContainer}>
             <TextInput
               style={styles.ageTextInput}
-              placeholder="29"
               keyboardType="numeric"
-            />
+              onChangeText={(text) => setAge(Number(text))}
+            >
+              {userAge}
+            </TextInput>
           </View>
-          <TouchableOpacity style={styles.saveButton} onPress={hideModal}>
+          <TouchableOpacity style={styles.saveButton} onPressIn={handleSaveAge}>
             <Text style={styles.saveButtonText}>Save</Text>
           </TouchableOpacity>
         </View>
@@ -187,9 +276,17 @@ const EditProfile = ({ navigation }: any) => {
       return (
         <View style={{ alignItems: "center" }}>
           <View style={styles.textInputContainer}>
-            <TextInput style={styles.nameTextInput} placeholder="Liverpool" />
+            <TextInput
+              style={styles.nameTextInput}
+              onChangeText={(text) => setLocation(text)}
+            >
+              {userLocation}
+            </TextInput>
           </View>
-          <TouchableOpacity style={styles.saveButton} onPress={hideModal}>
+          <TouchableOpacity
+            style={styles.saveButton}
+            onPressIn={handleSaveLocation}
+          >
             <Text style={styles.saveButtonText}>Save</Text>
           </TouchableOpacity>
         </View>
@@ -200,10 +297,15 @@ const EditProfile = ({ navigation }: any) => {
           <View style={styles.textInputContainer}>
             <TextInput
               style={styles.nameTextInput}
-              placeholder="Unversity of Liverpool"
-            />
+              onChangeText={(text) => setEducation(text)}
+            >
+              {userEducation}
+            </TextInput>
           </View>
-          <TouchableOpacity style={styles.saveButton} onPress={hideModal}>
+          <TouchableOpacity
+            style={styles.saveButton}
+            onPressIn={handleSaveEducation}
+          >
             <Text style={styles.saveButtonText}>Save</Text>
           </TouchableOpacity>
         </View>
@@ -219,7 +321,7 @@ const EditProfile = ({ navigation }: any) => {
         behavior={Platform.OS === "ios" ? "height" : "padding"}
       >
         <View style={styles.topBarContainer}>
-          <TouchableOpacity onPress={goBack} style={styles.backButton}>
+          <TouchableOpacity onPressIn={goBack} style={styles.backButton}>
             <Ionicons
               name="chevron-back"
               size={32}
@@ -250,7 +352,7 @@ const EditProfile = ({ navigation }: any) => {
               <View style={styles.detailSectionTextView}>
                 <Text style={styles.detailSectionText}>{userDisplayName}</Text>
                 <TouchableOpacity
-                  onPress={() => {
+                  onPressIn={() => {
                     handleEditPress(EditProfileType.Name);
                   }}
                 >
@@ -268,14 +370,17 @@ const EditProfile = ({ navigation }: any) => {
               </Text>
               <View style={styles.detailSectionTextView}>
                 <Text
-                  style={[styles.detailSectionText, { width: 260 }]}
+                  style={[
+                    styles.detailSectionText,
+                    { width: 260, textAlign: "right" },
+                  ]}
                   numberOfLines={1}
                   ellipsizeMode="tail"
                 >
-                  {mockUserBio}
+                  {userBio}
                 </Text>
                 <TouchableOpacity
-                  onPress={() => {
+                  onPressIn={() => {
                     handleEditPress(EditProfileType.Bio);
                   }}
                 >
@@ -297,10 +402,10 @@ const EditProfile = ({ navigation }: any) => {
                   numberOfLines={1}
                   ellipsizeMode="tail"
                 >
-                  Male
+                  {selectedGender}
                 </Text>
                 <TouchableOpacity
-                  onPress={() => {
+                  onPressIn={() => {
                     handleEditPress(EditProfileType.Gender);
                   }}
                 >
@@ -322,10 +427,10 @@ const EditProfile = ({ navigation }: any) => {
                   numberOfLines={1}
                   ellipsizeMode="tail"
                 >
-                  29
+                  {userAge}
                 </Text>
                 <TouchableOpacity
-                  onPress={() => {
+                  onPressIn={() => {
                     handleEditPress(EditProfileType.Age);
                   }}
                 >
@@ -347,10 +452,10 @@ const EditProfile = ({ navigation }: any) => {
                   numberOfLines={1}
                   ellipsizeMode="tail"
                 >
-                  Liverpool
+                  {userLocation}
                 </Text>
                 <TouchableOpacity
-                  onPress={() => {
+                  onPressIn={() => {
                     handleEditPress(EditProfileType.Location);
                   }}
                 >
@@ -372,10 +477,10 @@ const EditProfile = ({ navigation }: any) => {
                   numberOfLines={1}
                   ellipsizeMode="tail"
                 >
-                  Unviersity of Liverpool
+                  {userEducation}
                 </Text>
                 <TouchableOpacity
-                  onPress={() => {
+                  onPressIn={() => {
                     handleEditPress(EditProfileType.Education);
                   }}
                 >
@@ -547,7 +652,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   optionPickerContainer: {
-    width: 360,
+    width: Platform.OS === "ios" ? 360 : 320,
     backgroundColor: ThemeColours.SecondaryColour,
     borderRadius: 8,
     paddingHorizontal: 16,

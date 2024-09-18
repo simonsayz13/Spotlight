@@ -21,6 +21,7 @@ import {
   AuthErrorCode,
   FireBaseAuthErrorMessages,
 } from "../../Constants/errorMessages";
+import { createUserProfile } from "../../Firebase/firebaseFireStore";
 const Register = ({ navigation }: any) => {
   const [email, setEmail] = useState<string>("");
   const [username, setUsername] = useState<string>("");
@@ -35,6 +36,8 @@ const Register = ({ navigation }: any) => {
     setLoading(false);
     if (response.success) {
       navigation.replace(ProfileStackScreens.Profile);
+      //@ts-ignore
+      await createUserProfile(response.userId, username);
     } else {
       console.log(response.errorMessage);
       const errorCode = response.errorMessage as AuthErrorCode;

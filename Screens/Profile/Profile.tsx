@@ -11,6 +11,7 @@ import {
 import { useSelector } from "react-redux";
 import { RootState } from "../../Redux/store";
 import {
+  Gender,
   ProfileStackScreens,
   ThemeColours,
   userContentSelectorButtons,
@@ -24,9 +25,16 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 
 const Profile = ({ navigation }: any) => {
   const [buttonStates, setButtonStates] = useState(userContentSelectorButtons);
-  const { userId, userDisplayName } = useSelector(
-    (state: RootState) => state.user
-  );
+  const {
+    userId,
+    userDisplayName,
+    userProfilePhotoURL,
+    userAge,
+    userBio,
+    userGender,
+    userLocation,
+    userEducation,
+  } = useSelector((state: RootState) => state.user);
   const handlePress = (id: number) => {
     setButtonStates((prevStates) =>
       prevStates.map((button) =>
@@ -65,7 +73,13 @@ const Profile = ({ navigation }: any) => {
           }}
         >
           <Text style={styles.userNameFont}>{userDisplayName}</Text>
-          <Ionicons name="male" size={20} color="#4bb9f3" />
+          {userGender === Gender.Male ? (
+            <Ionicons name="male" size={20} color="#4bb9f3" />
+          ) : userGender === Gender.Female ? (
+            <Ionicons name="female" size={20} color="#f268df" />
+          ) : (
+            <></>
+          )}
         </View>
         <Text style={styles.metaDataFont}>IP Address: United Kingdom</Text>
       </View>
@@ -86,7 +100,9 @@ const Profile = ({ navigation }: any) => {
             />
           </TouchableOpacity>
         </View>
-        <Text style={styles.descriptionText}>{mockUserBio}</Text>
+        <Text style={styles.descriptionText}>
+          {userBio ? userBio : "Add a bio in edit profile"}
+        </Text>
       </View>
       <View style={styles.userStatsContainer}>
         <View style={styles.statsView}>

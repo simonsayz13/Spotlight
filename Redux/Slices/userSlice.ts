@@ -6,7 +6,11 @@ export const userSlice = createSlice({
     userId: null,
     userDisplayName: null,
     userProfilePhotoURL: null,
-    loginStatus: null,
+    userBio: null,
+    userAge: null,
+    userGender: null,
+    userLocation: null,
+    userEducation: null,
   },
   reducers: {
     setUser: (state, action) => {
@@ -19,16 +23,45 @@ export const userSlice = createSlice({
       state.userId = null;
       state.userDisplayName = null;
       state.userProfilePhotoURL = null;
-      state.loginStatus = null;
+      state.userBio = null;
+      state.userGender = null;
+      state.userLocation = null;
+      state.userEducation = null;
     },
-    setLoadingLogin: (state, action) => {
-      const { loginStatus } = action.payload;
-      state.loginStatus = loginStatus;
+    updateDisplayName: (state, action) => {
+      state.userDisplayName = action.payload;
+    },
+    updateBio: (state, action) => {
+      state.userBio = action.payload;
+    },
+    updateProfilePhotoURL: (state, action) => {
+      state.userProfilePhotoURL = action.payload;
+    },
+    updateGender: (state, action) => {
+      state.userGender = action.payload;
+    },
+    updateLocation: (state, action) => {
+      state.userLocation = action.payload;
+    },
+    updateEducation: (state, action) => {
+      state.userEducation = action.payload;
+    },
+    updateAge: (state, action) => {
+      state.userAge = action.payload;
     },
   },
 });
 
-// Action creators are generated for each case reducer function
-export const { setUser, clearUser, setLoadingLogin } = userSlice.actions;
+export const {
+  setUser,
+  clearUser,
+  updateDisplayName,
+  updateBio,
+  updateProfilePhotoURL,
+  updateGender,
+  updateLocation,
+  updateEducation,
+  updateAge,
+} = userSlice.actions;
 
 export default userSlice.reducer;

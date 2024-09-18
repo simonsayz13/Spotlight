@@ -6,7 +6,7 @@ import {
   signOut,
   getAuth,
 } from "firebase/auth";
-import { clearUser, setLoadingLogin, setUser } from "../Redux/Slices/userSlice";
+import { clearUser, setUser } from "../Redux/Slices/userSlice";
 import store from "../Redux/store";
 import { LoginStatus } from "../Constants/UI";
 
@@ -18,7 +18,6 @@ export const signUpWithEmail = async (
   password: string
 ) => {
   try {
-    store.dispatch(setLoadingLogin({ loginStatus: LoginStatus.Loading }));
     return await createUserWithEmailAndPassword(auth, email, password)
       .then(async (userCredential) => {
         return await updateProfile(auth.currentUser!, {
@@ -30,28 +29,31 @@ export const signUpWithEmail = async (
             profileURL: auth.currentUser?.photoURL,
           };
           store.dispatch(setUser(userData));
-          store.dispatch(setLoadingLogin({ loginStatus: LoginStatus.Success }));
-          return { success: true, errorMessage: null };
+          return {
+            success: true,
+            errorMessage: null,
+            userId: auth.currentUser?.uid,
+          };
         });
       })
       .catch((error) => {
-        store.dispatch(setLoadingLogin({ loginStatus: LoginStatus.Failed }));
         return {
           success: false,
           errorMessage: error.code,
+          userId: null,
         };
       });
   } catch (error: any) {
     return {
       success: false,
       errorMessage: "Error attempting to sign up",
+      userId: null,
     };
   }
 };
 
 export const signInWithEmail = async (email: string, password: string) => {
   try {
-    store.dispatch(setLoadingLogin({ loginStatus: LoginStatus.Loading }));
     return await signInWithEmailAndPassword(auth, email, password)
       .then(() => {
         const userData = {
@@ -60,11 +62,12 @@ export const signInWithEmail = async (email: string, password: string) => {
           profileURL: auth.currentUser?.photoURL,
         };
         store.dispatch(setUser(userData));
-        store.dispatch(setLoadingLogin({ loginStatus: LoginStatus.Success }));
-        return { success: true, errorMessage: null };
+        return {
+          success: true,
+          errorMessage: null,
+        };
       })
       .catch((error) => {
-        store.dispatch(setLoadingLogin({ loginStatus: LoginStatus.Failed }));
         return {
           success: false,
           errorMessage: error.code,
