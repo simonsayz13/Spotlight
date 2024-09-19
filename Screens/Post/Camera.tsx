@@ -1,6 +1,5 @@
 import {
   Button,
-  Dimensions,
   Platform,
   SafeAreaView,
   StyleSheet,
@@ -13,9 +12,9 @@ import { CameraType } from "expo-camera/legacy";
 import { useRef, useState } from "react";
 import React from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { ThemeColours } from "../../Constants/UI";
+import { PostStackScreens, ThemeColours } from "../../Constants/UI";
 const Camera = ({ navigation }: any) => {
-  const [facing, setFacing] = useState<CameraType>(CameraType.front);
+  const [facing, setFacing] = useState<CameraType>(CameraType.back);
   const [permission, requestPermission] = useCameraPermissions();
   const [isCameraReady, setIsCameraReady] = useState(false);
   const cameraRef = useRef<ExpoCamera>(null);
@@ -56,6 +55,9 @@ const Camera = ({ navigation }: any) => {
       try {
         const photo = await cameraRef.current.takePictureAsync();
         console.log("Picture taken:", photo?.uri);
+        navigation.navigate(PostStackScreens.ViewPhoto, {
+          photoURI: photo?.uri,
+        });
         // Do something with the photo, e.g., save it, navigate, etc.
       } catch (error) {
         console.error("Error taking picture:", error);
@@ -73,14 +75,18 @@ const Camera = ({ navigation }: any) => {
       >
         <View style={styles.topButtonsContainer}>
           <TouchableOpacity onPress={handleBackButton}>
-            <Ionicons name="arrow-back" size={38} color="#ef6e6e" />
+            <Ionicons
+              name="chevron-back"
+              size={32}
+              color={ThemeColours.SecondaryColour}
+            />
           </TouchableOpacity>
           <View>
             <TouchableOpacity onPress={toggleCameraFacing}>
               <Ionicons
                 name="camera-reverse-outline"
-                size={38}
-                color="#ef6e6e"
+                size={32}
+                color={ThemeColours.SecondaryColour}
               />
             </TouchableOpacity>
           </View>
@@ -114,15 +120,17 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     padding: 8,
+    backgroundColor: ThemeColours.PrimaryColour,
   },
   bottomButtonsContainer: {
     flex: 1,
     alignItems: "center",
     position: "absolute",
+    height: 100,
     justifyContent: "center",
     bottom: 0,
     width: "100%",
-    marginVertical: Platform.OS === "ios" ? 20 : 30,
+    backgroundColor: ThemeColours.PrimaryColour,
   },
   text: {
     fontSize: 24,
@@ -136,12 +144,12 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     justifyContent: "center",
     alignItems: "center",
-    borderColor: "#ef6e6e",
+    borderColor: ThemeColours.SecondaryColour,
   },
   captureButton: {
     height: 60,
     width: 60,
-    backgroundColor: "#ef6e6e",
+    backgroundColor: ThemeColours.SecondaryColour,
     borderRadius: 100,
   },
 });

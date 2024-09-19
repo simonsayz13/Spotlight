@@ -10,6 +10,7 @@ import ProfileStack from "./Stacks/ProfileStack";
 import { Platform } from "react-native";
 import { ThemeColours } from "../Constants/UI";
 import MessagingStackScreen from "./Stacks/MessagingStack";
+import PostStackScreen from "./Stacks/PostStack";
 
 const Tab = createBottomTabNavigator();
 
@@ -95,7 +96,7 @@ const TabNavigation = () => {
       />
       <Tab.Screen
         name="Post"
-        component={Camera}
+        component={PostStackScreen}
         listeners={({ navigation }) => ({
           tabPress: (e) => {
             // Prevent default action if tab is already focused

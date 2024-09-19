@@ -28,6 +28,12 @@ export enum MessagingStackScreens {
   Chat = "chat",
 }
 
+export enum PostStackScreens {
+  Camera = "camera",
+  CreatePost = "createpost",
+  ViewPhoto = "viewphoto",
+}
+
 export enum ThemeColours {
   PrimaryColour = "#ec5050",
   SecondaryColour = "#ffffff",
