@@ -14,18 +14,21 @@ import { ThemeColours } from "../Constants/UI";
 const PostCard = ({ title, imageUrl, user, likes, openPost }: any) => {
   return (
     <TouchableOpacity style={styles.card} activeOpacity={1} onPress={openPost}>
-      <Image
-        source={{
-          uri: "https://archive.org/download/placeholder-image/placeholder-image.jpg",
-        }}
-        style={styles.image}
-      />
-      {/* <Image
-        style={styles.image}
-        source={{
-          uri: "https://media.istockphoto.com/id/1147544807/vector/thumbnail-image-vector-graphic.jpg?s=612x612&w=0&k=20&c=rnCKVbdxqkjlcs3xH87-9gocETqpspHFXu5dIGB4wuM=",
-        }}
-      /> */}
+      {imageUrl ? (
+        <Image
+          style={styles.image}
+          source={{
+            uri: imageUrl,
+          }}
+        />
+      ) : (
+        <Image
+          source={{
+            uri: "https://archive.org/download/placeholder-image/placeholder-image.jpg",
+          }}
+          style={styles.image}
+        />
+      )}
 
       <View style={styles.content}>
         <Text style={styles.title}>{title}</Text>

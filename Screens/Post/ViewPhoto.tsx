@@ -7,7 +7,7 @@ import {
   SafeAreaView,
   TouchableOpacity,
 } from "react-native";
-import { PostStackScreens, ThemeColours } from "../../Constants/UI";
+import { PostStackScreens, ThemeColoursPrimary } from "../../Constants/UI";
 import Ionicons from "@expo/vector-icons/Ionicons";
 const ViewPhoto = ({ navigation, route }: any) => {
   const { photoURI } = route.params;
@@ -29,7 +29,7 @@ const ViewPhoto = ({ navigation, route }: any) => {
           <Ionicons
             name="chevron-back"
             size={32}
-            color={ThemeColours.SecondaryColour}
+            color={ThemeColoursPrimary.SecondaryColour}
           />
         </TouchableOpacity>
         <Text style={styles.title}>Photo View</Text>
@@ -37,7 +37,7 @@ const ViewPhoto = ({ navigation, route }: any) => {
           <Ionicons
             name="chevron-forward"
             size={32}
-            color={ThemeColours.SecondaryColour}
+            color={ThemeColoursPrimary.SecondaryColour}
           />
         </TouchableOpacity>
       </View>
@@ -51,13 +51,13 @@ const styles = StyleSheet.create({
     flex: 1,
     // justifyContent: "center",
     alignItems: "center",
-    backgroundColor: ThemeColours.PrimaryColour,
+    backgroundColor: ThemeColoursPrimary.PrimaryColour,
   },
   topBarContainer: {
     padding: 8,
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: ThemeColours.PrimaryColour,
+    backgroundColor: ThemeColoursPrimary.PrimaryColour,
   },
   button: {
     width: 32, // same width as the icon
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 20,
     fontWeight: "bold",
-    color: ThemeColours.SecondaryColour,
+    color: ThemeColoursPrimary.SecondaryColour,
   },
   placeholder: {
     width: 32, // same width as the backButton to balance the layout
@@ -75,7 +75,6 @@ const styles = StyleSheet.create({
   imageView: {
     width: "100%",
     height: "100%",
-    // marginVertical: 20,
   },
 });
 

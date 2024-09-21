@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
   View,
   Text,
@@ -22,6 +22,8 @@ import { logOut } from "../../Firebase/firebaseAuth";
 import PostCard from "../../Components/PostCard";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { getPostsByUserId } from "../../Firebase/firebaseFireStore";
+import { useFocusEffect } from "@react-navigation/native";
 
 const Profile = ({ navigation }: any) => {
   const [buttonStates, setButtonStates] = useState(userContentSelectorButtons);
@@ -35,6 +37,26 @@ const Profile = ({ navigation }: any) => {
     userLocation,
     userEducation,
   } = useSelector((state: RootState) => state.user);
+  const [postsData, setPostsData] = useState<Array<any>>([]);
+
+  useFocusEffect(
+    useCallback(() => {
+      // Define an async function within the callback
+      const fetchPosts = async () => {
+        try {
+          return await getPostsByUserId(userId!);
+        } catch (error) {
+          console.error("Error fetching posts:", error);
+        }
+      };
+
+      fetchPosts().then((posts) => {
+        console.log("fetched:", posts);
+        setPostsData(posts!);
+      });
+    }, [userId]) // Include dependencies like userId if they change
+  );
+
   const handlePress = (id: number) => {
     setButtonStates((prevStates) =>
       prevStates.map((button) =>
@@ -142,13 +164,14 @@ const Profile = ({ navigation }: any) => {
         </View>
 
         <ScrollView contentContainerStyle={styles.scrollView}>
-          {mockUserPostsData.map((data) => {
+          {postsData.map((post) => {
             return (
               <PostCard
-                key={data.id}
-                title={data.title}
-                user={data.user}
-                likes={data.likes}
+                key={post.id}
+                title={post.title}
+                user={userDisplayName}
+                likes={post.likes}
+                imageUrl={post.media[0].media_url}
               />
             );
           })}

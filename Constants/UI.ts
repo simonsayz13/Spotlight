@@ -40,6 +40,13 @@ export enum ThemeColours {
   ThirdColour = "#feea00",
 }
 
+export enum ThemeColoursPrimary {
+  PrimaryColour = "#ffffff",
+  SecondaryColour = "#000000",
+  ThirdColour = "red",
+  GreyColour = "#b9b9b9",
+}
+
 export enum LoginStatus {
   Success = "success",
   Loading = "loading",

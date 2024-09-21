@@ -8,12 +8,13 @@ export const uploadImage = async (uri: string) => {
 
   const response = await fetch(uri);
   const blob = await response.blob();
-  const storageRef = ref(storage, `images/${fileName}`);
+  const storageRef = ref(storage, `test/${fileName}`);
 
   try {
     const snapshot = await uploadBytes(storageRef, blob);
     const downloadUrl = await getDownloadURL(snapshot.ref);
     console.log("Image uploaded to Firebase:", downloadUrl);
+    return downloadUrl;
   } catch (error) {
     console.log(error);
   }

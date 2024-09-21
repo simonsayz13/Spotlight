@@ -8,13 +8,16 @@ import { CreatePost } from "../../Screens/Post/CreatePost";
 const PostStack = createNativeStackNavigator();
 
 const PostStackScreen = () => (
-  <PostStack.Navigator screenOptions={{ headerShown: false }}>
-    <PostStack.Screen name={PostStackScreens.Camera} component={Camera} />
-    <PostStack.Screen name={PostStackScreens.ViewPhoto} component={ViewPhoto} />
+  <PostStack.Navigator
+    screenOptions={{ headerShown: false }}
+    initialRouteName={PostStackScreens.CreatePost}
+  >
     <PostStack.Screen
       name={PostStackScreens.CreatePost}
       component={CreatePost}
     />
+    <PostStack.Screen name={PostStackScreens.Camera} component={Camera} />
+    <PostStack.Screen name={PostStackScreens.ViewPhoto} component={ViewPhoto} />
   </PostStack.Navigator>
 );
 

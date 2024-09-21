@@ -12,7 +12,11 @@ import { CameraType } from "expo-camera/legacy";
 import { useRef, useState } from "react";
 import React from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { PostStackScreens, ThemeColours } from "../../Constants/UI";
+import {
+  PostStackScreens,
+  ThemeColours,
+  ThemeColoursPrimary,
+} from "../../Constants/UI";
 const Camera = ({ navigation }: any) => {
   const [facing, setFacing] = useState<CameraType>(CameraType.back);
   const [permission, requestPermission] = useCameraPermissions();
@@ -106,7 +110,7 @@ const Camera = ({ navigation }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: ThemeColours.PrimaryColour,
+    backgroundColor: ThemeColoursPrimary.SecondaryColour,
   },
   message: {
     textAlign: "center",
@@ -120,7 +124,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     padding: 8,
-    backgroundColor: ThemeColours.PrimaryColour,
+    backgroundColor: ThemeColoursPrimary.SecondaryColour,
   },
   bottomButtonsContainer: {
     flex: 1,
@@ -130,7 +134,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     bottom: 0,
     width: "100%",
-    backgroundColor: ThemeColours.PrimaryColour,
+    backgroundColor: ThemeColoursPrimary.SecondaryColour,
   },
   text: {
     fontSize: 24,
