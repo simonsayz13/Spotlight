@@ -10,13 +10,10 @@ import {
   TextInput,
   TouchableWithoutFeedback,
   Keyboard,
-  Modal,
-  ActivityIndicator,
 } from "react-native";
 import {
   MiscStackScreens,
   PostStackScreens,
-  ThemeColours,
   ThemeColoursPrimary,
 } from "../../Constants/UI";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -25,6 +22,7 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useSelector } from "react-redux";
 import { RootState } from "../../Redux/store";
 import { createPost } from "../../Firebase/firebaseFireStore";
+import ActivityLoader from "../../Components/ActivityLoader";
 
 const { width, height } = Dimensions.get("window");
 
@@ -162,17 +160,7 @@ const CreatePost = ({ navigation, route }: any) => {
           </View>
         </View>
 
-        <Modal transparent={true} animationType="fade" visible={posting}>
-          <View style={styles.loadingModal}>
-            <View style={styles.activityIndicatorWrapper}>
-              <ActivityIndicator
-                size="large"
-                color={ThemeColoursPrimary.SecondaryColour}
-              />
-              <Text>Posting...</Text>
-            </View>
-          </View>
-        </Modal>
+        <ActivityLoader indicator={posting} text={"Posting..."} />
       </SafeAreaView>
     </TouchableWithoutFeedback>
   );
@@ -294,20 +282,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: ThemeColoursPrimary.PrimaryColour,
-  },
-  loadingModal: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent background
-  },
-  activityIndicatorWrapper: {
-    backgroundColor: "#FFFFFF",
-    padding: 20,
-    borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
-    elevation: 5,
   },
 });
 
