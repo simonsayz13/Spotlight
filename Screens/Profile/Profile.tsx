@@ -7,13 +7,16 @@ import {
   Image,
   Platform,
   SafeAreaView,
+  TouchableWithoutFeedback,
 } from "react-native";
 import { useSelector } from "react-redux";
 import { RootState } from "../../Redux/store";
 import {
   Gender,
+  HomeStackScreens,
   ProfileStackScreens,
   ThemeColours,
+  ThemeColoursPrimary,
   userContentSelectorButtons,
 } from "../../Constants/UI";
 import { mockUserBio, mockUserPostsData } from "../../Constants/mockData";
@@ -95,12 +98,11 @@ const Profile = ({ navigation }: any) => {
           }}
         >
           <Text style={styles.userNameFont}>{userDisplayName}</Text>
-          {userGender === Gender.Male ? (
+          {userGender === Gender.Male && (
             <Ionicons name="male" size={20} color="#4bb9f3" />
-          ) : userGender === Gender.Female ? (
+          )}
+          {userGender === Gender.Female && (
             <Ionicons name="female" size={20} color="#f268df" />
-          ) : (
-            <></>
           )}
         </View>
         <Text style={styles.metaDataFont}>IP Address: United Kingdom</Text>
@@ -118,12 +120,12 @@ const Profile = ({ navigation }: any) => {
             <AntDesign
               name="edit"
               size={24}
-              color={ThemeColours.SecondaryColour}
+              color={ThemeColoursPrimary.SecondaryColour}
             />
           </TouchableOpacity>
         </View>
         <Text style={styles.descriptionText}>
-          {userBio ? userBio : "Add a bio in edit profile"}
+          {userBio ?? "Add a bio in edit profile"}
         </Text>
       </View>
       <View style={styles.userStatsContainer}>
@@ -172,6 +174,9 @@ const Profile = ({ navigation }: any) => {
                 user={userDisplayName}
                 likes={post.likes}
                 imageUrl={post.media[0].media_url}
+                openPost={() => {
+                  navigation.navigate(HomeStackScreens.Post);
+                }}
               />
             );
           })}
@@ -184,7 +189,7 @@ const Profile = ({ navigation }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: ThemeColours.PrimaryColour,
+    backgroundColor: ThemeColoursPrimary.PrimaryColour,
     paddingTop: Platform.OS === "android" ? 8 : 0,
   },
   profileDetails: {
@@ -193,13 +198,13 @@ const styles = StyleSheet.create({
     marginHorizontal: 8,
   },
   userNameFont: {
-    color: ThemeColours.SecondaryColour,
+    color: ThemeColoursPrimary.SecondaryColour,
     fontWeight: "bold",
     fontSize: 22,
   },
   metaDataFont: {
     fontSize: 10,
-    color: ThemeColours.SecondaryColour,
+    color: ThemeColoursPrimary.SecondaryColour,
     opacity: 0.6,
   },
   description: {
@@ -208,12 +213,12 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   descriptionTitle: {
-    color: ThemeColours.SecondaryColour,
+    color: ThemeColoursPrimary.SecondaryColour,
     fontSize: 18,
     fontWeight: "bold",
   },
   descriptionText: {
-    color: ThemeColours.SecondaryColour,
+    color: ThemeColoursPrimary.SecondaryColour,
   },
   userStatsContainer: {
     flexDirection: "row",
@@ -225,15 +230,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   statsCount: {
-    color: ThemeColours.SecondaryColour,
+    color: ThemeColoursPrimary.SecondaryColour,
     fontWeight: "bold",
   },
   statsFont: {
-    color: ThemeColours.SecondaryColour,
+    color: ThemeColoursPrimary.SecondaryColour,
   },
   signOutButton: {
     padding: 8,
-    backgroundColor: ThemeColours.SecondaryColour,
+    backgroundColor: ThemeColoursPrimary.LogoColour,
     borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
@@ -241,7 +246,7 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 16,
     fontWeight: "bold",
-    color: ThemeColours.PrimaryColour,
+    color: ThemeColoursPrimary.PrimaryColour,
   },
   userContentContainer: {
     flex: 1,
@@ -249,11 +254,10 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
     elevation: 5, // For Android shadow
-    shadowOffset: { width: 0, height: -2 },
+    shadowOffset: { width: 0, height: -1 },
     shadowOpacity: 0.2,
-    shadowRadius: 4,
-    marginHorizontal: 4,
-    backgroundColor: ThemeColours.PrimaryColour,
+    shadowRadius: 2,
+    backgroundColor: ThemeColoursPrimary.PrimaryColour,
   },
   contentContainerSelectorBar: {
     height: 34,
@@ -269,19 +273,19 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     flexWrap: "wrap",
     flexDirection: "row",
-    justifyContent: "center",
     marginTop: 2,
+    paddingLeft: 10,
     gap: 4,
   },
   menuButton: {
     fontSize: 16,
     fontWeight: "normal",
-    color: ThemeColours.SecondaryColour,
+    color: ThemeColoursPrimary.SecondaryColour,
   },
   menuButtonClicked: {
     fontSize: 16,
     fontWeight: "bold",
-    color: ThemeColours.SecondaryColour,
+    color: ThemeColoursPrimary.SecondaryColour,
   },
   textWrapper: {
     position: "relative",
@@ -292,7 +296,7 @@ const styles = StyleSheet.create({
     bottom: -4, // Adjust this value to control the gap between the text and underline
     height: 3,
     width: "70%",
-    backgroundColor: ThemeColours.ThirdColour, // Set the underline color
+    backgroundColor: ThemeColoursPrimary.LogoColour, // Set the underline color
     borderRadius: 18,
   },
   image: {

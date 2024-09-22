@@ -1,16 +1,13 @@
-import {
-  StyleSheet,
-  View,
-  Text,
-  SafeAreaView,
-  Platform,
-  StatusBar,
-} from "react-native";
+import { StyleSheet, View, Text, SafeAreaView } from "react-native";
 import TopNavigationBar from "../../Components/TopNavigationBar";
 import Contents from "./Contents";
 import { useCallback, useState } from "react";
 import DrawerNavigationBar from "../../Components/DrawerNavigationBar";
-import { HomeStackScreens, ThemeColours } from "../../Constants/UI";
+import {
+  HomeStackScreens,
+  ThemeColours,
+  ThemeColoursPrimary,
+} from "../../Constants/UI";
 
 const DrawerMenu = () => {
   return (
@@ -52,7 +49,7 @@ const HomeScreen = ({ navigation }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: ThemeColours.PrimaryColour,
+    backgroundColor: ThemeColoursPrimary.PrimaryColour,
   },
   content: {
     flex: 1,
@@ -66,10 +63,10 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 10,
     paddingLeft: 20,
-    backgroundColor: ThemeColours.PrimaryColour,
+    backgroundColor: ThemeColoursPrimary.PrimaryColour,
   },
   drawerText: {
-    color: ThemeColours.SecondaryColour,
+    color: ThemeColoursPrimary.SecondaryColour,
     marginBottom: 20,
     fontSize: 18,
   },

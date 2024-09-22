@@ -5,7 +5,11 @@ import {
   View,
   TouchableOpacity,
 } from "react-native";
-import { ProfileStackScreens, ThemeColours } from "../../Constants/UI";
+import {
+  ProfileStackScreens,
+  ThemeColours,
+  ThemeColoursPrimary,
+} from "../../Constants/UI";
 
 const LoginSignUpScreen = ({ navigation }: any) => {
   const onClickLogin = () => {
@@ -36,7 +40,7 @@ const LoginSignUpScreen = ({ navigation }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: ThemeColours.PrimaryColour,
+    backgroundColor: ThemeColoursPrimary.PrimaryColour,
   },
   logoContainer: {
     height: "65%",
@@ -44,15 +48,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   textContainer: {
-    backgroundColor: ThemeColours.SecondaryColour, // Background color for the text container
+    backgroundColor: ThemeColoursPrimary.LogoColour, // Background color for the text container
     paddingHorizontal: 16, // Padding around the text
     paddingVertical: 8, // Padding around the text
-    borderRadius: 20, // Rounded corners
+    borderRadius: 18, // Rounded corners
   },
   logoText: {
     fontWeight: "bold",
     fontSize: 66,
-    color: ThemeColours.PrimaryColour, // Same color as background
+    color: ThemeColoursPrimary.PrimaryColour, // Same color as background
     padding: 20,
   },
   bottomView: {
@@ -65,13 +69,13 @@ const styles = StyleSheet.create({
     height: 40,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: ThemeColours.SecondaryColour,
-    borderRadius: 30,
+    backgroundColor: ThemeColoursPrimary.LogoColour,
+    borderRadius: 10,
   },
   buttonText: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "bold",
-    color: ThemeColours.PrimaryColour,
+    color: ThemeColoursPrimary.PrimaryColour,
   },
 });
 

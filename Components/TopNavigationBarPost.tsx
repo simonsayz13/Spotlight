@@ -3,7 +3,7 @@ import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
-import { ThemeColours } from "../Constants/UI";
+import { ThemeColours, ThemeColoursPrimary } from "../Constants/UI";
 const TopNavigationBarPost = ({ navigation }: any) => {
   return (
     <View style={styles.container}>
@@ -16,16 +16,18 @@ const TopNavigationBarPost = ({ navigation }: any) => {
           <Ionicons
             name="chevron-back"
             size={32}
-            color={ThemeColours.SecondaryColour}
+            color={ThemeColoursPrimary.SecondaryColour}
           />
         </TouchableOpacity>
         <View style={styles.userWrapper}>
           <Ionicons
             name="person-circle-outline"
             size={34}
-            color={ThemeColours.SecondaryColour}
+            color={ThemeColoursPrimary.SecondaryColour}
           />
-          <Text style={{ color: ThemeColours.SecondaryColour }}>User</Text>
+          <Text style={{ color: ThemeColoursPrimary.SecondaryColour }}>
+            User
+          </Text>
         </View>
       </View>
       <View style={styles.followShareWrapper}>
@@ -33,7 +35,7 @@ const TopNavigationBarPost = ({ navigation }: any) => {
           <SimpleLineIcons
             name="user-follow"
             size={28}
-            color={ThemeColours.SecondaryColour}
+            color={ThemeColoursPrimary.SecondaryColour}
           />
         </TouchableOpacity>
 
@@ -41,7 +43,7 @@ const TopNavigationBarPost = ({ navigation }: any) => {
           <FontAwesome
             name="share-square-o"
             size={28}
-            color={ThemeColours.SecondaryColour}
+            color={ThemeColoursPrimary.SecondaryColour}
           />
         </TouchableOpacity>
       </View>
@@ -55,7 +57,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row",
     justifyContent: "space-between",
-    backgroundColor: ThemeColours.PrimaryColour,
+    backgroundColor: ThemeColoursPrimary.PrimaryColour,
+    borderBottomWidth: 0.4,
+    borderBottomColor: ThemeColoursPrimary.GreyColour,
   },
   leftWrapper: {
     flexDirection: "row", // Align children in a row

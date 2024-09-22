@@ -2,7 +2,7 @@ import { StyleSheet, RefreshControl, ScrollView } from "react-native";
 import PostCard from "../../Components/PostCard";
 import { useCallback, useEffect, useState } from "react";
 import { mockExploreData } from "../../Constants/mockData";
-import { ThemeColours } from "../../Constants/UI";
+import { ThemeColours, ThemeColoursPrimary } from "../../Constants/UI";
 
 const Contents = (props: any) => {
   const { content, openPost } = props;
@@ -55,12 +55,10 @@ const Contents = (props: any) => {
 
 const styles = StyleSheet.create({
   scrollView: {
-    flexGrow: 1,
     flexWrap: "wrap",
-    backgroundColor: ThemeColours.PrimaryColour,
     flexDirection: "row",
-    justifyContent: "center",
-    marginTop: 4,
+    paddingLeft: 10,
+    paddingTop: 4,
     gap: 4,
     paddingBottom: 8,
   },

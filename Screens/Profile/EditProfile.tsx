@@ -13,11 +13,15 @@ import {
   KeyboardAvoidingView,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { EditProfileType, Gender, ThemeColours } from "../../Constants/UI";
+import {
+  EditProfileType,
+  Gender,
+  ThemeColours,
+  ThemeColoursPrimary,
+} from "../../Constants/UI";
 import { useSelector } from "react-redux";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { RootState } from "../../Redux/store";
-import { mockUserBio } from "../../Constants/mockData";
 import { TextInput } from "react-native-gesture-handler";
 import { updateProfileField } from "../../Firebase/firebaseFireStore";
 import { FireStoreUsersField } from "../../Constants/dbReference";
@@ -25,7 +29,6 @@ import {
   updateAge,
   updateBio,
   updateDisplayName,
-  updateEducation,
   updateGender,
   updateLocation,
 } from "../../Redux/Slices/userSlice";
@@ -39,7 +42,6 @@ const EditProfile = ({ navigation }: any) => {
     userBio,
     userGender,
     userLocation,
-    userEducation,
   } = useSelector((state: RootState) => state.user);
   const slideAnim = useRef(new Animated.Value(400)).current;
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -54,7 +56,6 @@ const EditProfile = ({ navigation }: any) => {
   );
   const [age, setAge] = useState<number | null>(userAge);
   const [location, setLocation] = useState<string | null>(userLocation);
-  const [education, setEducation] = useState<string | null>(userEducation);
 
   const handleEditPress = (editType: string) => {
     setEditType(editType);
@@ -138,13 +139,6 @@ const EditProfile = ({ navigation }: any) => {
       [FireStoreUsersField.Location]: location,
     });
     store.dispatch(updateLocation(location));
-    hideModal();
-  };
-  const handleSaveEducation = async () => {
-    await updateProfileField(userId!, {
-      [FireStoreUsersField.Education]: education,
-    });
-    store.dispatch(updateEducation(education));
     hideModal();
   };
 
@@ -291,25 +285,6 @@ const EditProfile = ({ navigation }: any) => {
           </TouchableOpacity>
         </View>
       );
-    } else if (type === EditProfileType.Education) {
-      return (
-        <View style={{ alignItems: "center" }}>
-          <View style={styles.textInputContainer}>
-            <TextInput
-              style={styles.nameTextInput}
-              onChangeText={(text) => setEducation(text)}
-            >
-              {userEducation}
-            </TextInput>
-          </View>
-          <TouchableOpacity
-            style={styles.saveButton}
-            onPressIn={handleSaveEducation}
-          >
-            <Text style={styles.saveButtonText}>Save</Text>
-          </TouchableOpacity>
-        </View>
-      );
     }
     return <></>;
   };
@@ -325,7 +300,7 @@ const EditProfile = ({ navigation }: any) => {
             <Ionicons
               name="chevron-back"
               size={32}
-              color={ThemeColours.SecondaryColour}
+              color={ThemeColoursPrimary.SecondaryColour}
             />
           </TouchableOpacity>
           <Text style={styles.title}>Edit Profile</Text>
@@ -341,7 +316,11 @@ const EditProfile = ({ navigation }: any) => {
                   resizeMode="contain"
                 />
                 <TouchableOpacity style={styles.iconContainer}>
-                  <Ionicons name="camera-sharp" size={18} color="black" />
+                  <Ionicons
+                    name="camera-sharp"
+                    size={18}
+                    color={ThemeColoursPrimary.PrimaryColour}
+                  />
                 </TouchableOpacity>
               </View>
             </View>
@@ -359,11 +338,12 @@ const EditProfile = ({ navigation }: any) => {
                   <AntDesign
                     name="edit"
                     size={20}
-                    color={ThemeColours.SecondaryColour}
+                    color={ThemeColoursPrimary.SecondaryColour}
                   />
                 </TouchableOpacity>
               </View>
             </View>
+            <View style={styles.divider} />
             <View style={styles.detailSection}>
               <Text style={styles.detailSectionTitle}>
                 {EditProfileType.Bio}
@@ -387,11 +367,12 @@ const EditProfile = ({ navigation }: any) => {
                   <AntDesign
                     name="edit"
                     size={20}
-                    color={ThemeColours.SecondaryColour}
+                    color={ThemeColoursPrimary.SecondaryColour}
                   />
                 </TouchableOpacity>
               </View>
             </View>
+            <View style={styles.divider} />
             <View style={styles.detailSection}>
               <Text style={styles.detailSectionTitle}>
                 {EditProfileType.Gender}
@@ -412,11 +393,12 @@ const EditProfile = ({ navigation }: any) => {
                   <AntDesign
                     name="edit"
                     size={20}
-                    color={ThemeColours.SecondaryColour}
+                    color={ThemeColoursPrimary.SecondaryColour}
                   />
                 </TouchableOpacity>
               </View>
             </View>
+            <View style={styles.divider} />
             <View style={styles.detailSection}>
               <Text style={styles.detailSectionTitle}>
                 {EditProfileType.Age}
@@ -437,11 +419,12 @@ const EditProfile = ({ navigation }: any) => {
                   <AntDesign
                     name="edit"
                     size={20}
-                    color={ThemeColours.SecondaryColour}
+                    color={ThemeColoursPrimary.SecondaryColour}
                   />
                 </TouchableOpacity>
               </View>
             </View>
+            <View style={styles.divider} />
             <View style={styles.detailSection}>
               <Text style={styles.detailSectionTitle}>
                 {EditProfileType.Location}
@@ -462,32 +445,7 @@ const EditProfile = ({ navigation }: any) => {
                   <AntDesign
                     name="edit"
                     size={20}
-                    color={ThemeColours.SecondaryColour}
-                  />
-                </TouchableOpacity>
-              </View>
-            </View>
-            <View style={styles.detailSection}>
-              <Text style={styles.detailSectionTitle}>
-                {EditProfileType.Education}
-              </Text>
-              <View style={styles.detailSectionTextView}>
-                <Text
-                  style={styles.detailSectionText}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                >
-                  {userEducation}
-                </Text>
-                <TouchableOpacity
-                  onPressIn={() => {
-                    handleEditPress(EditProfileType.Education);
-                  }}
-                >
-                  <AntDesign
-                    name="edit"
-                    size={20}
-                    color={ThemeColours.SecondaryColour}
+                    color={ThemeColoursPrimary.SecondaryColour}
                   />
                 </TouchableOpacity>
               </View>
@@ -518,7 +476,7 @@ const EditProfile = ({ navigation }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: ThemeColours.PrimaryColour,
+    backgroundColor: ThemeColoursPrimary.PrimaryColour,
     paddingTop: Platform.OS === "android" ? 8 : 0,
   },
   topBarContainer: {
@@ -533,7 +491,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 20,
     fontWeight: "bold",
-    color: ThemeColours.SecondaryColour,
+    color: ThemeColoursPrimary.SecondaryColour,
   },
   placeholder: {
     width: 32, // same width as the backButton to balance the layout
@@ -561,7 +519,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     right: 0,
     justifyContent: "center",
-    backgroundColor: ThemeColours.SecondaryColour,
+    backgroundColor: ThemeColoursPrimary.SecondaryColour,
     borderRadius: 20, // Half of the size of the icon to make it circular
     padding: 4, // Padding to make the icon stand out
   },
@@ -576,7 +534,7 @@ const styles = StyleSheet.create({
   detailSectionTitle: {
     fontWeight: "bold",
     fontSize: 20,
-    color: ThemeColours.SecondaryColour,
+    color: ThemeColoursPrimary.SecondaryColour,
   },
   detailSectionTextView: {
     flexDirection: "row",
@@ -584,7 +542,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   detailSectionText: {
-    color: ThemeColours.SecondaryColour,
+    color: ThemeColoursPrimary.SecondaryColour,
     fontSize: 20,
   },
   modalContainer: {
@@ -592,7 +550,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: ThemeColours.PrimaryColour,
+    backgroundColor: ThemeColoursPrimary.PrimaryColour,
     borderTopLeftRadius: 14,
     borderTopRightRadius: 14,
     elevation: 10, // For Android shadow
@@ -608,44 +566,45 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    color: ThemeColours.SecondaryColour,
+    color: ThemeColoursPrimary.SecondaryColour,
     paddingVertical: 8,
     alignSelf: "center",
   },
   modalDescription: {
     marginVertical: 10,
     fontSize: 16,
-    color: ThemeColours.SecondaryColour,
+    color: ThemeColoursPrimary.SecondaryColour,
   },
   textInputContainer: {
     width: 300,
     height: 50,
-    backgroundColor: ThemeColours.SecondaryColour,
     borderRadius: 10,
     justifyContent: "center",
     paddingLeft: 6,
     marginBottom: 10,
+    backgroundColor: ThemeColoursPrimary.BackgroundColour,
+    // borderWidth: 2,
   },
   nameTextInput: {
     fontSize: 16,
-    color: ThemeColours.PrimaryColour,
+    color: ThemeColoursPrimary.SecondaryColour,
   },
   saveButton: {
-    backgroundColor: ThemeColours.SecondaryColour,
+    backgroundColor: ThemeColoursPrimary.LogoColour,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 10,
     padding: 10,
   },
   saveButtonText: {
-    color: ThemeColours.PrimaryColour,
+    color: ThemeColoursPrimary.PrimaryColour,
     fontSize: 16,
     fontWeight: "bold",
   },
   bioTextInputContainer: {
     width: 300,
     height: 160,
-    backgroundColor: ThemeColours.SecondaryColour,
+    backgroundColor: ThemeColoursPrimary.BackgroundColour,
     borderRadius: 10,
     paddingLeft: 8,
     paddingTop: 6,
@@ -653,11 +612,12 @@ const styles = StyleSheet.create({
   },
   optionPickerContainer: {
     width: Platform.OS === "ios" ? 360 : 320,
-    backgroundColor: ThemeColours.SecondaryColour,
-    borderRadius: 8,
+    backgroundColor: ThemeColoursPrimary.PrimaryColour,
+    borderRadius: 20,
     paddingHorizontal: 16,
     justifyContent: "center",
     marginBottom: 10,
+    borderWidth: 1.2,
   },
   optionPicker: {
     height: 30,
@@ -666,18 +626,18 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginVertical: 6,
   },
-  optionText: { fontSize: 18, color: ThemeColours.PrimaryColour },
+  optionText: { fontSize: 18, color: ThemeColoursPrimary.SecondaryColour },
   divider: {
     height: 1,
     width: "100%", // Same width as the TouchableOpacity
-    backgroundColor: ThemeColours.PrimaryColour, // Gray line color
+    backgroundColor: ThemeColoursPrimary.SecondaryColour, // Gray line color
     alignSelf: "center",
-    opacity: 0.2,
+    opacity: 0.15,
   },
   ageInputContainer: {
     width: 100,
     height: 50,
-    backgroundColor: ThemeColours.SecondaryColour,
+    backgroundColor: ThemeColoursPrimary.BackgroundColour,
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
@@ -685,7 +645,7 @@ const styles = StyleSheet.create({
   },
   ageTextInput: {
     fontSize: 22,
-    color: ThemeColours.PrimaryColour,
+    color: ThemeColoursPrimary.SecondaryColour,
   },
 });
 

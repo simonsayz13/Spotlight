@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, Image, StyleSheet, ScrollView } from "react-native";
 import { mockCommentData } from "../Constants/mockData";
-import { ThemeColours } from "../Constants/UI";
+import { ThemeColours, ThemeColoursPrimary } from "../Constants/UI";
 import CommentCard from "./CommentCard";
 
 const MainPost = () => {
@@ -34,7 +34,7 @@ const MainPost = () => {
 
       {/* Comment Count */}
       <View style={styles.commentCountContainer}>
-        <Text style={{ color: ThemeColours.SecondaryColour }}>
+        <Text style={{ color: ThemeColoursPrimary.SecondaryColour }}>
           {mockCommentData.length} Comments
         </Text>
       </View>
@@ -47,7 +47,9 @@ const MainPost = () => {
       </View>
 
       <View style={{ alignItems: "center", paddingTop: 15, paddingBottom: 40 }}>
-        <Text style={{ color: ThemeColours.SecondaryColour }}>- The end -</Text>
+        <Text style={{ color: ThemeColoursPrimary.SecondaryColour }}>
+          - The end -
+        </Text>
       </View>
     </ScrollView>
   );
@@ -71,7 +73,7 @@ const styles = StyleSheet.create({
   postTitleText: {
     fontSize: 20,
     fontWeight: "bold",
-    color: ThemeColours.SecondaryColour,
+    color: ThemeColoursPrimary.SecondaryColour,
   },
   postDescriptionContainer: {
     marginHorizontal: 8,
@@ -79,7 +81,7 @@ const styles = StyleSheet.create({
   postDescriptionText: {
     fontSize: 16,
     fontWeight: "500",
-    color: ThemeColours.SecondaryColour,
+    color: ThemeColoursPrimary.SecondaryColour,
   },
   userMetaDataContainer: {
     marginVertical: 6,
@@ -88,7 +90,7 @@ const styles = StyleSheet.create({
   userMetaDataText: {
     fontSize: 11,
     opacity: 0.6,
-    color: ThemeColours.SecondaryColour,
+    color: ThemeColoursPrimary.SecondaryColour,
   },
   postContentContainer: {
     borderBottomWidth: 1,

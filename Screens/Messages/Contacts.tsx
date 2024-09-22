@@ -7,7 +7,11 @@ import {
   TouchableOpacity,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { MessagingStackScreens, ThemeColours } from "../../Constants/UI";
+import {
+  MessagingStackScreens,
+  ThemeColours,
+  ThemeColoursPrimary,
+} from "../../Constants/UI";
 import { mockContactsList } from "../../Constants/mockData";
 import { ScrollView } from "react-native-gesture-handler";
 const Contacts = ({ navigation }: any) => {
@@ -17,14 +21,21 @@ const Contacts = ({ navigation }: any) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.searchBar}>
-        <Ionicons name="search" size={32} color={ThemeColours.PrimaryColour} />
-        <TextInput
-          style={styles.input}
-          placeholder="Search..."
-          placeholderTextColor={ThemeColours.PrimaryColour}
-        />
+      <View style={styles.searchBarContainer}>
+        <View style={styles.searchBar}>
+          <Ionicons
+            name="search"
+            size={32}
+            color={ThemeColoursPrimary.SecondaryColour}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Search..."
+            placeholderTextColor={ThemeColoursPrimary.SecondaryColour}
+          />
+        </View>
       </View>
+
       <ScrollView style={styles.scrollViewContainer}>
         {mockContactsList.map((contact) => {
           return (
@@ -38,7 +49,7 @@ const Contacts = ({ navigation }: any) => {
                 <Ionicons
                   name="person-circle-outline"
                   size={62}
-                  color={ThemeColours.SecondaryColour}
+                  color={ThemeColoursPrimary.SecondaryColour}
                 />
                 <View>
                   <View style={styles.usernameTimeStampContainer}>
@@ -63,27 +74,29 @@ const Contacts = ({ navigation }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: ThemeColours.PrimaryColour,
+    backgroundColor: ThemeColoursPrimary.PrimaryColour,
   },
   searchBarContainer: {
     flexDirection: "row",
     alignItems: "center",
+    borderBottomWidth: 0.2,
+    borderBottomColor: ThemeColoursPrimary.GreyColour,
   },
   searchBar: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#f1f1f1",
     borderRadius: 10,
-    borderColor: ThemeColours.PrimaryColour,
+    borderColor: ThemeColoursPrimary.PrimaryColour,
     borderWidth: 1.0,
     marginHorizontal: 26,
-    marginVertical: 8,
+    marginVertical: 6,
     paddingHorizontal: 8,
   },
   input: {
     height: 36,
     paddingLeft: 8,
-    color: ThemeColours.PrimaryColour,
+    // color: ThemeColoursPrimary.PrimaryColour,
     fontSize: 16,
     width: "90%",
   },
@@ -103,11 +116,11 @@ const styles = StyleSheet.create({
   },
   usernameText: {
     fontWeight: "bold",
-    color: ThemeColours.SecondaryColour,
+    color: ThemeColoursPrimary.SecondaryColour,
     fontSize: 20,
   },
   lastMessageText: {
-    color: ThemeColours.SecondaryColour,
+    color: ThemeColoursPrimary.SecondaryColour,
     opacity: 0.7,
     fontSize: 16,
   },

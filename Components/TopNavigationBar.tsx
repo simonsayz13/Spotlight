@@ -6,11 +6,14 @@ import {
   Animated,
   TextInput,
   Keyboard,
-  Platform,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useRef, useState } from "react";
-import { ThemeColours, TopNavigationHomeButtons } from "../Constants/UI";
+import { useState } from "react";
+import {
+  ThemeColours,
+  ThemeColoursPrimary,
+  TopNavigationHomeButtons,
+} from "../Constants/UI";
 
 const TopNavigationBar = (props: any) => {
   const { setContent, drawerHandler } = props;
@@ -61,23 +64,15 @@ const TopNavigationBar = (props: any) => {
 
   return (
     <View style={styles.container}>
-      {showSearchBar ? (
-        <TouchableOpacity onPress={toggleSearchBar}>
-          <Ionicons
-            name="chevron-back"
-            size={32}
-            color={ThemeColours.SecondaryColour}
-          />
-        </TouchableOpacity>
-      ) : (
-        <TouchableOpacity onPress={drawerHandler}>
-          <Ionicons
-            name="menu"
-            size={32}
-            color={ThemeColours.SecondaryColour}
-          />
-        </TouchableOpacity>
-      )}
+      <TouchableOpacity
+        onPress={showSearchBar ? toggleSearchBar : drawerHandler}
+      >
+        <Ionicons
+          name={showSearchBar ? "chevron-back" : "menu"}
+          size={32}
+          color={ThemeColoursPrimary.SecondaryColour}
+        />
+      </TouchableOpacity>
 
       <View style={styles.menuContainer}>
         <Animated.View
@@ -115,7 +110,7 @@ const TopNavigationBar = (props: any) => {
         <Ionicons
           name="search"
           size={32}
-          color={ThemeColours.SecondaryColour}
+          color={ThemeColoursPrimary.SecondaryColour}
         />
       </TouchableOpacity>
     </View>
@@ -123,13 +118,6 @@ const TopNavigationBar = (props: any) => {
 };
 
 const styles = StyleSheet.create({
-  menuContainer: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 12,
-  },
   container: {
     top: 0,
     left: 0,
@@ -138,16 +126,27 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row",
     justifyContent: "space-around",
+    backgroundColor: ThemeColoursPrimary.PrimaryColour,
+    borderBottomWidth: 0.4,
+    borderBottomColor: ThemeColoursPrimary.GreyColour,
   },
+  menuContainer: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 12,
+  },
+
   menuButton: {
     fontSize: 20,
     fontWeight: "normal",
-    color: ThemeColours.SecondaryColour,
+    color: ThemeColoursPrimary.SecondaryColour,
   },
   menuButtonClicked: {
     fontSize: 20,
     fontWeight: "bold",
-    color: ThemeColours.SecondaryColour,
+    color: ThemeColoursPrimary.SecondaryColour,
   },
   textWrapper: {
     position: "relative",
@@ -158,17 +157,17 @@ const styles = StyleSheet.create({
     bottom: -4, // Adjust this value to control the gap between the text and underline
     height: 3,
     width: "70%",
-    backgroundColor: ThemeColours.ThirdColour, // Set the underline color
+    backgroundColor: ThemeColoursPrimary.LogoColour, // Set the underline color
     borderRadius: 18,
   },
   searchBar: {
     flexGrow: 1,
     width: "100%",
     position: "absolute",
-    backgroundColor: "#f1f1f1",
+    backgroundColor: ThemeColoursPrimary.BackgroundColour,
     borderRadius: 20,
-    borderColor: ThemeColours.PrimaryColour,
-    borderWidth: 1.0,
+    // borderColor: ThemeColours.PrimaryColour,
+    borderWidth: 2,
   },
   input: {
     height: 36,

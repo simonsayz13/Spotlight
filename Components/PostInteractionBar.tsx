@@ -14,7 +14,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import Octicons from "@expo/vector-icons/Octicons";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { ThemeColours } from "../Constants/UI";
+import { ThemeColours, ThemeColoursPrimary } from "../Constants/UI";
 
 const screenWidth = Dimensions.get("window").width;
 const PostInteractionBar = () => {
@@ -47,14 +47,14 @@ const PostInteractionBar = () => {
             <FontAwesome
               name="pencil-square-o"
               size={20}
-              color={ThemeColours.PrimaryColour}
+              color={ThemeColoursPrimary.SecondaryColour}
             />
             <TextInput
               style={styles.input}
               placeholder="Say something..."
               onFocus={handleKeyboardDidShow}
               onBlur={handleKeyboardDidHide}
-              placeholderTextColor={ThemeColours.PrimaryColour}
+              placeholderTextColor={ThemeColoursPrimary.SecondaryColour}
             />
           </View>
           {inputActive && (
@@ -63,21 +63,21 @@ const PostInteractionBar = () => {
                 <MaterialIcons
                   name="alternate-email"
                   size={22}
-                  color={ThemeColours.PrimaryColour}
+                  color={ThemeColoursPrimary.SecondaryColour}
                 />
               </TouchableOpacity>
               <TouchableOpacity>
                 <Octicons
                   name="smiley"
                   size={20}
-                  color={ThemeColours.PrimaryColour}
+                  color={ThemeColoursPrimary.SecondaryColour}
                 />
               </TouchableOpacity>
               <TouchableOpacity>
                 <FontAwesome
                   name="image"
                   size={20}
-                  color={ThemeColours.PrimaryColour}
+                  color={ThemeColoursPrimary.SecondaryColour}
                 />
               </TouchableOpacity>
             </View>
@@ -91,30 +91,36 @@ const PostInteractionBar = () => {
               <AntDesign
                 name="hearto"
                 size={28}
-                color={ThemeColours.ThirdColour}
+                color={ThemeColoursPrimary.SecondaryColour}
               />
             </TouchableOpacity>
-            <Text style={{ color: ThemeColours.ThirdColour }}>520</Text>
+            <Text style={{ color: ThemeColoursPrimary.SecondaryColour }}>
+              520
+            </Text>
           </View>
           <View style={styles.actionWrapper}>
             <TouchableOpacity>
               <AntDesign
                 name="staro"
                 size={28}
-                color={ThemeColours.ThirdColour}
+                color={ThemeColoursPrimary.SecondaryColour}
               />
             </TouchableOpacity>
-            <Text style={{ color: ThemeColours.ThirdColour }}>Col</Text>
+            <Text style={{ color: ThemeColoursPrimary.SecondaryColour }}>
+              Fav
+            </Text>
           </View>
           <View style={styles.actionWrapper}>
             <TouchableOpacity>
               <Ionicons
                 name="chatbubble-ellipses-outline"
                 size={28}
-                color={ThemeColours.ThirdColour}
+                color={ThemeColoursPrimary.SecondaryColour}
               />
             </TouchableOpacity>
-            <Text style={{ color: ThemeColours.ThirdColour }}>4</Text>
+            <Text style={{ color: ThemeColoursPrimary.SecondaryColour }}>
+              4
+            </Text>
           </View>
         </View>
       )}
@@ -129,18 +135,17 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     gap: Platform.OS === "ios" ? 14 : 8,
-    backgroundColor: ThemeColours.PrimaryColour,
+    backgroundColor: ThemeColoursPrimary.PrimaryColour,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    // Elevation for Android
-    elevation: 4,
+    shadowOffset: { width: 0, height: -6 },
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    elevation: 20,
   },
   searchBar: {
     backgroundColor: "#f1f1f1",
     borderRadius: 20,
-    borderColor: ThemeColours.PrimaryColour,
+    borderColor: ThemeColoursPrimary.SecondaryColour,
     borderWidth: 1.2,
     flexDirection: "row",
     alignItems: "center",

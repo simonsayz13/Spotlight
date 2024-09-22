@@ -17,7 +17,7 @@ import {
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MapView, { Marker } from "react-native-maps";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
-import { ThemeColours } from "../../Constants/UI";
+import { ThemeColours, ThemeColoursPrimary } from "../../Constants/UI";
 const Map = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedMarker, setSelectedMarker] = useState(null);
@@ -82,12 +82,12 @@ const Map = () => {
           <Ionicons
             name="search"
             size={32}
-            color={ThemeColours.PrimaryColour}
+            color={ThemeColoursPrimary.SecondaryColour}
           />
           <TextInput
             style={styles.input}
             placeholder="Search..."
-            placeholderTextColor={ThemeColours.PrimaryColour}
+            placeholderTextColor={ThemeColoursPrimary.SecondaryColour}
           />
         </View>
         <MapView style={styles.map}>
@@ -142,7 +142,7 @@ const Map = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: ThemeColours.PrimaryColour,
+    backgroundColor: ThemeColoursPrimary.PrimaryColour,
   },
   map: {
     width: "100%",
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#f1f1f1",
     borderRadius: 10,
-    borderColor: ThemeColours.PrimaryColour,
+    borderColor: ThemeColoursPrimary.PrimaryColour,
     borderWidth: 1.0,
     marginHorizontal: 26,
     marginVertical: 8,
@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
   input: {
     height: 36,
     paddingLeft: 8,
-    color: ThemeColours.PrimaryColour,
+    color: ThemeColoursPrimary.SecondaryColour,
     fontSize: 16,
     width: "90%",
   },
@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: ThemeColours.PrimaryColour,
+    backgroundColor: ThemeColoursPrimary.PrimaryColour,
     borderTopLeftRadius: 14,
     borderTopRightRadius: 14,
     padding: 16,
@@ -188,12 +188,12 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    color: ThemeColours.SecondaryColour,
+    color: ThemeColoursPrimary.SecondaryColour,
   },
   modalDescription: {
     marginVertical: 10,
     fontSize: 16,
-    color: ThemeColours.SecondaryColour,
+    color: ThemeColoursPrimary.SecondaryColour,
   },
 });
 

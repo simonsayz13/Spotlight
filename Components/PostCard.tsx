@@ -9,7 +9,7 @@ import {
 } from "react-native";
 
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { ThemeColours } from "../Constants/UI";
+import { ThemeColours, ThemeColoursPrimary } from "../Constants/UI";
 
 const PostCard = ({ title, imageUrl, user, likes, openPost }: any) => {
   return (
@@ -38,7 +38,7 @@ const PostCard = ({ title, imageUrl, user, likes, openPost }: any) => {
             <AntDesign
               name="hearto"
               size={12}
-              color={ThemeColours.SecondaryColour}
+              color={ThemeColoursPrimary.SecondaryColour}
             />
             <Text style={styles.userFont}>{likes}</Text>
           </View>
@@ -50,7 +50,7 @@ const PostCard = ({ title, imageUrl, user, likes, openPost }: any) => {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: ThemeColours.PrimaryColour,
+    backgroundColor: ThemeColoursPrimary.PrimaryColour,
     borderRadius: 4,
     ...Platform.select({
       ios: {
@@ -78,11 +78,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
     fontWeight: "bold",
-    color: ThemeColours.SecondaryColour,
+    color: ThemeColoursPrimary.SecondaryColour,
   },
   userFont: {
     fontSize: 12,
-    color: ThemeColours.SecondaryColour,
+    color: ThemeColoursPrimary.SecondaryColour,
     opacity: 0.7,
   },
   userLikes: {

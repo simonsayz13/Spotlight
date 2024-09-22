@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Octicons from "@expo/vector-icons/Octicons";
-import { ThemeColours } from "../Constants/UI";
+import { ThemeColours, ThemeColoursPrimary } from "../Constants/UI";
 
 const CommentCard = ({ commentData }: any) => {
   return (
@@ -12,7 +12,7 @@ const CommentCard = ({ commentData }: any) => {
         <Ionicons
           name="person-circle-outline"
           size={30}
-          color={ThemeColours.SecondaryColour}
+          color={ThemeColoursPrimary.SecondaryColour}
         />
         <Text style={styles.userNameFont}>{commentData.userName}</Text>
         <View style={styles.separatorDot} />
@@ -26,7 +26,7 @@ const CommentCard = ({ commentData }: any) => {
           <Octicons
             name="reply"
             size={20}
-            color={ThemeColours.SecondaryColour}
+            color={ThemeColoursPrimary.SecondaryColour}
           />
           <Text style={styles.miscFont}>Reply</Text>
         </TouchableOpacity>
@@ -36,7 +36,7 @@ const CommentCard = ({ commentData }: any) => {
             <AntDesign
               name="like2"
               size={20}
-              color={ThemeColours.SecondaryColour}
+              color={ThemeColoursPrimary.SecondaryColour}
             />
           </TouchableOpacity>
           <Text style={styles.miscFont}>{commentData.likes}</Text>
@@ -47,7 +47,7 @@ const CommentCard = ({ commentData }: any) => {
             <AntDesign
               name="dislike2"
               size={20}
-              color={ThemeColours.SecondaryColour}
+              color={ThemeColoursPrimary.SecondaryColour}
             />
           </TouchableOpacity>
           <Text style={styles.miscFont}>{commentData.dislikes}</Text>
@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
   userNameFont: {
     fontSize: 12,
     fontWeight: "bold",
-    color: ThemeColours.SecondaryColour,
+    color: ThemeColoursPrimary.SecondaryColour,
   },
   timeStampFont: {
     fontSize: 12,
@@ -86,11 +86,11 @@ const styles = StyleSheet.create({
   separatorDot: {
     height: 3.5,
     width: 3.5,
-    backgroundColor: ThemeColours.SecondaryColour,
+    backgroundColor: ThemeColoursPrimary.SecondaryColour,
     borderRadius: 50,
   },
   commentFont: {
-    color: ThemeColours.SecondaryColour,
+    color: ThemeColoursPrimary.SecondaryColour,
   },
   commentActions: {
     flexDirection: "row",
@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   miscFont: {
-    color: ThemeColours.SecondaryColour,
+    color: ThemeColoursPrimary.SecondaryColour,
   },
 });
 

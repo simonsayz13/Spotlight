@@ -10,7 +10,7 @@ import {
   Keyboard,
   TouchableOpacity,
 } from "react-native";
-import { ThemeColours } from "../../Constants/UI";
+import { ThemeColours, ThemeColoursPrimary } from "../../Constants/UI";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { mockChatData } from "../../Constants/mockData";
 const Chat = ({ route, navigation }: any) => {
@@ -40,13 +40,13 @@ const Chat = ({ route, navigation }: any) => {
           <Ionicons
             name="chevron-back"
             size={32}
-            color={ThemeColours.SecondaryColour}
+            color={ThemeColoursPrimary.SecondaryColour}
           />
         </TouchableOpacity>
         <Ionicons
           name="person-circle-outline"
           size={48}
-          color={ThemeColours.SecondaryColour}
+          color={ThemeColoursPrimary.SecondaryColour}
         />
         <View style={styles.usernameActivityContainer}>
           <Text style={styles.userNameText}>{userName}</Text>
@@ -83,7 +83,7 @@ const Chat = ({ route, navigation }: any) => {
                 <Ionicons
                   name="person-circle-outline"
                   size={38}
-                  color={ThemeColours.SecondaryColour}
+                  color={ThemeColoursPrimary.SecondaryColour}
                 />
                 <Text
                   style={[
@@ -110,7 +110,7 @@ const Chat = ({ route, navigation }: any) => {
           <TextInput
             style={styles.input}
             placeholder="Send message..."
-            placeholderTextColor={ThemeColours.PrimaryColour}
+            placeholderTextColor={ThemeColoursPrimary.SecondaryColour}
             returnKeyType="send"
           />
         </View>
@@ -121,7 +121,7 @@ const Chat = ({ route, navigation }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: ThemeColours.PrimaryColour,
+    backgroundColor: ThemeColoursPrimary.PrimaryColour,
   },
   topBarContainer: {
     flexDirection: "row",
@@ -129,12 +129,12 @@ const styles = StyleSheet.create({
   },
   userNameText: {
     fontSize: 20,
-    color: ThemeColours.SecondaryColour,
+    color: ThemeColoursPrimary.SecondaryColour,
     fontWeight: "bold",
   },
   activityStatusText: {
     fontSize: 12,
-    color: ThemeColours.SecondaryColour,
+    color: ThemeColoursPrimary.SecondaryColour,
     opacity: 0.6,
   },
   usernameActivityContainer: {
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#f1f1f1",
-    borderColor: ThemeColours.PrimaryColour,
+    // borderColor: ThemeColoursPrimary.PrimaryColour,
     borderWidth: 1.0,
     paddingHorizontal: 8,
     marginVertical: 8,
@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
     paddingLeft: 8,
     fontSize: 16,
     width: "90%",
-    color: ThemeColours.PrimaryColour,
+    color: ThemeColoursPrimary.SecondaryColour,
   },
   messageContainer: {
     flexDirection: "row",
@@ -179,14 +179,14 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: ThemeColours.PrimaryColour,
-    backgroundColor: ThemeColours.SecondaryColour,
-    color: ThemeColours.PrimaryColour,
+    borderColor: ThemeColoursPrimary.SecondaryColour,
+    backgroundColor: ThemeColoursPrimary.PrimaryColour,
+    color: ThemeColoursPrimary.SecondaryColour,
     overflow: "hidden",
   },
   timeStampContainer: {
     padding: 6, // Optional: Add some padding
   },
-  timeStampText: { fontSize: 10, color: ThemeColours.SecondaryColour },
+  timeStampText: { fontSize: 10, color: ThemeColoursPrimary.SecondaryColour },
 });
 export default Chat;
