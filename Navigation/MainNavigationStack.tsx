@@ -1,16 +1,38 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import TabNavigation from "./TabNavigation";
-import { HomeStackScreens, MessagingStackScreens } from "../Constants/UI";
+import {
+  HomeStackScreens,
+  MessagingStackScreens,
+  MiscStackScreens,
+} from "../Constants/UI";
 import Post from "../Screens/Home/Post";
 import Chat from "../Screens/Messages/Chat";
-const MainStack = createNativeStackNavigator();
+import PhotoBrowser from "../Screens/Misc/PhotoBrowser";
+import {
+  TransitionPresets,
+  createStackNavigator,
+} from "@react-navigation/stack";
+import ImageCropScreen from "../Screens/Misc/ImageCropper";
+const MainStack = createStackNavigator();
 
 const MainNavigationStack = () => (
   <MainStack.Navigator screenOptions={{ headerShown: false }}>
     <MainStack.Screen name={"MainTab"} component={TabNavigation} />
     <MainStack.Screen name={HomeStackScreens.Post} component={Post} />
     <MainStack.Screen name={MessagingStackScreens.Chat} component={Chat} />
+    <MainStack.Screen
+      name={MiscStackScreens.PhotoBrowser}
+      component={PhotoBrowser}
+      options={{
+        gestureDirection: "vertical",
+        presentation: "modal",
+      }}
+    />
+    <MainStack.Screen
+      name={MiscStackScreens.ImageCropper}
+      component={ImageCropScreen}
+    />
   </MainStack.Navigator>
 );
 

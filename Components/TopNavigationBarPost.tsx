@@ -3,7 +3,7 @@ import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
-import { ThemeColours, ThemeColoursPrimary } from "../Constants/UI";
+import { ThemeColoursPrimary } from "../Constants/UI";
 const TopNavigationBarPost = ({ navigation }: any) => {
   return (
     <View style={styles.container}>

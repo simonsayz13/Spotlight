@@ -5,17 +5,20 @@ import {
   View,
   Text,
   SafeAreaView,
-  Image,
   Platform,
   ScrollView,
   Animated,
   PanResponder,
   KeyboardAvoidingView,
+  ActivityIndicator,
+  Alert,
+  Modal,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {
   EditProfileType,
   Gender,
+  MiscStackScreens,
   ThemeColours,
   ThemeColoursPrimary,
 } from "../../Constants/UI";
@@ -31,8 +34,14 @@ import {
   updateDisplayName,
   updateGender,
   updateLocation,
+  updateProfilePhotoURL,
 } from "../../Redux/Slices/userSlice";
 import store from "../../Redux/store";
+import * as ImagePicker from "expo-image-picker";
+import { Image } from "expo-image";
+import { uploadProfilePicture } from "../../Firebase/firebaseStorage";
+import ActivityLoader from "../../Components/ActivityLoader";
+
 const EditProfile = ({ navigation }: any) => {
   const {
     userId,
@@ -56,11 +65,53 @@ const EditProfile = ({ navigation }: any) => {
   );
   const [age, setAge] = useState<number | null>(userAge);
   const [location, setLocation] = useState<string | null>(userLocation);
+  const [uploading, setUploading] = useState(false);
 
   const handleEditPress = (editType: string) => {
     setEditType(editType);
     setIsModalVisible(true);
     showModal();
+  };
+
+  const goToPhotoBrowser = () => {
+    pickImage();
+  };
+
+  const pickImage = async () => {
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (permissionResult.granted === false) {
+      alert("Permission to access camera roll is required!");
+      return;
+    }
+
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true, // Allows cropping
+      aspect: [3, 4], // Specify aspect ratio (optional)
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setUploading(true);
+      try {
+        const uploadResponse = await uploadProfilePicture(
+          userId!,
+          result.assets[0].uri
+        );
+        await updateProfileField(userId!, {
+          profile_picture_url: uploadResponse,
+        });
+        store.dispatch(updateProfilePhotoURL(uploadResponse));
+      } catch (error) {
+        Alert.alert(
+          "Error",
+          "Error updating profile picture, please try again"
+        );
+      }
+      setUploading(false);
+    }
   };
 
   const goBack = () => {
@@ -311,11 +362,18 @@ const EditProfile = ({ navigation }: any) => {
             <View style={styles.imageSection}>
               <View style={styles.imageContainer}>
                 <Image
-                  source={require("../../assets/test_image/mock_profile_picture.png")}
+                  source={
+                    userProfilePhotoURL
+                      ? { uri: userProfilePhotoURL }
+                      : require("../../assets/test_image/mock_profile_picture.png")
+                  }
                   style={styles.image}
                   resizeMode="contain"
                 />
-                <TouchableOpacity style={styles.iconContainer}>
+                <TouchableOpacity
+                  style={styles.iconContainer}
+                  onPressIn={goToPhotoBrowser}
+                >
                   <Ionicons
                     name="camera-sharp"
                     size={18}
@@ -452,6 +510,9 @@ const EditProfile = ({ navigation }: any) => {
             </View>
           </View>
         </ScrollView>
+
+        {/* loading modal for uploading picture */}
+        <ActivityLoader indicator={uploading} text={"Uploading..."} />
 
         {/* Pop up modal */}
         {isModalVisible && (
@@ -646,6 +707,30 @@ const styles = StyleSheet.create({
   ageTextInput: {
     fontSize: 22,
     color: ThemeColoursPrimary.SecondaryColour,
+  },
+  loadingOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // Slight dark overlay
+  },
+  loadingModal: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent background
+  },
+  activityIndicatorWrapper: {
+    backgroundColor: "#FFFFFF",
+    padding: 20,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 5,
   },
 });
 

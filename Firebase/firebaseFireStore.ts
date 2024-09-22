@@ -20,7 +20,7 @@ export const createUserProfile = async (
   displayName: string
 ) => {
   try {
-    const docRef = await setDoc(doc(db, FireStoreCollections.Users, userId), {
+    await setDoc(doc(db, FireStoreCollections.Users, userId), {
       user_id: userId,
       display_name: displayName,
     });

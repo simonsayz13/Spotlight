@@ -11,3 +11,7 @@ export enum FireStoreUsersField {
   Location = "location",
   Education = "education",
 }
+
+export enum FireStorageFolder {
+  UserProfile = "user_profiles",
+}

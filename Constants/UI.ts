@@ -33,6 +33,10 @@ export enum PostStackScreens {
   CreatePost = "createpost",
   ViewPhoto = "viewphoto",
 }
+export enum MiscStackScreens {
+  PhotoBrowser = "photobrowser",
+  ImageCropper = "imagecropper",
+}
 
 export enum ThemeColours {
   PrimaryColour = "#ec5050",

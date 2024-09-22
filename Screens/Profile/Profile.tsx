@@ -15,11 +15,9 @@ import {
   Gender,
   HomeStackScreens,
   ProfileStackScreens,
-  ThemeColours,
   ThemeColoursPrimary,
   userContentSelectorButtons,
 } from "../../Constants/UI";
-import { mockUserBio, mockUserPostsData } from "../../Constants/mockData";
 import { ScrollView } from "react-native-gesture-handler";
 import { logOut } from "../../Firebase/firebaseAuth";
 import PostCard from "../../Components/PostCard";
@@ -85,7 +83,11 @@ const Profile = ({ navigation }: any) => {
     <SafeAreaView style={styles.container}>
       <View style={styles.profileDetails}>
         <Image
-          source={require("../../assets/test_image/mock_profile_picture.png")}
+          source={
+            userProfilePhotoURL
+              ? { uri: userProfilePhotoURL }
+              : require("../../assets/test_image/mock_profile_picture.png")
+          }
           style={styles.image}
           resizeMode="contain"
         />

@@ -14,6 +14,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import {
+  MiscStackScreens,
   PostStackScreens,
   ThemeColours,
   ThemeColoursPrimary,
@@ -51,8 +52,13 @@ const CreatePost = ({ navigation, route }: any) => {
     setTitle("");
     navigation.goBack();
   };
+
   const goToCamera = () => {
     navigation.navigate(PostStackScreens.Camera);
+  };
+
+  const goToPhotoBrowser = () => {
+    navigation.navigate(MiscStackScreens.PhotoBrowser);
   };
 
   const post = async () => {
@@ -96,7 +102,10 @@ const CreatePost = ({ navigation, route }: any) => {
           >
             <Ionicons name="camera-sharp" size={42} color="black" />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.imageSelectorButton}>
+          <TouchableOpacity
+            style={styles.imageSelectorButton}
+            onPressIn={goToPhotoBrowser}
+          >
             <MaterialCommunityIcons name="image-plus" size={42} color="black" />
           </TouchableOpacity>
         </View>
