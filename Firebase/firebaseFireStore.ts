@@ -7,11 +7,14 @@ import {
   query,
   where,
   getDocs,
+  getDoc,
+  orderBy,
 } from "firebase/firestore";
 import app from "./FirebaseApp";
 import { FireStoreCollections } from "../Constants/dbReference";
 import "react-native-get-random-values";
 import { v4 as uuidv4 } from "uuid";
+import { Alert } from "react-native";
 
 const db = getFirestore(app);
 
@@ -44,6 +47,16 @@ export const updateProfileField = async (
   }
 };
 
+export const fetchUserProfile = async (userId: string) => {
+  try {
+    const userProfileCollection = doc(db, FireStoreCollections.Users, userId);
+    const userDoc = await getDoc(userProfileCollection);
+    if (userDoc.exists()) return userDoc.data();
+  } catch (error) {
+    Alert.alert("Error", "Error fetchhing user profile");
+  }
+};
+
 export const createPost = async (userId: string, postData: any) => {
   try {
     const postId = uuidv4();
@@ -60,26 +73,47 @@ export const createPost = async (userId: string, postData: any) => {
 export const getPostsByUserId = async (userId: string) => {
   try {
     // Reference the 'posts' collection
-    const postsCollection = collection(db, "posts");
-
-    // Create a query to filter documents where 'authorId' is equal to the specified value
+    const postsCollection = collection(db, FireStoreCollections.Posts);
     const q = query(postsCollection, where("user_id", "==", userId));
+    const snapshot = await getDocs(q);
+    const postsList = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
 
-    // Execute the query and get the snapshot of matching documents
-    const querySnapshot = await getDocs(q);
-
-    // Array to store the retrieved posts
-    let posts: Array<any> = [];
-
-    // Loop through each document in the snapshot and extract the data
-    querySnapshot.forEach((doc) => {
-      posts.push({ id: doc.id, ...doc.data() });
-    });
-
-    // Return the list of posts
-    return posts;
+    return postsList;
   } catch (error) {
     console.error("Error retrieving posts:", error);
     return [];
+  }
+};
+
+export const getAllPosts = async () => {
+  try {
+    const postsCollection = collection(db, FireStoreCollections.Posts);
+    const q = query(postsCollection, orderBy("timeStamp", "desc"));
+    const snapshot = await getDocs(q);
+    const postsList = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    return postsList;
+  } catch (error) {
+    return [];
+  }
+};
+
+export const fetchUserDetails = async (userId: string) => {
+  try {
+    const userDocRef = doc(db, "users", userId);
+    const userDoc = await getDoc(userDocRef);
+    if (userDoc.exists()) {
+      const { profile_picture_url, display_name } = userDoc.data();
+      return { profile_picture_url, display_name };
+    } else {
+      return null;
+    }
+  } catch (error) {
+    return null; // Return null on error
   }
 };

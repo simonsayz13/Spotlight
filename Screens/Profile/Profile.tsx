@@ -4,10 +4,10 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Image,
   Platform,
   SafeAreaView,
   TouchableWithoutFeedback,
+  Alert,
 } from "react-native";
 import { useSelector } from "react-redux";
 import { RootState } from "../../Redux/store";
@@ -25,6 +25,7 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { getPostsByUserId } from "../../Firebase/firebaseFireStore";
 import { useFocusEffect } from "@react-navigation/native";
+import { Image } from "expo-image";
 
 const Profile = ({ navigation }: any) => {
   const [buttonStates, setButtonStates] = useState(userContentSelectorButtons);
@@ -36,7 +37,6 @@ const Profile = ({ navigation }: any) => {
     userBio,
     userGender,
     userLocation,
-    userEducation,
   } = useSelector((state: RootState) => state.user);
   const [postsData, setPostsData] = useState<Array<any>>([]);
 
@@ -47,12 +47,11 @@ const Profile = ({ navigation }: any) => {
         try {
           return await getPostsByUserId(userId!);
         } catch (error) {
-          console.error("Error fetching posts:", error);
+          Alert.alert("Error", `${error}`);
         }
       };
 
       fetchPosts().then((posts) => {
-        console.log("fetched:", posts);
         setPostsData(posts!);
       });
     }, [userId]) // Include dependencies like userId if they change
@@ -89,7 +88,6 @@ const Profile = ({ navigation }: any) => {
               : require("../../assets/test_image/mock_profile_picture.png")
           }
           style={styles.image}
-          resizeMode="contain"
         />
         <View
           style={{
@@ -253,8 +251,8 @@ const styles = StyleSheet.create({
   userContentContainer: {
     flex: 1,
     marginTop: 12,
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
+    borderTopLeftRadius: 14,
+    borderTopRightRadius: 14,
     elevation: 5, // For Android shadow
     shadowOffset: { width: 0, height: -1 },
     shadowOpacity: 0.2,

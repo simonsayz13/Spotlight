@@ -6,9 +6,10 @@ import {
   signOut,
   getAuth,
 } from "firebase/auth";
-import { clearUser, setUser } from "../Redux/Slices/userSlice";
+import { clearUser, createUser, updateUser } from "../Redux/Slices/userSlice";
 import store from "../Redux/store";
 import { LoginStatus } from "../Constants/UI";
+import { fetchUserProfile } from "./firebaseFireStore";
 
 const auth = getAuth(app);
 
@@ -28,7 +29,7 @@ export const signUpWithEmail = async (
             displayName: auth.currentUser?.displayName,
             profileURL: auth.currentUser?.photoURL,
           };
-          store.dispatch(setUser(userData));
+          store.dispatch(createUser(userData));
           return {
             success: true,
             errorMessage: null,
@@ -55,13 +56,9 @@ export const signUpWithEmail = async (
 export const signInWithEmail = async (email: string, password: string) => {
   try {
     return await signInWithEmailAndPassword(auth, email, password)
-      .then(() => {
-        const userData = {
-          userId: auth.currentUser?.uid,
-          displayName: auth.currentUser?.displayName,
-          profileURL: auth.currentUser?.photoURL,
-        };
-        store.dispatch(setUser(userData));
+      .then(async () => {
+        const userData = await fetchUserProfile(auth.currentUser?.uid!);
+        store.dispatch(updateUser(userData));
         return {
           success: true,
           errorMessage: null,
@@ -81,7 +78,7 @@ export const signInWithEmail = async (email: string, password: string) => {
 export const logOut = async () => {
   try {
     await signOut(auth).then(() => {
-      // store.dispatch(clearUser());
+      store.dispatch(clearUser());
     });
   } catch (error) {
     console.log(`signUpWithEmail Error: ${error}`);

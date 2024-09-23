@@ -8,10 +8,7 @@ import { CreatePost } from "../../Screens/Post/CreatePost";
 const PostStack = createNativeStackNavigator();
 
 const PostStackScreen = () => (
-  <PostStack.Navigator
-    screenOptions={{ headerShown: false }}
-    initialRouteName={PostStackScreens.CreatePost}
-  >
+  <PostStack.Navigator screenOptions={{ headerShown: false }}>
     <PostStack.Screen
       name={PostStackScreens.CreatePost}
       component={CreatePost}

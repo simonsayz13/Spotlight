@@ -1,17 +1,36 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
-  Image,
   StyleSheet,
   TouchableOpacity,
   Platform,
 } from "react-native";
 
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { ThemeColours, ThemeColoursPrimary } from "../Constants/UI";
+import { ThemeColoursPrimary } from "../Constants/UI";
+import { Image } from "expo-image";
+import { fetchUserDetails } from "../Firebase/firebaseFireStore";
+import { useSelector } from "react-redux";
+import { RootState } from "../Redux/store";
 
-const PostCard = ({ title, imageUrl, user, likes, openPost }: any) => {
+const PostCard = ({ title, imageUrl, userId, likes, openPost }: any) => {
+  const [displayName, setDisplayName] = useState("");
+  const [profilePicUrl, setProfilePicUrl] = useState("");
+  const { userDisplayName } = useSelector((state: RootState) => state.user);
+
+  const fetchUserData = async () => {
+    try {
+      const userDetails = await fetchUserDetails(userId);
+      setDisplayName(userDetails?.display_name);
+      setProfilePicUrl(userDetails?.profile_picture_url);
+    } catch (error) {}
+  };
+
+  useEffect(() => {
+    fetchUserData();
+  }, [userId]);
+
   return (
     <TouchableOpacity style={styles.card} activeOpacity={1} onPress={openPost}>
       {imageUrl ? (
@@ -33,7 +52,9 @@ const PostCard = ({ title, imageUrl, user, likes, openPost }: any) => {
       <View style={styles.content}>
         <Text style={styles.title}>{title}</Text>
         <View style={styles.userLikes}>
-          <Text style={styles.userFont}>{user}</Text>
+          <Text style={styles.userFont}>
+            {userId ? displayName : userDisplayName}
+          </Text>
           <View style={styles.likes}>
             <AntDesign
               name="hearto"

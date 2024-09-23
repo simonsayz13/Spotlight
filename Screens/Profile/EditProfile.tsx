@@ -24,7 +24,6 @@ import {
 } from "../../Constants/UI";
 import { useSelector } from "react-redux";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { RootState } from "../../Redux/store";
 import { TextInput } from "react-native-gesture-handler";
 import { updateProfileField } from "../../Firebase/firebaseFireStore";
 import { FireStoreUsersField } from "../../Constants/dbReference";
@@ -36,7 +35,7 @@ import {
   updateLocation,
   updateProfilePhotoURL,
 } from "../../Redux/Slices/userSlice";
-import store from "../../Redux/store";
+import store, { RootState } from "../../Redux/store";
 import * as ImagePicker from "expo-image-picker";
 import { Image } from "expo-image";
 import { uploadProfilePicture } from "../../Firebase/firebaseStorage";
@@ -67,6 +66,7 @@ const EditProfile = ({ navigation }: any) => {
   const [location, setLocation] = useState<string | null>(userLocation);
   const [uploading, setUploading] = useState(false);
 
+  console.log(userAge);
   const handleEditPress = (editType: string) => {
     setEditType(editType);
     setIsModalVisible(true);
@@ -252,7 +252,7 @@ const EditProfile = ({ navigation }: any) => {
                 setSelectedGender(Gender.Male);
               }}
             >
-              <Text style={styles.optionText}>Male</Text>
+              <Text style={styles.optionText}>{Gender.Male}</Text>
               {selectedGender === Gender.Male && (
                 <AntDesign
                   name="check"
@@ -267,7 +267,7 @@ const EditProfile = ({ navigation }: any) => {
               activeOpacity={1}
               onPressIn={() => setSelectedGender(Gender.Female)}
             >
-              <Text style={styles.optionText}>Female</Text>
+              <Text style={styles.optionText}>{Gender.Female}</Text>
               {selectedGender === Gender.Female && (
                 <AntDesign
                   name="check"
@@ -282,7 +282,7 @@ const EditProfile = ({ navigation }: any) => {
               activeOpacity={1}
               onPressIn={() => setSelectedGender(Gender.Other)}
             >
-              <Text style={styles.optionText}>Other</Text>
+              <Text style={styles.optionText}>{Gender.Other}</Text>
               {selectedGender === Gender.Other && (
                 <AntDesign
                   name="check"
@@ -523,7 +523,7 @@ const EditProfile = ({ navigation }: any) => {
             ]}
             {...modalPanResponder.panHandlers}
           >
-            <View style={styles.modalContent}>
+            <View>
               <Text style={styles.modalTitle}>Edit {editType}</Text>
               {modalBodyDom(editType as EditProfileType)}
             </View>
@@ -620,9 +620,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 2,
     height: 300,
-  },
-  modalContent: {
-    // alignItems: "center",
   },
   modalTitle: {
     fontSize: 18,

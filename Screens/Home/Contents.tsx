@@ -1,28 +1,37 @@
-import { StyleSheet, RefreshControl, ScrollView } from "react-native";
+import { StyleSheet, RefreshControl, ScrollView, Alert } from "react-native";
 import PostCard from "../../Components/PostCard";
 import { useCallback, useEffect, useState } from "react";
-import { mockExploreData } from "../../Constants/mockData";
-import { ThemeColours, ThemeColoursPrimary } from "../../Constants/UI";
+import { getAllPosts } from "../../Firebase/firebaseFireStore";
 
 const Contents = (props: any) => {
   const { content, openPost } = props;
   const [refreshing, setRefreshing] = useState(false);
-  const [data, setData] = useState([]); // Assuming this will be your data source
+  const [data, setData] = useState<Array<any>>([]); // Assuming this will be your data source
 
   // Refresh the contents page
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     // Simulate a network request or data fetching
+
     setTimeout(() => {
-      // Update  data here
-      console.log("refreshing...");
+      fetchPosts();
       setRefreshing(false);
-    }, 2000); // Simulating a 2-second fetch time
+    }, 800); // Simulating a 2-second fetch time
   }, [data]);
+
+  const fetchPosts = async () => {
+    try {
+      const data = await getAllPosts();
+      console.log("fetching");
+      setData(data);
+    } catch (error) {
+      Alert.alert("Error", "Error fetching posts");
+    }
+  };
 
   // Hook for loading data
   useEffect(() => {
-    console.log(content);
+    fetchPosts();
   }, [content]);
 
   return (
@@ -38,14 +47,15 @@ const Contents = (props: any) => {
       }
       showsVerticalScrollIndicator={false}
     >
-      {mockExploreData.map((data) => {
+      {data.map((data) => {
         return (
           <PostCard
             key={data.id}
             title={data.title}
-            user={data.user}
+            userId={data.user_id}
             likes={data.likes}
             openPost={openPost}
+            imageUrl={data.media[0].media_url}
           />
         );
       })}

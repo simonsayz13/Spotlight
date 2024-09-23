@@ -10,10 +10,9 @@ export const userSlice = createSlice({
     userAge: null,
     userGender: null,
     userLocation: null,
-    userEducation: null,
   },
   reducers: {
-    setUser: (state, action) => {
+    createUser: (state, action) => {
       const { userId, displayName, profileURL } = action.payload;
       state.userDisplayName = displayName;
       state.userId = userId;
@@ -26,7 +25,6 @@ export const userSlice = createSlice({
       state.userBio = null;
       state.userGender = null;
       state.userLocation = null;
-      state.userEducation = null;
     },
     updateDisplayName: (state, action) => {
       state.userDisplayName = action.payload;
@@ -43,25 +41,40 @@ export const userSlice = createSlice({
     updateLocation: (state, action) => {
       state.userLocation = action.payload;
     },
-    updateEducation: (state, action) => {
-      state.userEducation = action.payload;
-    },
     updateAge: (state, action) => {
       state.userAge = action.payload;
+    },
+    updateUser: (state, action) => {
+      const {
+        user_id,
+        display_name,
+        profile_picture_url,
+        biography,
+        age,
+        gender,
+        location,
+      } = action.payload;
+      state.userDisplayName = display_name;
+      state.userId = user_id;
+      state.userProfilePhotoURL = profile_picture_url;
+      state.userBio = biography;
+      state.userAge = age;
+      state.userGender = gender;
+      state.userLocation = location;
     },
   },
 });
 
 export const {
-  setUser,
+  createUser,
   clearUser,
   updateDisplayName,
   updateBio,
   updateProfilePhotoURL,
   updateGender,
   updateLocation,
-  updateEducation,
   updateAge,
+  updateUser,
 } = userSlice.actions;
 
 export default userSlice.reducer;

@@ -65,17 +65,18 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   signInButton: {
-    width: 240,
+    width: 140,
     height: 40,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: ThemeColoursPrimary.LogoColour,
+    backgroundColor: ThemeColoursPrimary.PrimaryColour,
+    borderWidth: 1.5,
     borderRadius: 10,
   },
   buttonText: {
     fontSize: 18,
     fontWeight: "bold",
-    color: ThemeColoursPrimary.PrimaryColour,
+    color: ThemeColoursPrimary.SecondaryColour,
   },
 });
 

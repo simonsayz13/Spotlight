@@ -1,4 +1,4 @@
-import React, { memo, useState } from "react";
+import React, { memo, useEffect, useState } from "react";
 import {
   StyleSheet,
   View,
@@ -10,10 +10,12 @@ import {
   TextInput,
   TouchableWithoutFeedback,
   Keyboard,
+  Alert,
 } from "react-native";
 import {
   MiscStackScreens,
   PostStackScreens,
+  ProfileStackScreens,
   ThemeColoursPrimary,
 } from "../../Constants/UI";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -60,6 +62,9 @@ const CreatePost = ({ navigation, route }: any) => {
   };
 
   const post = async () => {
+    if (!userId) {
+      return Alert.alert("Not Signed in", "Please sign in to make a post");
+    }
     setPosting(true);
     const imageURL = await uploadImage(photoURI);
     const timeStamp = Date.now();

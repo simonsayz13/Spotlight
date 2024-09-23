@@ -5,6 +5,7 @@ import {
   HomeStackScreens,
   MessagingStackScreens,
   MiscStackScreens,
+  PostStackScreens,
 } from "../Constants/UI";
 import Post from "../Screens/Home/Post";
 import Chat from "../Screens/Messages/Chat";
@@ -14,6 +15,7 @@ import {
   createStackNavigator,
 } from "@react-navigation/stack";
 import ImageCropScreen from "../Screens/Misc/ImageCropper";
+import { CreatePost } from "../Screens/Post/CreatePost";
 const MainStack = createStackNavigator();
 
 const MainNavigationStack = () => (
