@@ -2,9 +2,10 @@ import { StyleSheet, RefreshControl, ScrollView, Alert } from "react-native";
 import PostCard from "../../Components/PostCard";
 import { useCallback, useEffect, useState } from "react";
 import { getAllPosts } from "../../Firebase/firebaseFireStore";
+import { HomeStackScreens } from "../../Constants/UI";
 
 const Contents = (props: any) => {
-  const { content, openPost } = props;
+  const { content, navigation } = props;
   const [refreshing, setRefreshing] = useState(false);
   const [data, setData] = useState<Array<any>>([]); // Assuming this will be your data source
 
@@ -22,7 +23,6 @@ const Contents = (props: any) => {
   const fetchPosts = async () => {
     try {
       const data = await getAllPosts();
-      console.log("fetching");
       setData(data);
     } catch (error) {
       Alert.alert("Error", "Error fetching posts");
@@ -33,6 +33,12 @@ const Contents = (props: any) => {
   useEffect(() => {
     fetchPosts();
   }, [content]);
+
+  const openPost = (postData: any) => {
+    navigation.navigate(HomeStackScreens.Post, {
+      postData: postData,
+    });
+  };
 
   return (
     <ScrollView
@@ -47,15 +53,13 @@ const Contents = (props: any) => {
       }
       showsVerticalScrollIndicator={false}
     >
-      {data.map((data) => {
+      {data.map((post) => {
         return (
           <PostCard
-            key={data.id}
-            title={data.title}
-            userId={data.user_id}
-            likes={data.likes}
+            key={post.id}
+            postData={post}
             openPost={openPost}
-            imageUrl={data.media[0].media_url}
+            navigation={navigation}
           />
         );
       })}

@@ -25,10 +25,6 @@ const HomeScreen = ({ navigation }: any) => {
     setContent(content);
   }, []);
 
-  const openPost = () => {
-    navigation.navigate(HomeStackScreens.Post);
-  };
-
   return (
     <SafeAreaView style={styles.container}>
       <DrawerNavigationBar drawerContent={DrawerMenu}>
@@ -38,7 +34,7 @@ const HomeScreen = ({ navigation }: any) => {
               setContent={changeContent}
               drawerHandler={openDrawer}
             />
-            <Contents content={content} openPost={openPost} />
+            <Contents content={content} navigation={navigation} />
           </View>
         )}
       </DrawerNavigationBar>

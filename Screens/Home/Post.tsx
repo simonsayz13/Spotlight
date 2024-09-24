@@ -11,15 +11,17 @@ import PostInteractionBar from "../../Components/PostInteractionBar";
 import MainPost from "../../Components/MainPost";
 import { ThemeColoursPrimary } from "../../Constants/UI";
 
-const Post = ({ navigation }: any) => {
+const Post = ({ navigation, route }: any) => {
+  const { postData } = route.params;
+  const userId = postData.user_id;
   return (
     <SafeAreaView style={styles.container}>
-      <TopNavigationBarPost navigation={navigation} />
+      <TopNavigationBarPost navigation={navigation} userId={userId} />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "height" : "padding"}
         style={styles.container}
       >
-        <MainPost />
+        <MainPost postData={postData} />
         <View style={styles.bottomView}>
           <PostInteractionBar />
         </View>

@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   Platform,
   SafeAreaView,
-  TouchableWithoutFeedback,
   Alert,
 } from "react-native";
 import { useSelector } from "react-redux";
@@ -77,6 +76,12 @@ const Profile = ({ navigation }: any) => {
 
   const handleEdit = () => {
     navigation.navigate(ProfileStackScreens.EditProfile);
+  };
+
+  const openPost = (postData: any) => {
+    navigation.navigate(HomeStackScreens.Post, {
+      postData: postData,
+    });
   };
   return (
     <SafeAreaView style={styles.container}>
@@ -170,13 +175,9 @@ const Profile = ({ navigation }: any) => {
             return (
               <PostCard
                 key={post.id}
-                title={post.title}
-                user={userDisplayName}
-                likes={post.likes}
-                imageUrl={post.media[0].media_url}
-                openPost={() => {
-                  navigation.navigate(HomeStackScreens.Post);
-                }}
+                postData={post}
+                openPost={openPost}
+                navigation={navigation}
               />
             );
           })}

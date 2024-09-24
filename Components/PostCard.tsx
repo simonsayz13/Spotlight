@@ -14,16 +14,16 @@ import { fetchUserDetails } from "../Firebase/firebaseFireStore";
 import { useSelector } from "react-redux";
 import { RootState } from "../Redux/store";
 
-const PostCard = ({ title, imageUrl, userId, likes, openPost }: any) => {
+const PostCard = ({ postData, openPost }: any) => {
   const [displayName, setDisplayName] = useState("");
-  const [profilePicUrl, setProfilePicUrl] = useState("");
-  const { userDisplayName } = useSelector((state: RootState) => state.user);
 
+  const { userDisplayName } = useSelector((state: RootState) => state.user);
+  const { title, user_Id: userId, likes } = postData;
+  const imageUrl = postData.media[0].media_url;
   const fetchUserData = async () => {
     try {
       const userDetails = await fetchUserDetails(userId);
       setDisplayName(userDetails?.display_name);
-      setProfilePicUrl(userDetails?.profile_picture_url);
     } catch (error) {}
   };
 
@@ -32,7 +32,13 @@ const PostCard = ({ title, imageUrl, userId, likes, openPost }: any) => {
   }, [userId]);
 
   return (
-    <TouchableOpacity style={styles.card} activeOpacity={1} onPress={openPost}>
+    <TouchableOpacity
+      style={styles.card}
+      activeOpacity={1}
+      onPress={() => {
+        openPost(postData);
+      }}
+    >
       {imageUrl ? (
         <Image
           style={styles.image}

@@ -1,10 +1,11 @@
 import React from "react";
-import { View, Text, Image, StyleSheet, ScrollView } from "react-native";
-import { mockCommentData } from "../Constants/mockData";
-import { ThemeColours, ThemeColoursPrimary } from "../Constants/UI";
+import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { Image } from "expo-image";
+import { ThemeColoursPrimary } from "../Constants/UI";
 import CommentCard from "./CommentCard";
-
-const MainPost = () => {
+const MainPost = ({ postData }: any) => {
+  const { title, description, comments, timeStamp } = postData;
+  const imageUrl = postData.media[0].media_url;
   return (
     <ScrollView
       contentContainerStyle={styles.scrollView}
@@ -12,18 +13,18 @@ const MainPost = () => {
       overScrollMode="never"
     >
       <View style={styles.imageContainer}>
-        <Image
-          source={require("../assets/test_image/image_laopobaobao.jpg")}
-          style={styles.image}
-          resizeMode="contain"
-        />
+        {imageUrl ? (
+          <Image source={{ uri: imageUrl }} style={styles.image} />
+        ) : (
+          <></>
+        )}
       </View>
       <View style={styles.postContentContainer}>
         <View style={styles.postTitleContainer}>
-          <Text style={styles.postTitleText}>好想婆宝宝怎么办啊啊啊</Text>
+          <Text style={styles.postTitleText}>{title}</Text>
         </View>
         <View style={styles.postDescriptionContainer}>
-          <Text style={styles.postDescriptionText}>爱你哦😗</Text>
+          <Text style={styles.postDescriptionText}>{description}</Text>
         </View>
         <View style={styles.userMetaDataContainer}>
           <Text style={styles.userMetaDataText}>
@@ -35,13 +36,13 @@ const MainPost = () => {
       {/* Comment Count */}
       <View style={styles.commentCountContainer}>
         <Text style={{ color: ThemeColoursPrimary.SecondaryColour }}>
-          {mockCommentData.length} Comments
+          {comments.length} Comments
         </Text>
       </View>
 
       {/* Comment Section */}
       <View>
-        {mockCommentData.map((comment: any) => (
+        {comments.map((comment: any) => (
           <CommentCard key={comment.id} commentData={comment} />
         ))}
       </View>

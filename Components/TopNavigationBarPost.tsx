@@ -1,10 +1,26 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import { ThemeColoursPrimary } from "../Constants/UI";
-const TopNavigationBarPost = ({ navigation }: any) => {
+import { fetchUserDetails } from "../Firebase/firebaseFireStore";
+import { Image } from "expo-image";
+const TopNavigationBarPost = ({ navigation, userId }: any) => {
+  const [profilePicUrl, setProfilePicUrl] = useState("");
+  const [displayName, setDisplayName] = useState("");
+
+  const fetchUserData = async () => {
+    try {
+      const userDetails = await fetchUserDetails(userId);
+      setDisplayName(userDetails?.display_name);
+      setProfilePicUrl(userDetails?.profile_picture_url);
+    } catch (error) {}
+  };
+  useEffect(() => {
+    fetchUserData();
+  }, [userId]);
+
   return (
     <View style={styles.container}>
       <View style={styles.leftWrapper}>
@@ -20,14 +36,15 @@ const TopNavigationBarPost = ({ navigation }: any) => {
           />
         </TouchableOpacity>
         <View style={styles.userWrapper}>
-          <Ionicons
-            name="person-circle-outline"
-            size={34}
-            color={ThemeColoursPrimary.SecondaryColour}
+          <Image
+            source={
+              profilePicUrl
+                ? { uri: profilePicUrl }
+                : require("../assets/test_image/mock_profile_picture.png")
+            }
+            style={styles.profileImage}
           />
-          <Text style={{ color: ThemeColoursPrimary.SecondaryColour }}>
-            User
-          </Text>
+          <Text style={styles.usernameText}>{displayName}</Text>
         </View>
       </View>
       <View style={styles.followShareWrapper}>
@@ -72,14 +89,23 @@ const styles = StyleSheet.create({
   userWrapper: {
     alignItems: "center",
     flexDirection: "row",
-    gap: 4,
+    marginLeft: 10,
+  },
+  usernameText: {
+    color: ThemeColoursPrimary.SecondaryColour,
+    fontSize: 18,
     marginLeft: 10,
   },
   followShareWrapper: {
     alignItems: "center",
     flexDirection: "row",
-    gap: 16,
+    gap: 14,
     marginRight: 10,
+  },
+  profileImage: {
+    width: 40, // Width and height should be the same
+    height: 42,
+    borderRadius: 50, // Half of the width or height for a perfect circle
   },
 });
 
