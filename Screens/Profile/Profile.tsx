@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -22,12 +22,18 @@ import { logOut } from "../../Firebase/firebaseAuth";
 import PostCard from "../../Components/PostCard";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { getPostsByUserId } from "../../Firebase/firebaseFireStore";
+import {
+  fetchUserDetails,
+  getPostsByUserId,
+} from "../../Firebase/firebaseFireStore";
 import { useFocusEffect } from "@react-navigation/native";
 import { Image } from "expo-image";
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 
-const Profile = ({ navigation }: any) => {
+const Profile = ({ navigation, route }: any) => {
   const [buttonStates, setButtonStates] = useState(userContentSelectorButtons);
+  const guestView = route?.params?.guestView;
+  const opId = route?.params?.opId;
   const {
     userId,
     userDisplayName,
@@ -38,21 +44,42 @@ const Profile = ({ navigation }: any) => {
     userLocation,
   } = useSelector((state: RootState) => state.user);
   const [postsData, setPostsData] = useState<Array<any>>([]);
-
+  const [displayName, setDisplayName] = useState(userDisplayName);
+  const [profilePicUrl, setProfilePicUrl] = useState(userProfilePhotoURL);
+  const [bio, setBio] = useState(userBio);
+  const [gender, setGender] = useState(userGender);
   useFocusEffect(
     useCallback(() => {
       // Define an async function within the callback
-      const fetchPosts = async () => {
+      const fetchPosts = async (userId: string) => {
         try {
-          return await getPostsByUserId(userId!);
+          return await getPostsByUserId(userId);
         } catch (error) {
           Alert.alert("Error", `${error}`);
         }
       };
 
-      fetchPosts().then((posts) => {
+      const id = guestView ? opId : userId;
+      fetchPosts(id).then((posts) => {
         setPostsData(posts!);
       });
+
+      if (guestView) {
+        const fetchUser = async () => {
+          try {
+            return await fetchUserDetails(opId);
+          } catch (error) {
+            Alert.alert("Error", `${error}`);
+          }
+        };
+        fetchUser().then((data: any) => {
+          const { profile_picture_url, display_name, biography, gender } = data;
+          setDisplayName(display_name);
+          setProfilePicUrl(profile_picture_url);
+          setBio(biography);
+          setGender(gender);
+        });
+      }
     }, [userId]) // Include dependencies like userId if they change
   );
 
@@ -86,14 +113,11 @@ const Profile = ({ navigation }: any) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.profileDetails}>
-        <Image
-          source={
-            userProfilePhotoURL
-              ? { uri: userProfilePhotoURL }
-              : require("../../assets/test_image/mock_profile_picture.png")
-          }
-          style={styles.image}
-        />
+        {profilePicUrl ? (
+          <Image source={{ uri: profilePicUrl }} style={styles.image} />
+        ) : (
+          <FontAwesome6 name="circle-user" size={70} color="black" />
+        )}
         <View
           style={{
             flexDirection: "row",
@@ -102,11 +126,11 @@ const Profile = ({ navigation }: any) => {
             marginBottom: 2,
           }}
         >
-          <Text style={styles.userNameFont}>{userDisplayName}</Text>
-          {userGender === Gender.Male && (
+          <Text style={styles.userNameFont}>{displayName}</Text>
+          {gender === Gender.Male && (
             <Ionicons name="male" size={20} color="#4bb9f3" />
           )}
-          {userGender === Gender.Female && (
+          {gender === Gender.Female && (
             <Ionicons name="female" size={20} color="#f268df" />
           )}
         </View>
@@ -121,16 +145,20 @@ const Profile = ({ navigation }: any) => {
           }}
         >
           <Text style={styles.descriptionTitle}>Bio</Text>
-          <TouchableOpacity onPress={handleEdit}>
-            <AntDesign
-              name="edit"
-              size={24}
-              color={ThemeColoursPrimary.SecondaryColour}
-            />
-          </TouchableOpacity>
+          {guestView ?? (
+            <TouchableOpacity onPress={handleEdit}>
+              <AntDesign
+                name="edit"
+                size={24}
+                color={ThemeColoursPrimary.SecondaryColour}
+              />
+            </TouchableOpacity>
+          )}
         </View>
         <Text style={styles.descriptionText}>
-          {userBio ?? "Add a bio in edit profile"}
+          {guestView
+            ? bio ?? "No bio available"
+            : bio ?? "Add a bio in edit profile"}
         </Text>
       </View>
       <View style={styles.userStatsContainer}>
@@ -146,9 +174,15 @@ const Profile = ({ navigation }: any) => {
           <Text style={styles.statsCount}>666</Text>
           <Text style={styles.statsFont}>Likes & Favs</Text>
         </View>
-        <TouchableOpacity style={styles.signOutButton} onPress={handleLogout}>
-          <Text style={styles.buttonText}>Sign out</Text>
-        </TouchableOpacity>
+        {guestView ? (
+          <TouchableOpacity style={styles.signOutButton}>
+            <Text style={styles.buttonText}>Follow</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity style={styles.signOutButton} onPress={handleLogout}>
+            <Text style={styles.buttonText}>Sign out</Text>
+          </TouchableOpacity>
+        )}
       </View>
       {/* Posts */}
       <View style={styles.userContentContainer}>

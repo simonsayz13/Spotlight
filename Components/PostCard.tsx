@@ -14,11 +14,11 @@ import { fetchUserDetails } from "../Firebase/firebaseFireStore";
 import { useSelector } from "react-redux";
 import { RootState } from "../Redux/store";
 
-const PostCard = ({ postData, openPost }: any) => {
+const PostCard = ({ postData, openPost, self }: any) => {
   const [displayName, setDisplayName] = useState("");
 
   const { userDisplayName } = useSelector((state: RootState) => state.user);
-  const { title, user_Id: userId, likes } = postData;
+  const { title, user_id: userId, likes } = postData;
   const imageUrl = postData.media[0].media_url;
   const fetchUserData = async () => {
     try {
@@ -59,7 +59,7 @@ const PostCard = ({ postData, openPost }: any) => {
         <Text style={styles.title}>{title}</Text>
         <View style={styles.userLikes}>
           <Text style={styles.userFont}>
-            {userId ? displayName : userDisplayName}
+            {self ? userDisplayName : displayName}
           </Text>
           <View style={styles.likes}>
             <AntDesign

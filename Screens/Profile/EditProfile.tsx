@@ -66,7 +66,6 @@ const EditProfile = ({ navigation }: any) => {
   const [location, setLocation] = useState<string | null>(userLocation);
   const [uploading, setUploading] = useState(false);
 
-  console.log(userAge);
   const handleEditPress = (editType: string) => {
     setEditType(editType);
     setIsModalVisible(true);
@@ -368,7 +367,6 @@ const EditProfile = ({ navigation }: any) => {
                       : require("../../assets/test_image/mock_profile_picture.png")
                   }
                   style={styles.image}
-                  resizeMode="contain"
                 />
                 <TouchableOpacity
                   style={styles.iconContainer}

@@ -14,7 +14,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import Octicons from "@expo/vector-icons/Octicons";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { ThemeColours, ThemeColoursPrimary } from "../Constants/UI";
+import { ThemeColoursPrimary } from "../Constants/UI";
 
 const screenWidth = Dimensions.get("window").width;
 const PostInteractionBar = () => {

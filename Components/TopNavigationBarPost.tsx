@@ -3,9 +3,10 @@ import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
-import { ThemeColoursPrimary } from "../Constants/UI";
+import { ProfileStackScreens, ThemeColoursPrimary } from "../Constants/UI";
 import { fetchUserDetails } from "../Firebase/firebaseFireStore";
 import { Image } from "expo-image";
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 const TopNavigationBarPost = ({ navigation, userId }: any) => {
   const [profilePicUrl, setProfilePicUrl] = useState("");
   const [displayName, setDisplayName] = useState("");
@@ -21,6 +22,13 @@ const TopNavigationBarPost = ({ navigation, userId }: any) => {
     fetchUserData();
   }, [userId]);
 
+  const goToProfile = () => {
+    navigation.navigate(ProfileStackScreens.Profile, {
+      guestView: true,
+      opId: userId,
+    });
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.leftWrapper}>
@@ -35,17 +43,18 @@ const TopNavigationBarPost = ({ navigation, userId }: any) => {
             color={ThemeColoursPrimary.SecondaryColour}
           />
         </TouchableOpacity>
-        <View style={styles.userWrapper}>
-          <Image
-            source={
-              profilePicUrl
-                ? { uri: profilePicUrl }
-                : require("../assets/test_image/mock_profile_picture.png")
-            }
-            style={styles.profileImage}
-          />
+        <TouchableOpacity style={styles.userWrapper} onPressIn={goToProfile}>
+          {profilePicUrl ? (
+            <Image
+              source={{ uri: profilePicUrl }}
+              style={styles.profileImage}
+            />
+          ) : (
+            <FontAwesome6 name="circle-user" size={40} color="black" />
+          )}
+
           <Text style={styles.usernameText}>{displayName}</Text>
-        </View>
+        </TouchableOpacity>
       </View>
       <View style={styles.followShareWrapper}>
         <TouchableOpacity>

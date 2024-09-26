@@ -108,8 +108,7 @@ export const fetchUserDetails = async (userId: string) => {
     const userDocRef = doc(db, "users", userId);
     const userDoc = await getDoc(userDocRef);
     if (userDoc.exists()) {
-      const { profile_picture_url, display_name } = userDoc.data();
-      return { profile_picture_url, display_name };
+      return userDoc.data();
     } else {
       return null;
     }

@@ -60,6 +60,7 @@ const Contents = (props: any) => {
             postData={post}
             openPost={openPost}
             navigation={navigation}
+            self={false}
           />
         );
       })}
