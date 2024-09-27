@@ -12,8 +12,6 @@ const Contents = (props: any) => {
   // Refresh the contents page
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    // Simulate a network request or data fetching
-
     setTimeout(() => {
       fetchPosts();
       setRefreshing(false);

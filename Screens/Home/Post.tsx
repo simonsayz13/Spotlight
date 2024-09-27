@@ -23,7 +23,7 @@ const Post = ({ navigation, route }: any) => {
       >
         <MainPost postData={postData} />
         <View style={styles.bottomView}>
-          <PostInteractionBar />
+          <PostInteractionBar postData={postData} />
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>

@@ -15,3 +15,15 @@ export enum FireStoreUsersField {
 export enum FireStorageFolder {
   UserProfile = "user_profiles",
 }
+
+export enum FireStorePostField {
+  Likes = "likes",
+  Favourites = "favourites",
+}
+
+export enum FireStoreAction {
+  Add = "add",
+  Remove = "remove",
+  Increment = "increment",
+  Decrement = "decrement",
+}

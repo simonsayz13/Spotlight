@@ -9,9 +9,17 @@ import {
   getDocs,
   getDoc,
   orderBy,
+  increment,
+  Timestamp,
+  deleteDoc,
 } from "firebase/firestore";
 import app from "./FirebaseApp";
-import { FireStoreCollections } from "../Constants/dbReference";
+import {
+  FireStorageFolder,
+  FireStoreAction,
+  FireStoreCollections,
+  FireStorePostField,
+} from "../Constants/dbReference";
 import "react-native-get-random-values";
 import { v4 as uuidv4 } from "uuid";
 import { Alert } from "react-native";
@@ -105,7 +113,7 @@ export const getAllPosts = async () => {
 
 export const fetchUserDetails = async (userId: string) => {
   try {
-    const userDocRef = doc(db, "users", userId);
+    const userDocRef = doc(db, FireStoreCollections.Users, userId);
     const userDoc = await getDoc(userDocRef);
     if (userDoc.exists()) {
       return userDoc.data();
@@ -114,5 +122,94 @@ export const fetchUserDetails = async (userId: string) => {
     }
   } catch (error) {
     return null; // Return null on error
+  }
+};
+
+export const updatePostMetric = async (
+  postId: string,
+  metric: FireStorePostField,
+  action: FireStoreAction
+) => {
+  const postRef = doc(db, FireStoreCollections.Posts, postId);
+
+  try {
+    let func;
+    if (action === FireStoreAction.Increment) func = increment(1);
+    if (action === FireStoreAction.Decrement) func = increment(-1);
+    await updateDoc(postRef, {
+      [metric]: func,
+    });
+  } catch (error) {
+    console.error("Error incrementing field: ", error);
+  }
+};
+
+export const updateUserPostMetric = async (
+  userId: string,
+  metric: FireStorePostField,
+  postId: string,
+  action: FireStoreAction
+) => {
+  const metricRef = doc(
+    db,
+    `${FireStoreCollections.Users}/${userId}/${metric}`,
+    postId
+  );
+
+  try {
+    let func;
+    if (action === FireStoreAction.Add)
+      func = setDoc(metricRef, {
+        liked: true,
+        timestamp: Timestamp.now(),
+      });
+
+    if (action === FireStoreAction.Remove) func = await deleteDoc(metricRef);
+
+    await func;
+  } catch (error) {
+    console.error("Error updating user post metric:", error);
+  }
+};
+
+export const hasUserInteractedWithPost = async (
+  userId: string,
+  metric: FireStorePostField,
+  postId: string
+) => {
+  const metricRef = doc(
+    db,
+    `${FireStoreCollections.Users}/${userId}/${metric}`,
+    postId
+  );
+
+  try {
+    const docSnapshot = await getDoc(metricRef);
+    return docSnapshot.exists(); // Returns true if the user has liked the post
+  } catch (error) {
+    console.error("Error checking liked status:", error);
+    return false;
+  }
+};
+
+export const getPostMetrics = async (
+  postId: string,
+  metric: FireStorePostField
+) => {
+  const postRef = doc(db, FireStoreCollections.Posts, postId);
+
+  try {
+    const postSnapshot = await getDoc(postRef); // Retrieve the document snapshot
+
+    if (postSnapshot.exists()) {
+      const fieldValue = postSnapshot.get(metric); // Get the specific field value
+      return fieldValue; // Return the field value
+    } else {
+      console.log("No such document!");
+      return null;
+    }
+  } catch (error) {
+    console.error("Error fetching field value: ", error);
+    return null;
   }
 };

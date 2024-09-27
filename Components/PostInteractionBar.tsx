@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
   StyleSheet,
   View,
@@ -15,11 +15,62 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import Octicons from "@expo/vector-icons/Octicons";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { ThemeColoursPrimary } from "../Constants/UI";
+import {
+  updateUserPostMetric,
+  updatePostMetric,
+  hasUserInteractedWithPost,
+  getPostMetrics,
+} from "../Firebase/firebaseFireStore";
+import { FireStoreAction, FireStorePostField } from "../Constants/dbReference";
+import { useSelector } from "react-redux";
+import { RootState } from "../Redux/store";
+import { useFocusEffect } from "@react-navigation/native";
 
 const screenWidth = Dimensions.get("window").width;
-const PostInteractionBar = () => {
-  const [inputWidth] = useState(new Animated.Value(185));
+const PostInteractionBar = ({ postData }: any) => {
+  const { userId } = useSelector((state: RootState) => state.user);
+  const { likes, comments, favourites } = postData;
+  const [inputWidth] = useState(new Animated.Value(200));
   const [inputActive, setInputActive] = useState(false);
+  const [liked, setLiked] = useState(false);
+  const [favourited, setFavourited] = useState(false);
+  const [currentLikes, setCurrentLikes] = useState(likes);
+  const [currentFavourites, setCurrentFavourites] = useState(favourites);
+
+  useFocusEffect(
+    useCallback(() => {
+      const fetchMetric = async () => {
+        try {
+          const hasLiked = await hasUserInteractedWithPost(
+            userId!,
+            FireStorePostField.Likes,
+            postData.id
+          );
+          const hasFavourited = await hasUserInteractedWithPost(
+            userId!,
+            FireStorePostField.Favourites,
+            postData.id
+          );
+          setLiked(hasLiked);
+          setFavourited(hasFavourited);
+
+          const likes = await getPostMetrics(
+            postData.id,
+            FireStorePostField.Likes
+          );
+          setCurrentLikes(likes);
+          const favourites = await getPostMetrics(
+            postData.id,
+            FireStorePostField.Favourites
+          );
+          setCurrentFavourites(favourites);
+        } catch (error) {
+          console.log("Error fetching user metric on this post");
+        }
+      };
+      fetchMetric();
+    }, [])
+  );
 
   const handleKeyboardDidShow = () => {
     setInputActive(true);
@@ -32,11 +83,75 @@ const PostInteractionBar = () => {
 
   const handleKeyboardDidHide = () => {
     Animated.timing(inputWidth, {
-      toValue: 185, // Initial width when the keyboard is closed
+      toValue: 200, // Initial width when the keyboard is closed
       duration: 300,
       useNativeDriver: false,
     }).start();
     setInputActive(false);
+  };
+
+  const onClickLike = () => {
+    if (!liked) {
+      updatePostMetric(
+        postData.id,
+        FireStorePostField.Likes,
+        FireStoreAction.Increment
+      );
+      setLiked(true);
+      setCurrentLikes(currentLikes + 1);
+      updateUserPostMetric(
+        userId!,
+        FireStorePostField.Likes,
+        postData.id,
+        FireStoreAction.Add
+      );
+    } else {
+      updatePostMetric(
+        postData.id,
+        FireStorePostField.Likes,
+        FireStoreAction.Decrement
+      );
+      setLiked(false);
+      setCurrentLikes(currentLikes - 1);
+      updateUserPostMetric(
+        userId!,
+        FireStorePostField.Likes,
+        postData.id,
+        FireStoreAction.Remove
+      );
+    }
+  };
+
+  const onClickFavourite = () => {
+    if (!favourited) {
+      updatePostMetric(
+        postData.id,
+        FireStorePostField.Favourites,
+        FireStoreAction.Increment
+      );
+      setFavourited(true);
+      setCurrentFavourites(currentFavourites + 1);
+      updateUserPostMetric(
+        userId!,
+        FireStorePostField.Favourites,
+        postData.id,
+        FireStoreAction.Add
+      );
+    } else {
+      updatePostMetric(
+        postData.id,
+        FireStorePostField.Favourites,
+        FireStoreAction.Decrement
+      );
+      setFavourited(false);
+      setCurrentFavourites(currentFavourites - 1);
+      updateUserPostMetric(
+        userId!,
+        FireStorePostField.Favourites,
+        postData.id,
+        FireStoreAction.Remove
+      );
+    }
   };
 
   return (
@@ -87,27 +202,35 @@ const PostInteractionBar = () => {
       {!inputActive && (
         <View style={styles.actionsContainer}>
           <View style={styles.actionWrapper}>
-            <TouchableOpacity>
+            <TouchableOpacity onPressIn={onClickLike}>
               <AntDesign
-                name="hearto"
+                name={liked ? "heart" : "hearto"}
                 size={28}
-                color={ThemeColoursPrimary.SecondaryColour}
+                color={
+                  liked
+                    ? ThemeColoursPrimary.LogoColour
+                    : ThemeColoursPrimary.SecondaryColour
+                }
               />
             </TouchableOpacity>
             <Text style={{ color: ThemeColoursPrimary.SecondaryColour }}>
-              520
+              {currentLikes}
             </Text>
           </View>
           <View style={styles.actionWrapper}>
-            <TouchableOpacity>
+            <TouchableOpacity onPressIn={onClickFavourite}>
               <AntDesign
-                name="staro"
+                name={favourited ? "star" : "staro"}
                 size={28}
-                color={ThemeColoursPrimary.SecondaryColour}
+                color={
+                  favourited
+                    ? ThemeColoursPrimary.GoldColour
+                    : ThemeColoursPrimary.SecondaryColour
+                }
               />
             </TouchableOpacity>
             <Text style={{ color: ThemeColoursPrimary.SecondaryColour }}>
-              Fav
+              {currentFavourites}
             </Text>
           </View>
           <View style={styles.actionWrapper}>
@@ -119,7 +242,7 @@ const PostInteractionBar = () => {
               />
             </TouchableOpacity>
             <Text style={{ color: ThemeColoursPrimary.SecondaryColour }}>
-              4
+              {comments.length}
             </Text>
           </View>
         </View>
@@ -161,12 +284,12 @@ const styles = StyleSheet.create({
   },
   actionsContainer: {
     flexDirection: "row",
-    gap: Platform.OS === "ios" ? 10 : 4,
+    gap: Platform.OS === "ios" ? 14 : 4,
   },
   actionWrapper: {
     alignItems: "center",
     flexDirection: "row",
-    gap: 1,
+    gap: 2,
   },
   commentStyle: { flexDirection: "row" },
   iconContainer: {

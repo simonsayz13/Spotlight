@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -10,16 +10,48 @@ import {
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { ThemeColoursPrimary } from "../Constants/UI";
 import { Image } from "expo-image";
-import { fetchUserDetails } from "../Firebase/firebaseFireStore";
+import {
+  fetchUserDetails,
+  getPostMetrics,
+  hasUserInteractedWithPost,
+} from "../Firebase/firebaseFireStore";
 import { useSelector } from "react-redux";
 import { RootState } from "../Redux/store";
+import { useFocusEffect } from "@react-navigation/native";
+import { FireStorePostField } from "../Constants/dbReference";
 
 const PostCard = ({ postData, openPost, self }: any) => {
   const [displayName, setDisplayName] = useState("");
-
-  const { userDisplayName } = useSelector((state: RootState) => state.user);
+  const { userDisplayName, userId: currentUserId } = useSelector(
+    (state: RootState) => state.user
+  );
   const { title, user_id: userId, likes } = postData;
+
+  const [currentLikes, setCurrentLikes] = useState(likes);
+  const [liked, setLiked] = useState(false);
+
   const imageUrl = postData.media[0].media_url;
+  useFocusEffect(
+    useCallback(() => {
+      const fetchPostData = async () => {
+        const hasLiked = await hasUserInteractedWithPost(
+          currentUserId!,
+          FireStorePostField.Likes,
+          postData.id
+        );
+        setLiked(hasLiked);
+
+        const likes = await getPostMetrics(
+          postData.id,
+          FireStorePostField.Likes
+        );
+        setCurrentLikes(likes);
+      };
+
+      fetchPostData();
+    }, [])
+  );
+
   const fetchUserData = async () => {
     try {
       const userDetails = await fetchUserDetails(userId);
@@ -63,11 +95,15 @@ const PostCard = ({ postData, openPost, self }: any) => {
           </Text>
           <View style={styles.likes}>
             <AntDesign
-              name="hearto"
+              name={liked ? "heart" : "hearto"}
               size={12}
-              color={ThemeColoursPrimary.SecondaryColour}
+              color={
+                liked
+                  ? ThemeColoursPrimary.LogoColour
+                  : ThemeColoursPrimary.SecondaryColour
+              }
             />
-            <Text style={styles.userFont}>{likes}</Text>
+            <Text style={styles.userFont}>{currentLikes}</Text>
           </View>
         </View>
       </View>
