@@ -10,6 +10,8 @@ export const userSlice = createSlice({
     userAge: null,
     userGender: null,
     userLocation: null,
+    userFavourites: [],
+    userLiked: [],
   },
   reducers: {
     createUser: (state, action) => {
@@ -25,7 +27,10 @@ export const userSlice = createSlice({
       state.userBio = null;
       state.userGender = null;
       state.userLocation = null;
+      state.userFavourites = [];
+      state.userLiked = [];
     },
+
     updateDisplayName: (state, action) => {
       state.userDisplayName = action.payload;
     },
@@ -62,6 +67,44 @@ export const userSlice = createSlice({
       state.userGender = gender;
       state.userLocation = location;
     },
+    setUserLiked: (state, action) => {
+      const { postId } = action.payload;
+      // If the postId is not already in the `Liked` array, add it.
+      if (!state.userLiked) {
+        state.userLiked = [];
+      }
+      //@ts-ignore
+      if (!state.userLiked.includes(postId)) {
+        //@ts-ignore
+        state.userLiked.push(postId);
+      }
+    },
+    removeUserLiked: (state, action) => {
+      const { postId } = action.payload;
+      if (state.userLiked) {
+        state.userLiked = state.userLiked.filter((id) => id !== postId);
+      }
+    },
+
+    setUserFavourites: (state, action) => {
+      const { postId } = action.payload;
+      if (!state.userFavourites) {
+        state.userFavourites = [];
+      }
+      //@ts-ignore
+      if (!state.userFavourites.includes(postId)) {
+        //@ts-ignore
+        state.userFavourites.push(postId);
+      }
+    },
+    removeUserFavourites: (state, action) => {
+      const { postId } = action.payload;
+      if (state.userFavourites) {
+        state.userFavourites = state.userFavourites.filter(
+          (id) => id !== postId
+        );
+      }
+    },
   },
 });
 
@@ -75,6 +118,10 @@ export const {
   updateLocation,
   updateAge,
   updateUser,
+  setUserLiked,
+  removeUserLiked,
+  setUserFavourites,
+  removeUserFavourites,
 } = userSlice.actions;
 
 export default userSlice.reducer;

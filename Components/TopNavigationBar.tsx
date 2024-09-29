@@ -9,11 +9,7 @@ import {
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useState } from "react";
-import {
-  ThemeColours,
-  ThemeColoursPrimary,
-  TopNavigationHomeButtons,
-} from "../Constants/UI";
+import { ThemeColoursPrimary, TopNavigationHomeButtons } from "../Constants/UI";
 
 const TopNavigationBar = (props: any) => {
   const { setContent, drawerHandler } = props;

@@ -10,12 +10,14 @@ import {
   PURGE,
   REGISTER,
 } from "redux-persist/es/constants";
+import postsReducer from "./Slices/postsSlices";
 
 const persistConfig = {
   key: "root",
   storage: AsyncStorage,
+  blacklist: ["posts"],
 };
-const rootReducer = combineReducers({ user: userReducer });
+const rootReducer = combineReducers({ user: userReducer, posts: postsReducer });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 

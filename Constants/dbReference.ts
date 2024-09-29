@@ -19,6 +19,7 @@ export enum FireStorageFolder {
 export enum FireStorePostField {
   Likes = "likes",
   Favourites = "favourites",
+  PostID = "postId",
 }
 
 export enum FireStoreAction {

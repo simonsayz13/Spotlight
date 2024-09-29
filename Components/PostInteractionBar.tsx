@@ -18,59 +18,39 @@ import { ThemeColoursPrimary } from "../Constants/UI";
 import {
   updateUserPostMetric,
   updatePostMetric,
-  hasUserInteractedWithPost,
-  getPostMetrics,
 } from "../Firebase/firebaseFireStore";
 import { FireStoreAction, FireStorePostField } from "../Constants/dbReference";
 import { useSelector } from "react-redux";
-import { RootState } from "../Redux/store";
+import store, { RootState } from "../Redux/store";
 import { useFocusEffect } from "@react-navigation/native";
+import {
+  decrementFavourites,
+  decrementLikes,
+  incrementFavourites,
+  incrementLikes,
+} from "../Redux/Slices/postsSlices";
+import {
+  setUserLiked,
+  removeUserLiked,
+  setUserFavourites,
+  removeUserFavourites,
+} from "../Redux/Slices/userSlice";
 
 const screenWidth = Dimensions.get("window").width;
 const PostInteractionBar = ({ postData }: any) => {
-  const { userId } = useSelector((state: RootState) => state.user);
-  const { likes, comments, favourites } = postData;
+  const { userId, userLiked, userFavourites } = useSelector(
+    (state: RootState) => state.user
+  );
+  const { likes, comments, favourites, id: postId } = postData;
   const [inputWidth] = useState(new Animated.Value(200));
   const [inputActive, setInputActive] = useState(false);
-  const [liked, setLiked] = useState(false);
-  const [favourited, setFavourited] = useState(false);
   const [currentLikes, setCurrentLikes] = useState(likes);
   const [currentFavourites, setCurrentFavourites] = useState(favourites);
 
-  useFocusEffect(
-    useCallback(() => {
-      const fetchMetric = async () => {
-        try {
-          const hasLiked = await hasUserInteractedWithPost(
-            userId!,
-            FireStorePostField.Likes,
-            postData.id
-          );
-          const hasFavourited = await hasUserInteractedWithPost(
-            userId!,
-            FireStorePostField.Favourites,
-            postData.id
-          );
-          setLiked(hasLiked);
-          setFavourited(hasFavourited);
-
-          const likes = await getPostMetrics(
-            postData.id,
-            FireStorePostField.Likes
-          );
-          setCurrentLikes(likes);
-          const favourites = await getPostMetrics(
-            postData.id,
-            FireStorePostField.Favourites
-          );
-          setCurrentFavourites(favourites);
-        } catch (error) {
-          console.log("Error fetching user metric on this post");
-        }
-      };
-      fetchMetric();
-    }, [])
-  );
+  //@ts-ignore
+  const liked = userLiked.includes(postId);
+  //@ts-ignore
+  const favourited = userFavourites.includes(postId);
 
   const handleKeyboardDidShow = () => {
     setInputActive(true);
@@ -93,63 +73,76 @@ const PostInteractionBar = ({ postData }: any) => {
   const onClickLike = () => {
     if (!liked) {
       updatePostMetric(
-        postData.id,
+        postId,
         FireStorePostField.Likes,
         FireStoreAction.Increment
       );
-      setLiked(true);
-      setCurrentLikes(currentLikes + 1);
       updateUserPostMetric(
         userId!,
         FireStorePostField.Likes,
-        postData.id,
+        postId,
         FireStoreAction.Add
       );
+      store.dispatch(incrementLikes({ [FireStorePostField.PostID]: postId }));
+      setCurrentLikes(currentLikes + 1);
+      store.dispatch(setUserLiked({ [FireStorePostField.PostID]: postId }));
     } else {
       updatePostMetric(
-        postData.id,
+        postId,
         FireStorePostField.Likes,
         FireStoreAction.Decrement
       );
-      setLiked(false);
-      setCurrentLikes(currentLikes - 1);
       updateUserPostMetric(
         userId!,
         FireStorePostField.Likes,
-        postData.id,
+        postId,
         FireStoreAction.Remove
       );
+      store.dispatch(decrementLikes({ [FireStorePostField.PostID]: postId }));
+      setCurrentLikes(currentLikes - 1);
+      store.dispatch(removeUserLiked({ [FireStorePostField.PostID]: postId }));
     }
   };
 
   const onClickFavourite = () => {
     if (!favourited) {
       updatePostMetric(
-        postData.id,
+        postId,
         FireStorePostField.Favourites,
         FireStoreAction.Increment
       );
-      setFavourited(true);
-      setCurrentFavourites(currentFavourites + 1);
       updateUserPostMetric(
         userId!,
         FireStorePostField.Favourites,
-        postData.id,
+        postId,
         FireStoreAction.Add
+      );
+      store.dispatch(
+        incrementFavourites({ [FireStorePostField.PostID]: postId })
+      );
+      setCurrentFavourites(currentFavourites + 1);
+      store.dispatch(
+        setUserFavourites({ [FireStorePostField.PostID]: postId })
       );
     } else {
       updatePostMetric(
-        postData.id,
+        postId,
         FireStorePostField.Favourites,
         FireStoreAction.Decrement
       );
-      setFavourited(false);
-      setCurrentFavourites(currentFavourites - 1);
+
       updateUserPostMetric(
         userId!,
         FireStorePostField.Favourites,
-        postData.id,
+        postId,
         FireStoreAction.Remove
+      );
+      store.dispatch(
+        decrementFavourites({ [FireStorePostField.PostID]: postId })
+      );
+      setCurrentFavourites(currentFavourites - 1);
+      store.dispatch(
+        removeUserFavourites({ [FireStorePostField.PostID]: postId })
       );
     }
   };

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -10,47 +10,20 @@ import {
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { ThemeColoursPrimary } from "../Constants/UI";
 import { Image } from "expo-image";
-import {
-  fetchUserDetails,
-  getPostMetrics,
-  hasUserInteractedWithPost,
-} from "../Firebase/firebaseFireStore";
+import { fetchUserDetails } from "../Firebase/firebaseFireStore";
 import { useSelector } from "react-redux";
 import { RootState } from "../Redux/store";
-import { useFocusEffect } from "@react-navigation/native";
-import { FireStorePostField } from "../Constants/dbReference";
 
 const PostCard = ({ postData, openPost, self }: any) => {
   const [displayName, setDisplayName] = useState("");
-  const { userDisplayName, userId: currentUserId } = useSelector(
+  const { userDisplayName, userLiked } = useSelector(
     (state: RootState) => state.user
   );
-  const { title, user_id: userId, likes } = postData;
-
-  const [currentLikes, setCurrentLikes] = useState(likes);
-  const [liked, setLiked] = useState(false);
-
+  const { title, user_id: userId, likes, id: postId } = postData;
   const imageUrl = postData.media[0].media_url;
-  useFocusEffect(
-    useCallback(() => {
-      const fetchPostData = async () => {
-        const hasLiked = await hasUserInteractedWithPost(
-          currentUserId!,
-          FireStorePostField.Likes,
-          postData.id
-        );
-        setLiked(hasLiked);
 
-        const likes = await getPostMetrics(
-          postData.id,
-          FireStorePostField.Likes
-        );
-        setCurrentLikes(likes);
-      };
-
-      fetchPostData();
-    }, [])
-  );
+  //@ts-ignore
+  const liked = userLiked.includes(postId);
 
   const fetchUserData = async () => {
     try {
@@ -103,7 +76,7 @@ const PostCard = ({ postData, openPost, self }: any) => {
                   : ThemeColoursPrimary.SecondaryColour
               }
             />
-            <Text style={styles.userFont}>{currentLikes}</Text>
+            <Text style={styles.userFont}>{likes}</Text>
           </View>
         </View>
       </View>

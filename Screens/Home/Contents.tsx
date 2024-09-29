@@ -3,12 +3,14 @@ import PostCard from "../../Components/PostCard";
 import { useCallback, useEffect, useState } from "react";
 import { getAllPosts } from "../../Firebase/firebaseFireStore";
 import { HomeStackScreens } from "../../Constants/UI";
+import { setPosts } from "../../Redux/Slices/postsSlices";
+import { useSelector } from "react-redux";
+import store, { RootState } from "../../Redux/store";
 
 const Contents = (props: any) => {
   const { content, navigation } = props;
   const [refreshing, setRefreshing] = useState(false);
-  const [data, setData] = useState<Array<any>>([]); // Assuming this will be your data source
-
+  const { posts } = useSelector((state: RootState) => state.posts);
   // Refresh the contents page
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -16,12 +18,12 @@ const Contents = (props: any) => {
       fetchPosts();
       setRefreshing(false);
     }, 800); // Simulating a 2-second fetch time
-  }, [data]);
+  }, []);
 
   const fetchPosts = async () => {
     try {
       const data = await getAllPosts();
-      setData(data);
+      store.dispatch(setPosts(data));
     } catch (error) {
       Alert.alert("Error", "Error fetching posts");
     }
@@ -51,9 +53,10 @@ const Contents = (props: any) => {
       }
       showsVerticalScrollIndicator={false}
     >
-      {data.map((post) => {
+      {posts.map((post) => {
         return (
           <PostCard
+            //@ts-ignore
             key={post.id}
             postData={post}
             openPost={openPost}
