@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   StyleSheet,
   View,
@@ -8,6 +8,8 @@ import {
   Dimensions,
   Platform,
   TouchableOpacity,
+  Alert,
+  Keyboard,
 } from "react-native";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
@@ -18,11 +20,11 @@ import { ThemeColoursPrimary } from "../Constants/UI";
 import {
   updateUserPostMetric,
   updatePostMetric,
+  addCommentToPost,
 } from "../Firebase/firebaseFireStore";
 import { FireStoreAction, FireStorePostField } from "../Constants/dbReference";
 import { useSelector } from "react-redux";
 import store, { RootState } from "../Redux/store";
-import { useFocusEffect } from "@react-navigation/native";
 import {
   decrementFavourites,
   decrementLikes,
@@ -38,19 +40,31 @@ import {
 
 const screenWidth = Dimensions.get("window").width;
 const PostInteractionBar = ({ postData }: any) => {
-  const { userId, userLiked, userFavourites } = useSelector(
-    (state: RootState) => state.user
-  );
+  const {
+    userId,
+    userLiked,
+    userFavourites,
+    userDisplayName,
+    userProfilePhotoURL,
+  } = useSelector((state: RootState) => state.user);
   const { likes, comments, favourites, id: postId } = postData;
   const [inputWidth] = useState(new Animated.Value(200));
   const [inputActive, setInputActive] = useState(false);
   const [currentLikes, setCurrentLikes] = useState(likes);
   const [currentFavourites, setCurrentFavourites] = useState(favourites);
-
+  const [commentInput, setCommentInput] = useState<string>("");
   //@ts-ignore
   const liked = userLiked.includes(postId);
   //@ts-ignore
   const favourited = userFavourites.includes(postId);
+
+  const textInputRef = useRef<TextInput>(null);
+
+  const showKeyboard = () => {
+    if (textInputRef.current) {
+      textInputRef.current.focus();
+    }
+  };
 
   const handleKeyboardDidShow = () => {
     setInputActive(true);
@@ -69,7 +83,6 @@ const PostInteractionBar = ({ postData }: any) => {
     }).start();
     setInputActive(false);
   };
-
   const onClickLike = () => {
     if (!liked) {
       updatePostMetric(
@@ -147,6 +160,24 @@ const PostInteractionBar = ({ postData }: any) => {
     }
   };
 
+  const handlePostComment = async () => {
+    try {
+      await addCommentToPost(
+        postId,
+        userId!,
+        userDisplayName!,
+        userProfilePhotoURL!,
+        commentInput
+      );
+      if (textInputRef.current) {
+        textInputRef.current.clear();
+        setCommentInput(""); // Also clear the state if you're managing it
+      }
+    } catch (error) {
+      Alert.alert("Error", "Error posting comment");
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View>
@@ -158,11 +189,15 @@ const PostInteractionBar = ({ postData }: any) => {
               color={ThemeColoursPrimary.SecondaryColour}
             />
             <TextInput
+              ref={textInputRef}
               style={styles.input}
               placeholder="Say something..."
               onFocus={handleKeyboardDidShow}
               onBlur={handleKeyboardDidHide}
               placeholderTextColor={ThemeColoursPrimary.SecondaryColour}
+              returnKeyType="send"
+              onChangeText={(text) => setCommentInput(text)}
+              onSubmitEditing={handlePostComment}
             />
           </View>
           {inputActive && (
@@ -227,7 +262,12 @@ const PostInteractionBar = ({ postData }: any) => {
             </Text>
           </View>
           <View style={styles.actionWrapper}>
-            <TouchableOpacity>
+            <TouchableOpacity
+              onPressIn={() => {
+                showKeyboard();
+                handleKeyboardDidShow();
+              }}
+            >
               <Ionicons
                 name="chatbubble-ellipses-outline"
                 size={28}
@@ -268,12 +308,13 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     height: 40,
     marginVertical: 6,
-    justifyContent: "space-between",
+    // justifyContent: "space-between",
   },
   input: {
     height: 20,
     marginLeft: 4,
     fontSize: 16,
+    width: screenWidth * 0.6,
   },
   actionsContainer: {
     flexDirection: "row",

@@ -1,11 +1,62 @@
-import React from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
-import { Image } from "expo-image";
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Image,
+  Dimensions,
+} from "react-native";
+import { Image as ExpoImage } from "expo-image";
 import { ThemeColoursPrimary } from "../Constants/UI";
 import CommentCard from "./CommentCard";
-const MainPost = ({ postData }: any) => {
-  const { title, description, comments, timeStamp } = postData;
+import { formatRelativeTime } from "../Util/utility";
+import { useSelector } from "react-redux";
+
+const { width: windowWidth } = Dimensions.get("window");
+const MAX_HEIGHT = 500; // Define the maximum height for images
+
+const MainPost = ({ postData, navigation }: any) => {
+  const { title, description, timeStamp, id: postId } = postData;
   const imageUrl = postData.media[0].media_url;
+  const [imageDimensions, setImageDimensions] = useState({
+    width: windowWidth,
+    height: 500,
+  });
+
+  const comments = useSelector(
+    (state: any) =>
+      state.posts.posts.find((post: any) => post.id === postId)?.comments || []
+  );
+
+  useEffect(() => {
+    if (imageUrl) {
+      // Fetch the image dimensions
+      Image.getSize(
+        imageUrl,
+        (width, height) => {
+          console.log(width, height);
+          let calculatedHeight = (windowWidth / width) * height; // Calculate height based on aspect ratio
+          let calculatedWidth = windowWidth;
+
+          // Check if the calculated height exceeds the maximum height
+          if (calculatedHeight > MAX_HEIGHT) {
+            calculatedHeight = MAX_HEIGHT; // Set to max height
+            calculatedWidth = (MAX_HEIGHT / height) * width; // Recalculate width to maintain aspect ratio
+          }
+
+          setImageDimensions({
+            width: calculatedWidth,
+            height: calculatedHeight,
+          }); // Update dimensions
+        },
+        (error) => {
+          console.error("Error getting image size:", error);
+        }
+      );
+    }
+  }, [imageUrl]);
+
   return (
     <ScrollView
       contentContainerStyle={styles.scrollView}
@@ -14,7 +65,15 @@ const MainPost = ({ postData }: any) => {
     >
       <View style={styles.imageContainer}>
         {imageUrl ? (
-          <Image source={{ uri: imageUrl }} style={styles.image} />
+          <ExpoImage
+            source={{ uri: imageUrl }}
+            style={{
+              width: imageDimensions.width,
+              height: imageDimensions.height,
+            }}
+            // resizeMode="contain"
+            contentFit="contain"
+          />
         ) : (
           <></>
         )}
@@ -28,7 +87,7 @@ const MainPost = ({ postData }: any) => {
         </View>
         <View style={styles.userMetaDataContainer}>
           <Text style={styles.userMetaDataText}>
-            Edited on 09-05 United Kingdom
+            Posted {formatRelativeTime(timeStamp)}
           </Text>
         </View>
       </View>
@@ -43,7 +102,11 @@ const MainPost = ({ postData }: any) => {
       {/* Comment Section */}
       <View>
         {comments.map((comment: any) => (
-          <CommentCard key={comment.id} commentData={comment} />
+          <CommentCard
+            key={comment.commentId}
+            commentData={comment}
+            navigation={navigation}
+          />
         ))}
       </View>
 
@@ -61,11 +124,13 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     width: "100%",
-    height: 400,
+    justifyContent: "center",
+    alignItems: "center",
+    // backgroundColor: "#e1e4e8",
   },
   image: {
     width: "100%",
-    height: "100%",
+    height: undefined,
   },
   postTitleContainer: {
     marginVertical: 8,

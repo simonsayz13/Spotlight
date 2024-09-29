@@ -12,10 +12,10 @@ import {
   increment,
   Timestamp,
   deleteDoc,
+  arrayUnion,
 } from "firebase/firestore";
 import app from "./FirebaseApp";
 import {
-  FireStorageFolder,
   FireStoreAction,
   FireStoreCollections,
   FireStorePostField,
@@ -23,6 +23,8 @@ import {
 import "react-native-get-random-values";
 import { v4 as uuidv4 } from "uuid";
 import { Alert } from "react-native";
+import store from "../Redux/store";
+import { addComment } from "../Redux/Slices/postsSlices";
 
 const db = getFirestore(app);
 
@@ -211,5 +213,37 @@ export const getPostMetrics = async (
   } catch (error) {
     console.error("Error fetching field value: ", error);
     return null;
+  }
+};
+
+export const addCommentToPost = async (
+  postId: string,
+  userId: string,
+  displayName: string,
+  userProfilePhotoURL: string,
+  commentText: string
+) => {
+  try {
+    // Reference to the specific post document in Firestore
+    const postRef = doc(db, FireStoreCollections.Posts, postId);
+
+    // Construct the comment object to add
+    const newComment = {
+      commentId: Date.now().toString(), // Unique ID for the comment
+      userId: userId,
+      displayName: displayName,
+      text: commentText,
+      profilePhotoUrl: userProfilePhotoURL,
+      timeStamp: new Date().toISOString(),
+    };
+
+    // Use the update function with arrayUnion to add the new comment
+    await updateDoc(postRef, {
+      comments: arrayUnion(newComment),
+    });
+
+    store.dispatch(addComment({ postId, comment: newComment }));
+  } catch (error) {
+    console.error("Error adding comment: ", error);
   }
 };

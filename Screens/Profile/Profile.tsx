@@ -145,7 +145,7 @@ const Profile = ({ navigation, route }: any) => {
           }}
         >
           <Text style={styles.descriptionTitle}>Bio</Text>
-          {guestView ?? (
+          {!guestView && (
             <TouchableOpacity onPress={handleEdit}>
               <AntDesign
                 name="edit"

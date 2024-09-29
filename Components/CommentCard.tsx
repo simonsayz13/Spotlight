@@ -3,23 +3,49 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Octicons from "@expo/vector-icons/Octicons";
-import { ThemeColours, ThemeColoursPrimary } from "../Constants/UI";
+import { ProfileStackScreens, ThemeColoursPrimary } from "../Constants/UI";
+import { formatRelativeTime } from "../Util/utility";
+import { Image } from "expo-image";
+import { useSelector } from "react-redux";
+import { RootState } from "../Redux/store";
 
-const CommentCard = ({ commentData }: any) => {
+const CommentCard = ({ commentData, navigation }: any) => {
+  const { profilePhotoUrl, userId: commentUserId } = commentData;
+  const { userId } = useSelector((state: RootState) => state.user);
+
+  const goToProfile = () => {
+    navigation.navigate(ProfileStackScreens.Profile, {
+      guestView: userId !== commentUserId,
+      opId: commentData.userId,
+    });
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.userContainer}>
-        <Ionicons
-          name="person-circle-outline"
-          size={30}
-          color={ThemeColoursPrimary.SecondaryColour}
-        />
-        <Text style={styles.userNameFont}>{commentData.userName}</Text>
+        <TouchableOpacity style={styles.userWrapper} onPressIn={goToProfile}>
+          {profilePhotoUrl ? (
+            <Image
+              source={{ uri: profilePhotoUrl }}
+              style={styles.profileImage}
+            />
+          ) : (
+            <Ionicons
+              name="person-circle-outline"
+              size={30}
+              color={ThemeColoursPrimary.SecondaryColour}
+            />
+          )}
+          <Text style={styles.userNameFont}>{commentData.displayName}</Text>
+        </TouchableOpacity>
+
         <View style={styles.separatorDot} />
-        <Text style={styles.userNameFont}>{commentData.timeStamp}</Text>
+        <Text style={styles.timeStampFont}>
+          {formatRelativeTime(commentData.timeStamp)}
+        </Text>
       </View>
       <View style={styles.commentContainer}>
-        <Text style={styles.commentFont}>{commentData.comment}</Text>
+        <Text style={styles.commentFont}>{commentData.text}</Text>
       </View>
       <View style={styles.commentActions}>
         <TouchableOpacity style={{ flexDirection: "row", gap: 4 }}>
@@ -31,27 +57,13 @@ const CommentCard = ({ commentData }: any) => {
           <Text style={styles.miscFont}>Reply</Text>
         </TouchableOpacity>
 
-        <View style={{ flexDirection: "row", gap: 2 }}>
-          <TouchableOpacity>
-            <AntDesign
-              name="like2"
-              size={20}
-              color={ThemeColoursPrimary.SecondaryColour}
-            />
-          </TouchableOpacity>
-          <Text style={styles.miscFont}>{commentData.likes}</Text>
-        </View>
-
-        <View style={{ flexDirection: "row", gap: 2 }}>
-          <TouchableOpacity>
-            <AntDesign
-              name="dislike2"
-              size={20}
-              color={ThemeColoursPrimary.SecondaryColour}
-            />
-          </TouchableOpacity>
-          <Text style={styles.miscFont}>{commentData.dislikes}</Text>
-        </View>
+        <TouchableOpacity>
+          <AntDesign
+            name={"hearto"}
+            size={20}
+            color={ThemeColoursPrimary.SecondaryColour}
+          />
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -72,7 +84,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   userNameFont: {
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: "bold",
     color: ThemeColoursPrimary.SecondaryColour,
   },
@@ -96,10 +108,20 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "flex-end",
     alignItems: "center",
-    gap: 10,
+    gap: 12,
   },
   miscFont: {
     color: ThemeColoursPrimary.SecondaryColour,
+  },
+  userWrapper: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 6,
+  },
+  profileImage: {
+    width: 34, // Width and height should be the same
+    height: 34,
+    borderRadius: 50, // Half of the width or height for a perfect circle
   },
 });
 

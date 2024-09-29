@@ -18,10 +18,10 @@ const Post = ({ navigation, route }: any) => {
     <SafeAreaView style={styles.container}>
       <TopNavigationBarPost navigation={navigation} userId={userId} />
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "height" : "padding"}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={styles.container}
       >
-        <MainPost postData={postData} />
+        <MainPost postData={postData} navigation={navigation} />
         <View style={styles.bottomView}>
           <PostInteractionBar postData={postData} />
         </View>

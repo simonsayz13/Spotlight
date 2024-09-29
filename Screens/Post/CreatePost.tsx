@@ -67,7 +67,7 @@ const CreatePost = ({ navigation, route }: any) => {
     }
     setPosting(true);
     const imageURL = await uploadImage(photoURI);
-    const timeStamp = Date.now();
+    const timeStamp = new Date().toISOString();
     const postData = {
       media: [
         {

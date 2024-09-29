@@ -41,6 +41,19 @@ export const postsSlice = createSlice({
         post.favourites -= 1;
       }
     },
+    addComment: (state, action) => {
+      const { postId, comment } = action.payload;
+
+      // Find the specific post by ID
+      const post = state.posts.find((post: any) => post.id === postId);
+
+      if (post) {
+        // Push the new comment to the comments array
+        //@ts-ignore
+        post.comments.push(comment);
+        console.log(comment);
+      }
+    },
   },
 });
 
@@ -50,6 +63,7 @@ export const {
   decrementLikes,
   incrementFavourites,
   decrementFavourites,
+  addComment,
 } = postsSlice.actions;
 
 export default postsSlice.reducer;
