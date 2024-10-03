@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -9,18 +9,35 @@ import {
   KeyboardAvoidingView,
   Keyboard,
   TouchableOpacity,
+  Platform,
 } from "react-native";
+import { Image } from "expo-image";
 import { ThemeColours, ThemeColoursPrimary } from "../../Constants/UI";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { mockChatData } from "../../Constants/mockData";
+import { useFocusEffect } from "@react-navigation/native";
+import { useSelector } from "react-redux";
+import { RootState } from "../../Redux/store";
+import {
+  createOrGetChatRoom,
+  messageListener,
+  sendMessage,
+} from "../../Firebase/firebaseFireStore";
+import { formatRelativeTime } from "../../Util/utility";
+
 const Chat = ({ route, navigation }: any) => {
-  const { userId, userName } = route.params;
-  const currentUserID = "1337";
+  const { userId: currentUserId, userProfilePhotoURL } = useSelector(
+    (state: RootState) => state.user
+  );
+  const { userId, userName, profilePicUrl } = route.params;
   const scrollViewRef = useRef<ScrollView>(null);
+  const [chatRoomId, setChatRoomId] = useState("");
+  const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState<Array<any>>([]);
   const goBack = () => {
     navigation.goBack();
   };
-
+  const textInputRef = useRef<TextInput>(null);
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
       "keyboardDidShow",
@@ -28,10 +45,25 @@ const Chat = ({ route, navigation }: any) => {
         scrollViewRef.current?.scrollToEnd({ animated: true });
       }
     );
+    const initiateChat = async () => {
+      await createOrGetChatRoom(currentUserId!, userId, setChatRoomId);
+    };
+    initiateChat();
     return () => {
       keyboardDidShowListener.remove();
     };
-  }, []);
+  }, [userId]);
+
+  useEffect(() => {
+    if (chatRoomId) messageListener(chatRoomId, setMessages);
+  }, [chatRoomId]);
+
+  const handleSendMessage = async () => {
+    await sendMessage(chatRoomId, currentUserId!, message);
+    if (textInputRef.current) {
+      textInputRef.current.clear();
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -43,11 +75,7 @@ const Chat = ({ route, navigation }: any) => {
             color={ThemeColoursPrimary.SecondaryColour}
           />
         </TouchableOpacity>
-        <Ionicons
-          name="person-circle-outline"
-          size={48}
-          color={ThemeColoursPrimary.SecondaryColour}
-        />
+        <Image source={{ uri: profilePicUrl }} style={styles.profileImage} />
         <View style={styles.usernameActivityContainer}>
           <Text style={styles.userNameText}>{userName}</Text>
           <Text style={styles.activityStatusText}>Active Today</Text>
@@ -64,41 +92,47 @@ const Chat = ({ route, navigation }: any) => {
             scrollViewRef.current?.scrollToEnd({ animated: false });
           }}
         >
-          {mockChatData.map((message: any) => {
+          {messages.map((message: any) => {
             return (
               <View
-                key={message.messageId + message.messageTimeStamp}
+                key={message.id + message.timestamp}
                 style={[
                   styles.messageContainer,
                   {
                     flexDirection:
-                      message.userId === currentUserID ? "row-reverse" : "row",
+                      message.senderId === currentUserId
+                        ? "row-reverse"
+                        : "row",
                     alignSelf:
-                      message.userId === currentUserID
+                      message.senderId === currentUserId
                         ? "flex-end"
                         : "flex-start", // Snap to right or left
                   },
                 ]}
               >
-                <Ionicons
-                  name="person-circle-outline"
-                  size={38}
-                  color={ThemeColoursPrimary.SecondaryColour}
+                <Image
+                  source={{
+                    uri:
+                      message.senderId === currentUserId
+                        ? userProfilePhotoURL
+                        : profilePicUrl,
+                  }}
+                  style={styles.chatProfileImage}
                 />
                 <Text
                   style={[
                     styles.messageText,
                     {
-                      marginLeft: message.userId === currentUserID ? 0 : 4,
-                      marginRight: message.userId === currentUserID ? 4 : 0,
+                      marginLeft: message.senderId === currentUserId ? 0 : 4,
+                      marginRight: message.senderId === currentUserId ? 4 : 0,
                     },
                   ]}
                 >
-                  {message.message}
+                  {message.text}
                 </Text>
                 <View style={styles.timeStampContainer}>
                   <Text style={styles.timeStampText}>
-                    {message.messageTimeStamp}
+                    {formatRelativeTime(message.timestamp)}
                   </Text>
                 </View>
               </View>
@@ -107,12 +141,19 @@ const Chat = ({ route, navigation }: any) => {
         </ScrollView>
 
         <View style={styles.messageBarContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Send message..."
-            placeholderTextColor={ThemeColoursPrimary.SecondaryColour}
-            returnKeyType="send"
-          />
+          <View style={styles.messageBar}>
+            <TextInput
+              ref={textInputRef}
+              style={styles.input}
+              placeholder="Send message..."
+              placeholderTextColor={ThemeColoursPrimary.SecondaryColour}
+              returnKeyType="send"
+              onChangeText={(text: string) => {
+                setMessage(text);
+              }}
+              onSubmitEditing={handleSendMessage}
+            />
+          </View>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -126,6 +167,10 @@ const styles = StyleSheet.create({
   topBarContainer: {
     flexDirection: "row",
     alignItems: "center",
+    borderBottomWidth: 0.4,
+    borderBottomColor: ThemeColoursPrimary.GreyColour,
+    paddingTop: Platform.OS === "android" ? 4 : 0,
+    paddingBottom: 4,
   },
   userNameText: {
     fontSize: 20,
@@ -148,14 +193,16 @@ const styles = StyleSheet.create({
     marginHorizontal: 8,
   },
   messageBarContainer: {
+    borderTopWidth: 0.4,
+    borderTopColor: ThemeColoursPrimary.GreyColour,
+  },
+  messageBar: {
     borderRadius: 12,
     marginHorizontal: 12,
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#f1f1f1",
-    // borderColor: ThemeColoursPrimary.PrimaryColour,
-    borderWidth: 1.0,
-    paddingHorizontal: 8,
+    borderWidth: 1,
     marginVertical: 8,
   },
   input: {
@@ -167,7 +214,8 @@ const styles = StyleSheet.create({
   },
   messageContainer: {
     flexDirection: "row",
-    marginVertical: 6,
+
+    marginTop: 6,
     width: "60%",
     alignItems: "center",
     borderRadius: 8,
@@ -178,7 +226,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "500",
     borderRadius: 8,
-    borderWidth: 1,
+    borderWidth: 1.3,
     borderColor: ThemeColoursPrimary.SecondaryColour,
     backgroundColor: ThemeColoursPrimary.PrimaryColour,
     color: ThemeColoursPrimary.SecondaryColour,
@@ -188,5 +236,17 @@ const styles = StyleSheet.create({
     padding: 6, // Optional: Add some padding
   },
   timeStampText: { fontSize: 10, color: ThemeColoursPrimary.SecondaryColour },
+  profileImage: {
+    width: 50, // Width and height should be the same
+    height: 50,
+    borderRadius: 50, // Half of the width or height for a perfect circle
+    marginRight: 4,
+  },
+  chatProfileImage: {
+    width: 40, // Width and height should be the same
+    height: 40,
+    borderRadius: 50, // Half of the width or height for a perfect circle
+    marginRight: 4,
+  },
 });
 export default Chat;

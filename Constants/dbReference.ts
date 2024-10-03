@@ -1,6 +1,7 @@
 export enum FireStoreCollections {
   Users = "users",
   Posts = "posts",
+  Chats = "chats",
 }
 
 export enum FireStoreUsersField {

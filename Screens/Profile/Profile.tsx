@@ -13,6 +13,7 @@ import { RootState } from "../../Redux/store";
 import {
   Gender,
   HomeStackScreens,
+  MessagingStackScreens,
   ProfileStackScreens,
   ThemeColoursPrimary,
   userContentSelectorButtons,
@@ -110,6 +111,14 @@ const Profile = ({ navigation, route }: any) => {
       postData: postData,
     });
   };
+
+  const openChat = () => {
+    navigation.navigate(MessagingStackScreens.Chat, {
+      userId: opId,
+      userName: displayName,
+      profilePicUrl,
+    });
+  };
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.profileDetails}>
@@ -145,7 +154,15 @@ const Profile = ({ navigation, route }: any) => {
           }}
         >
           <Text style={styles.descriptionTitle}>Bio</Text>
-          {!guestView && (
+          {guestView ? (
+            <TouchableOpacity onPressIn={openChat}>
+              <FontAwesome6
+                name="envelope"
+                size={24}
+                color={ThemeColoursPrimary.SecondaryColour}
+              />
+            </TouchableOpacity>
+          ) : (
             <TouchableOpacity onPress={handleEdit}>
               <AntDesign
                 name="edit"

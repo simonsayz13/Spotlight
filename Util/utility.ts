@@ -29,8 +29,11 @@ export const formatRelativeTime = (timeStamp: string) => {
   const diffInDays = Math.floor(diffInHours / 24);
 
   if (diffInMinutes < 60) {
-    // If within 60 minutes, show "X mins ago"
-    return `${diffInMinutes} mins ago`;
+    if (diffInMinutes < 1) {
+      return `now`;
+    } else {
+      return `${diffInMinutes} mins ago`;
+    }
   } else if (diffInHours < 24) {
     // If within 24 hours, show "X hours ago"
     return `${diffInHours} hours ago`;

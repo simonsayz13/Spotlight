@@ -35,7 +35,6 @@ const MainPost = ({ postData, navigation }: any) => {
       Image.getSize(
         imageUrl,
         (width, height) => {
-          console.log(width, height);
           let calculatedHeight = (windowWidth / width) * height; // Calculate height based on aspect ratio
           let calculatedWidth = windowWidth;
 

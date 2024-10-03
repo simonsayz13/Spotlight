@@ -13,6 +13,8 @@ import {
   Timestamp,
   deleteDoc,
   arrayUnion,
+  addDoc,
+  onSnapshot,
 } from "firebase/firestore";
 import app from "./FirebaseApp";
 import {
@@ -25,6 +27,7 @@ import { v4 as uuidv4 } from "uuid";
 import { Alert } from "react-native";
 import store from "../Redux/store";
 import { addComment } from "../Redux/Slices/postsSlices";
+import { SetStateAction } from "react";
 
 const db = getFirestore(app);
 
@@ -70,11 +73,10 @@ export const fetchUserProfile = async (userId: string) => {
 export const createPost = async (userId: string, postData: any) => {
   try {
     const postId = uuidv4();
-    const docRef = await setDoc(doc(db, FireStoreCollections.Posts, postId), {
+    await setDoc(doc(db, FireStoreCollections.Posts, postId), {
       ...postData,
       user_id: userId,
     });
-    console.log("Document written with Ref: ", docRef);
   } catch (e) {
     console.error("Error adding document: ", e);
   }
@@ -246,4 +248,114 @@ export const addCommentToPost = async (
   } catch (error) {
     console.error("Error adding comment: ", error);
   }
+};
+
+export const createOrGetChatRoom = async (
+  user1Id: string,
+  user2Id: string,
+  setChatRoomId: SetStateAction<any>
+) => {
+  try {
+    // Create a unique chat ID by sorting the user IDs
+    const sortedUserIds = [user1Id, user2Id].sort().join("_");
+
+    // Reference the chat room with this unique ID
+    const chatRoomRef = doc(
+      collection(db, FireStoreCollections.Chats),
+      sortedUserIds
+    );
+
+    // Check if the chat room already exists
+    const chatRoomSnapshot = await getDoc(chatRoomRef);
+
+    if (!chatRoomSnapshot.exists()) {
+      // If it doesn't exist, create a new chat room
+      const newChatRoom = {
+        participants: [user1Id, user2Id],
+        lastMessage: {},
+        createdAt: new Date().toISOString(),
+      };
+      // Set the document with the unique ID
+      await setDoc(chatRoomRef, newChatRoom);
+    }
+    setChatRoomId(chatRoomRef.id);
+  } catch (error) {
+    console.error("Error creating or getting chat room: ", error);
+    throw error;
+  }
+};
+
+export const sendMessage = async (
+  chatId: string,
+  senderId: string,
+  text: string
+) => {
+  try {
+    // Reference the chat room document
+    const chatRoomRef = doc(db, FireStoreCollections.Chats, chatId);
+
+    // Reference the messages subcollection inside the chat room
+    const messagesCollectionRef = collection(
+      chatRoomRef,
+      FireStoreCollections.Chats
+    );
+
+    // Create a new message object
+    const newMessage = {
+      senderId,
+      text,
+      timestamp: new Date().toISOString(), // Use server timestamp for consistency
+      read: false,
+    };
+
+    // Add the new message document to the messages subcollection
+    const newMessageRef = doc(messagesCollectionRef); // Generate a unique document reference
+    await setDoc(newMessageRef, newMessage);
+
+    // Update the chat room's last message field
+    await updateDoc(chatRoomRef, {
+      lastMessage: {
+        text: text,
+        timestamp: new Date().toISOString(),
+        senderId: senderId,
+      },
+    });
+
+    return { id: newMessageRef.id, ...newMessage };
+  } catch (error) {
+    console.error("Error sending message: ", error);
+    return null;
+  }
+};
+
+export const messageListener = (
+  chatId: string,
+  // setChatDetails: SetStateAction<any>,
+  setMessages: SetStateAction<any>
+) => {
+  const chatDocRef = doc(db, "chats", chatId);
+
+  // Listen for changes to the chat document
+  // const unsubscribeChatDetails = onSnapshot(chatDocRef, (docSnapshot) => {
+  //   if (docSnapshot.exists()) {
+  //     setChatDetails({ id: docSnapshot.id, ...docSnapshot.data() });
+  //   }
+  // });
+
+  // Reference the `messages` sub-collection within the specific chat document
+  const messagesRef = collection(chatDocRef, "chats");
+  const messagesQuery = query(messagesRef, orderBy("timestamp", "asc"));
+
+  // Attach a listener to get real-time updates on the messages
+  const unsubscribeMessages = onSnapshot(messagesQuery, (querySnapshot) => {
+    const messagesList = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    setMessages(messagesList);
+  });
+  return () => {
+    // unsubscribeChatDetails();
+    unsubscribeMessages();
+  };
 };
