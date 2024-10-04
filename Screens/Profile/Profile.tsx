@@ -24,7 +24,7 @@ import PostCard from "../../Components/PostCard";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {
-  fetchUserDetails,
+  getUserDetails,
   getPostsByUserId,
 } from "../../Firebase/firebaseFireStore";
 import { useFocusEffect } from "@react-navigation/native";
@@ -68,7 +68,7 @@ const Profile = ({ navigation, route }: any) => {
       if (guestView) {
         const fetchUser = async () => {
           try {
-            return await fetchUserDetails(opId);
+            return await getUserDetails(opId);
           } catch (error) {
             Alert.alert("Error", `${error}`);
           }

@@ -49,3 +49,13 @@ export const formatRelativeTime = (timeStamp: string) => {
     });
   }
 };
+
+export const sortConversationsByLastMessage = (conversations: any) => {
+  return conversations.sort((a: any, b: any) => {
+    const aTimestamp = a.lastMessage?.timestamp || 0; // Use 0 if timestamp is not present
+    const bTimestamp = b.lastMessage?.timestamp || 0; // Use 0 if timestamp is not present
+
+    // Compare timestamps to sort in descending order
+    return new Date(bTimestamp).getTime() - new Date(aTimestamp).getTime(); // For descending order
+  });
+};

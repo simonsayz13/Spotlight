@@ -18,6 +18,7 @@ import {
 } from "firebase/firestore";
 import app from "./FirebaseApp";
 import {
+  FireStorageFolder,
   FireStoreAction,
   FireStoreCollections,
   FireStorePostField,
@@ -28,6 +29,7 @@ import { Alert } from "react-native";
 import store from "../Redux/store";
 import { addComment } from "../Redux/Slices/postsSlices";
 import { SetStateAction } from "react";
+import { sortConversationsByLastMessage } from "../Util/utility";
 
 const db = getFirestore(app);
 
@@ -60,7 +62,7 @@ export const updateProfileField = async (
   }
 };
 
-export const fetchUserProfile = async (userId: string) => {
+export const getUserDetails = async (userId: string) => {
   try {
     const userProfileCollection = doc(db, FireStoreCollections.Users, userId);
     const userDoc = await getDoc(userProfileCollection);
@@ -112,20 +114,6 @@ export const getAllPosts = async () => {
     return postsList;
   } catch (error) {
     return [];
-  }
-};
-
-export const fetchUserDetails = async (userId: string) => {
-  try {
-    const userDocRef = doc(db, FireStoreCollections.Users, userId);
-    const userDoc = await getDoc(userDocRef);
-    if (userDoc.exists()) {
-      return userDoc.data();
-    } else {
-      return null;
-    }
-  } catch (error) {
-    return null; // Return null on error
   }
 };
 
@@ -333,29 +321,40 @@ export const messageListener = (
   // setChatDetails: SetStateAction<any>,
   setMessages: SetStateAction<any>
 ) => {
-  const chatDocRef = doc(db, "chats", chatId);
-
-  // Listen for changes to the chat document
-  // const unsubscribeChatDetails = onSnapshot(chatDocRef, (docSnapshot) => {
-  //   if (docSnapshot.exists()) {
-  //     setChatDetails({ id: docSnapshot.id, ...docSnapshot.data() });
-  //   }
-  // });
+  const chatDocRef = doc(db, FireStoreCollections.Chats, chatId);
 
   // Reference the `messages` sub-collection within the specific chat document
-  const messagesRef = collection(chatDocRef, "chats");
+  const messagesRef = collection(chatDocRef, FireStoreCollections.Chats);
   const messagesQuery = query(messagesRef, orderBy("timestamp", "asc"));
 
   // Attach a listener to get real-time updates on the messages
-  const unsubscribeMessages = onSnapshot(messagesQuery, (querySnapshot) => {
+  const subscribeMessages = onSnapshot(messagesQuery, (querySnapshot) => {
     const messagesList = querySnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
     setMessages(messagesList);
   });
-  return () => {
-    // unsubscribeChatDetails();
-    unsubscribeMessages();
-  };
+  return () => subscribeMessages();
+};
+
+export const conversationListener = (
+  currentUserId: string,
+  setConversations: SetStateAction<any>
+) => {
+  const conversationsRef = collection(db, FireStoreCollections.Chats);
+  const q = query(
+    conversationsRef,
+    where("participants", "array-contains", currentUserId)
+  );
+  const subscribeConversations = onSnapshot(q, (querySnapshot) => {
+    const chatsList = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    setConversations(sortConversationsByLastMessage(chatsList));
+  });
+
+  // Cleanup on component unmount
+  return () => subscribeConversations();
 };

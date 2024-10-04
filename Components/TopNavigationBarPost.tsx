@@ -4,7 +4,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import { ProfileStackScreens, ThemeColoursPrimary } from "../Constants/UI";
-import { fetchUserDetails } from "../Firebase/firebaseFireStore";
+import { getUserDetails } from "../Firebase/firebaseFireStore";
 import { Image } from "expo-image";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 const TopNavigationBarPost = ({ navigation, userId }: any) => {
@@ -13,7 +13,7 @@ const TopNavigationBarPost = ({ navigation, userId }: any) => {
 
   const fetchUserData = async () => {
     try {
-      const userDetails = await fetchUserDetails(userId);
+      const userDetails = await getUserDetails(userId);
       setDisplayName(userDetails?.display_name);
       setProfilePicUrl(userDetails?.profile_picture_url);
     } catch (error) {}

@@ -55,7 +55,15 @@ const Chat = ({ route, navigation }: any) => {
   }, [userId]);
 
   useEffect(() => {
-    if (chatRoomId) messageListener(chatRoomId, setMessages);
+    if (!chatRoomId) return;
+
+    // Call messageListener and capture the unsubscribe function
+    const unsubscribe = messageListener(chatRoomId, setMessages);
+
+    // Cleanup the listener on component unmount or when chatRoomId changes
+    return () => {
+      unsubscribe(); // Unsubscribe from Firestore listener
+    };
   }, [chatRoomId]);
 
   const handleSendMessage = async () => {
@@ -75,7 +83,15 @@ const Chat = ({ route, navigation }: any) => {
             color={ThemeColoursPrimary.SecondaryColour}
           />
         </TouchableOpacity>
-        <Image source={{ uri: profilePicUrl }} style={styles.profileImage} />
+        <Image
+          source={
+            profilePicUrl
+              ? { uri: profilePicUrl }
+              : require("../../assets/test_image/mock_profile_picture.png")
+          }
+          style={styles.profileImage}
+        />
+
         <View style={styles.usernameActivityContainer}>
           <Text style={styles.userNameText}>{userName}</Text>
           <Text style={styles.activityStatusText}>Active Today</Text>
@@ -110,15 +126,26 @@ const Chat = ({ route, navigation }: any) => {
                   },
                 ]}
               >
-                <Image
-                  source={{
-                    uri:
+                {!userProfilePhotoURL && !profilePicUrl ? (
+                  <Image
+                    source={require("../../assets/test_image/mock_profile_picture.png")}
+                    style={styles.chatProfileImage}
+                  />
+                ) : (
+                  <Image
+                    source={
                       message.senderId === currentUserId
-                        ? userProfilePhotoURL
-                        : profilePicUrl,
-                  }}
-                  style={styles.chatProfileImage}
-                />
+                        ? {
+                            uri: userProfilePhotoURL!,
+                          }
+                        : profilePicUrl
+                        ? { uri: profilePicUrl }
+                        : require("../../assets/test_image/mock_profile_picture.png")
+                    }
+                    style={styles.chatProfileImage}
+                  />
+                )}
+
                 <Text
                   style={[
                     styles.messageText,

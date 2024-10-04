@@ -9,7 +9,7 @@ import {
 import { clearUser, createUser, updateUser } from "../Redux/Slices/userSlice";
 import store from "../Redux/store";
 import { LoginStatus } from "../Constants/UI";
-import { fetchUserProfile } from "./firebaseFireStore";
+import { getUserDetails } from "./firebaseFireStore";
 
 const auth = getAuth(app);
 
@@ -57,7 +57,7 @@ export const signInWithEmail = async (email: string, password: string) => {
   try {
     return await signInWithEmailAndPassword(auth, email, password)
       .then(async () => {
-        const userData = await fetchUserProfile(auth.currentUser?.uid!);
+        const userData = await getUserDetails(auth.currentUser?.uid!);
         store.dispatch(updateUser(userData));
         return {
           success: true,
