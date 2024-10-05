@@ -5,7 +5,6 @@ import {
   StyleSheet,
   Animated,
   TextInput,
-  Keyboard,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useState, useRef, useEffect } from "react";
@@ -17,10 +16,10 @@ const TopNavigationBar = (props: any) => {
     searchText,
     showSearchBar,
     //* status updator
-    drawerHandler,
     handleSearchBarChange,
     setContent,
-    setShowSearchBar,
+    handlePressSearchBtn,
+    handlePressMenuBtn,
   } = props;
   const inputRef = useRef<TextInput>(null);
 
@@ -42,31 +41,6 @@ const TopNavigationBar = (props: any) => {
     setContent(clickedScreen);
   };
 
-  const toggleSearchBar = () => {
-    // Toggle the visibility of the search bar
-    setShowSearchBar((prev: boolean) => !prev);
-
-    // Define the animation
-    Animated.parallel([
-      Animated.timing(searchBarOpacity, {
-        toValue: showSearchBar ? 0 : 1, // Fade out if it's currently visible, fade in otherwise
-        duration: showSearchBar ? 0 : 200, // Duration of 300 milliseconds
-        useNativeDriver: true, // Use native driver for better performance
-      }),
-
-      Animated.timing(searchBarTranslateX, {
-        toValue: showSearchBar ? 10 : -2, // Move up if it's currently visible, move down otherwise
-        duration: showSearchBar ? 0 : 200, // Duration of 300 milliseconds
-        useNativeDriver: true, // Use native driver for better performance
-      }),
-    ]).start();
-  };
-
-  const fetchNewItem = () => {
-    console.log("fetch new item");
-    Keyboard.dismiss();
-  };
-
   //> Hooks
   useEffect(() => {
     if (showSearchBar && inputRef?.current) {
@@ -74,11 +48,26 @@ const TopNavigationBar = (props: any) => {
     }
   }, [showSearchBar]);
 
+  //* Animate Search appreance based on showSearchBar
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(searchBarOpacity, {
+        toValue: !showSearchBar ? 0 : 1, // Fade out if it's currently visible, fade in otherwise
+        duration: !showSearchBar ? 0 : 200, // Duration of 300 milliseconds
+        useNativeDriver: true, // Use native driver for better performance
+      }),
+
+      Animated.timing(searchBarTranslateX, {
+        toValue: !showSearchBar ? 10 : -2, // Move up if it's currently visible, move down otherwise
+        duration: !showSearchBar ? 0 : 200, // Duration of 300 milliseconds
+        useNativeDriver: true, // Use native driver for better performance
+      }),
+    ]).start();
+  }, [showSearchBar]);
+
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        onPress={showSearchBar ? toggleSearchBar : drawerHandler}
-      >
+      <TouchableOpacity onPress={handlePressMenuBtn}>
         <Ionicons
           name={showSearchBar ? "chevron-back" : "menu"}
           size={32}
@@ -122,9 +111,7 @@ const TopNavigationBar = (props: any) => {
             </TouchableOpacity>
           ))}
       </View>
-      <TouchableOpacity
-        onPress={showSearchBar ? fetchNewItem : toggleSearchBar}
-      >
+      <TouchableOpacity onPress={handlePressSearchBtn}>
         <Ionicons
           name="search"
           size={32}

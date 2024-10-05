@@ -5,12 +5,17 @@ import {
   SafeAreaView,
   NativeSyntheticEvent,
   TextInputChangeEventData,
+  Keyboard,
+  Alert,
 } from "react-native";
 import TopNavigationBar from "../../Components/TopNavigationBar";
 import Contents from "./Contents";
 import { useCallback, useState, useEffect } from "react";
 import DrawerNavigationBar from "../../Components/DrawerNavigationBar";
 import { ThemeColoursPrimary } from "../../Constants/UI";
+import { getPostsBySearch } from "../../Firebase/firebaseFireStore";
+import { setPosts } from "../../Redux/Slices/postsSlices";
+import store from "../../Redux/store";
 
 const DrawerMenu = () => {
   return (
@@ -36,6 +41,31 @@ const HomeScreen = ({ navigation }: any) => {
     if (evt?.nativeEvent?.text != null) setSearchText(evt.nativeEvent.text);
   };
 
+  const fetchPostsBySearch = async (searchText: string = "") => {
+    try {
+      const data = await getPostsBySearch(searchText);
+      setShowSearchBar(false);
+      store.dispatch(setPosts(data));
+    } catch (error) {
+      Alert.alert("Error", "Error fetching posts");
+    }
+  };
+
+  const fetchNewItem = () => {
+    console.log("fetch new item");
+    if (searchText.trim() === "") return;
+    fetchPostsBySearch(searchText);
+    Keyboard.dismiss();
+  };
+
+  const handlePressSearchBtn = () => {
+    showSearchBar ? fetchNewItem() : setShowSearchBar((prev: boolean) => !prev);
+  };
+
+  const handlePressMenuBtn = (cb) => {
+    showSearchBar ? setShowSearchBar((prev: boolean) => !prev) : cb();
+  };
+
   useEffect(() => {
     if (!showSearchBar) setSearchText("");
   }, [showSearchBar]);
@@ -49,9 +79,9 @@ const HomeScreen = ({ navigation }: any) => {
               searchText={searchText}
               showSearchBar={showSearchBar}
               setContent={changeContent}
-              setShowSearchBar={setShowSearchBar}
-              drawerHandler={openDrawer}
               handleSearchBarChange={handleSearchBarChange}
+              handlePressSearchBtn={handlePressSearchBtn}
+              handlePressMenuBtn={() => handlePressMenuBtn(openDrawer)}
             />
             <Contents
               content={content}

@@ -42,7 +42,6 @@ const Contents = (props: any) => {
   }, [content]);
 
   useEffect(() => {
-    console.log("posts", posts);
     if (posts) setFilteredPosts(posts);
   }, [posts]);
 
@@ -57,7 +56,6 @@ const Contents = (props: any) => {
 
   //* Filter the posts whose tilte contain the search text
   useEffect(() => {
-    if (!searchText) return setFilteredPosts([]);
     const filtered = posts.filter((post) =>
       post?.title?.toLowerCase().includes(searchText.toLowerCase())
     );
