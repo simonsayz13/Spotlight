@@ -30,15 +30,23 @@ const Contents = (props: any) => {
     }
   };
 
-  // Hook for loading data
+  const openPost = (postData: any) => {
+    navigation.navigate(HomeStackScreens.Post, {
+      postData: postData,
+    });
+  };
+  //> Hooks
+  //* Hook for loading data
   useEffect(() => {
     fetchPosts();
   }, [content]);
 
   useEffect(() => {
+    console.log("posts", posts);
     if (posts) setFilteredPosts(posts);
   }, [posts]);
 
+  //* Change the display of posts based on if search bar is active
   useEffect(() => {
     if (showSearchBar) {
       setFilteredPosts([]);
@@ -47,11 +55,14 @@ const Contents = (props: any) => {
     }
   }, [showSearchBar]);
 
-  const openPost = (postData: any) => {
-    navigation.navigate(HomeStackScreens.Post, {
-      postData: postData,
-    });
-  };
+  //* Filter the posts whose tilte contain the search text
+  useEffect(() => {
+    if (!searchText) return setFilteredPosts([]);
+    const filtered = posts.filter((post) =>
+      post?.title?.toLowerCase().includes(searchText.toLowerCase())
+    );
+    setFilteredPosts(filtered);
+  }, [searchText]);
 
   return (
     <ScrollView
