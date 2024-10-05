@@ -8,7 +8,7 @@ import {
   Keyboard,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { ThemeColoursPrimary, TopNavigationHomeButtons } from "../Constants/UI";
 
 const TopNavigationBar = (props: any) => {
@@ -22,8 +22,9 @@ const TopNavigationBar = (props: any) => {
     setContent,
     setShowSearchBar,
   } = props;
-  const [buttonStates, setButtonStates] = useState(TopNavigationHomeButtons);
+  const inputRef = useRef<TextInput>(null);
 
+  const [buttonStates, setButtonStates] = useState(TopNavigationHomeButtons);
   const [searchBarOpacity] = useState(new Animated.Value(0)); // Start with opacity 0 (invisible)
   const [searchBarTranslateX] = useState(new Animated.Value(10)); // Start with position off-screen
 
@@ -66,6 +67,13 @@ const TopNavigationBar = (props: any) => {
     Keyboard.dismiss();
   };
 
+  //> Hooks
+  useEffect(() => {
+    if (showSearchBar && inputRef?.current) {
+      inputRef.current?.focus();
+    }
+  }, [showSearchBar]);
+
   return (
     <View style={styles.container}>
       <TouchableOpacity
@@ -90,10 +98,11 @@ const TopNavigationBar = (props: any) => {
           pointerEvents={showSearchBar ? "auto" : "none"}
         >
           <TextInput
+            ref={inputRef}
             style={styles.input}
             placeholder="Search..."
-            onChange={handleSearchBarChange}
             value={searchText}
+            onChange={handleSearchBarChange}
           />
         </Animated.View>
         {!showSearchBar &&

@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import TopNavigationBar from "../../Components/TopNavigationBar";
 import Contents from "./Contents";
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import DrawerNavigationBar from "../../Components/DrawerNavigationBar";
 import { ThemeColoursPrimary } from "../../Constants/UI";
 
@@ -33,8 +33,12 @@ const HomeScreen = ({ navigation }: any) => {
   const handleSearchBarChange = (
     evt: NativeSyntheticEvent<TextInputChangeEventData>
   ) => {
-    evt?.nativeEvent?.text ?? setSearchText(evt.nativeEvent.text);
+    if (evt?.nativeEvent?.text != null) setSearchText(evt.nativeEvent.text);
   };
+
+  useEffect(() => {
+    if (!showSearchBar) setSearchText("");
+  }, [showSearchBar]);
 
   return (
     <SafeAreaView style={styles.container}>
