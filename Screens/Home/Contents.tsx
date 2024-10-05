@@ -8,9 +8,10 @@ import { useSelector } from "react-redux";
 import store, { RootState } from "../../Redux/store";
 
 const Contents = (props: any) => {
-  const { content, navigation } = props;
+  const { content, navigation, showSearchBar, searchText } = props;
   const [refreshing, setRefreshing] = useState(false);
   const { posts } = useSelector((state: RootState) => state.posts);
+  const [filteredPosts, setFilteredPosts] = useState([]);
   // Refresh the contents page
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -34,6 +35,18 @@ const Contents = (props: any) => {
     fetchPosts();
   }, [content]);
 
+  useEffect(() => {
+    if (posts) setFilteredPosts(posts);
+  }, [posts]);
+
+  useEffect(() => {
+    if (showSearchBar) {
+      setFilteredPosts([]);
+    } else {
+      setFilteredPosts(posts);
+    }
+  }, [showSearchBar]);
+
   const openPost = (postData: any) => {
     navigation.navigate(HomeStackScreens.Post, {
       postData: postData,
@@ -53,7 +66,7 @@ const Contents = (props: any) => {
       }
       showsVerticalScrollIndicator={false}
     >
-      {posts.map((post) => {
+      {filteredPosts.map((post) => {
         return (
           <PostCard
             //@ts-ignore

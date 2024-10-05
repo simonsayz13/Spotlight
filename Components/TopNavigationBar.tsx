@@ -12,9 +12,17 @@ import { useState } from "react";
 import { ThemeColoursPrimary, TopNavigationHomeButtons } from "../Constants/UI";
 
 const TopNavigationBar = (props: any) => {
-  const { setContent, drawerHandler } = props;
+  const {
+    //* status
+    searchText,
+    showSearchBar,
+    //* status updator
+    drawerHandler,
+    handleSearchBarChange,
+    setContent,
+    setShowSearchBar,
+  } = props;
   const [buttonStates, setButtonStates] = useState(TopNavigationHomeButtons);
-  const [showSearchBar, setShowSearchBar] = useState(false);
 
   const [searchBarOpacity] = useState(new Animated.Value(0)); // Start with opacity 0 (invisible)
   const [searchBarTranslateX] = useState(new Animated.Value(10)); // Start with position off-screen
@@ -35,7 +43,7 @@ const TopNavigationBar = (props: any) => {
 
   const toggleSearchBar = () => {
     // Toggle the visibility of the search bar
-    setShowSearchBar((prev) => !prev);
+    setShowSearchBar((prev: boolean) => !prev);
 
     // Define the animation
     Animated.parallel([
@@ -81,7 +89,12 @@ const TopNavigationBar = (props: any) => {
           ]}
           pointerEvents={showSearchBar ? "auto" : "none"}
         >
-          <TextInput style={styles.input} placeholder="Search..." />
+          <TextInput
+            style={styles.input}
+            placeholder="Search..."
+            onChange={handleSearchBarChange}
+            value={searchText}
+          />
         </Animated.View>
         {!showSearchBar &&
           buttonStates.map((button) => (

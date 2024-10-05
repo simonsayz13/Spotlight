@@ -1,13 +1,16 @@
-import { StyleSheet, View, Text, SafeAreaView } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Text,
+  SafeAreaView,
+  NativeSyntheticEvent,
+  TextInputChangeEventData,
+} from "react-native";
 import TopNavigationBar from "../../Components/TopNavigationBar";
 import Contents from "./Contents";
 import { useCallback, useState } from "react";
 import DrawerNavigationBar from "../../Components/DrawerNavigationBar";
-import {
-  HomeStackScreens,
-  ThemeColours,
-  ThemeColoursPrimary,
-} from "../../Constants/UI";
+import { ThemeColoursPrimary } from "../../Constants/UI";
 
 const DrawerMenu = () => {
   return (
@@ -20,10 +23,18 @@ const DrawerMenu = () => {
 
 const HomeScreen = ({ navigation }: any) => {
   const [content, setContent] = useState("Explore");
+  const [searchText, setSearchText] = useState("");
+  const [showSearchBar, setShowSearchBar] = useState(false);
 
   const changeContent = useCallback((content: string) => {
     setContent(content);
   }, []);
+
+  const handleSearchBarChange = (
+    evt: NativeSyntheticEvent<TextInputChangeEventData>
+  ) => {
+    evt?.nativeEvent?.text ?? setSearchText(evt.nativeEvent.text);
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -31,10 +42,19 @@ const HomeScreen = ({ navigation }: any) => {
         {({ openDrawer }: any) => (
           <View style={styles.mainContent}>
             <TopNavigationBar
+              searchText={searchText}
+              showSearchBar={showSearchBar}
               setContent={changeContent}
+              setShowSearchBar={setShowSearchBar}
               drawerHandler={openDrawer}
+              handleSearchBarChange={handleSearchBarChange}
             />
-            <Contents content={content} navigation={navigation} />
+            <Contents
+              content={content}
+              navigation={navigation}
+              searchText={searchText}
+              showSearchBar={showSearchBar}
+            />
           </View>
         )}
       </DrawerNavigationBar>
