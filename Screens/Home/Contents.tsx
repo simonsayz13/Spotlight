@@ -8,9 +8,10 @@ import { useSelector } from "react-redux";
 import store, { RootState } from "../../Redux/store";
 
 const Contents = (props: any) => {
-  const { content, navigation } = props;
+  const { content, navigation, showSearchBar, searchText } = props;
   const [refreshing, setRefreshing] = useState(false);
   const { posts } = useSelector((state: RootState) => state.posts);
+  const [filteredPosts, setFilteredPosts] = useState([]);
   // Refresh the contents page
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -29,16 +30,45 @@ const Contents = (props: any) => {
     }
   };
 
-  // Hook for loading data
-  useEffect(() => {
-    fetchPosts();
-  }, [content]);
-
   const openPost = (postData: any) => {
     navigation.navigate(HomeStackScreens.Post, {
       postData: postData,
     });
   };
+
+  console.log("filteredPosts", filteredPosts);
+  //> Hooks
+  //* Hook for loading data
+  useEffect(() => {
+    fetchPosts();
+  }, [content]);
+
+  useEffect(() => {
+    if (posts) {
+      setFilteredPosts(posts);
+    }
+  }, [posts]);
+
+  //* Change the display of posts based on if search bar is active
+  useEffect(() => {
+    if (showSearchBar) {
+      setFilteredPosts([]);
+    } else {
+      setFilteredPosts(posts);
+    }
+  }, [showSearchBar]);
+
+  //* Filter the posts whose tilte contain the search text
+  useEffect(() => {
+    if (searchText === "") {
+      return setFilteredPosts([]);
+    } // Display blank when no search text
+    // Filter posts whose title contains search text
+    const filtered = posts.filter((post) =>
+      post?.title?.toLowerCase().includes(searchText.toLowerCase())
+    );
+    setFilteredPosts(filtered);
+  }, [searchText]);
 
   return (
     <ScrollView
@@ -53,7 +83,7 @@ const Contents = (props: any) => {
       }
       showsVerticalScrollIndicator={false}
     >
-      {posts.map((post) => {
+      {filteredPosts.map((post) => {
         return (
           <PostCard
             //@ts-ignore

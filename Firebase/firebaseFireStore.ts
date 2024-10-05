@@ -118,6 +118,28 @@ export const getAllPosts = async () => {
   }
 };
 
+//TODO - apply a proper partial match search
+export const getPostsBySearch = async (searchText: string = "") => {
+  try {
+    const postsCollection = collection(db, FireStoreCollections.Posts);
+    const q = query(
+      postsCollection,
+      where("title", ">=", searchText),
+      where("title", "<=", searchText + "\uf8ff")
+      // orderBy("timeStamp", "desc")
+    );
+    const snapshot = await getDocs(q);
+    const postsList = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    return postsList;
+  } catch (error) {
+    return [];
+  }
+};
+
 export const updatePostMetric = async (
   postId: string,
   metric: FireStorePostField,

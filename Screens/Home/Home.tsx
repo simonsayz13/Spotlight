@@ -1,13 +1,22 @@
-import { StyleSheet, View, Text, SafeAreaView } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Text,
+  SafeAreaView,
+  NativeSyntheticEvent,
+  TextInputChangeEventData,
+  Keyboard,
+  Alert,
+} from "react-native";
 import TopNavigationBar from "../../Components/TopNavigationBar";
 import Contents from "./Contents";
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import DrawerNavigationBar from "../../Components/DrawerNavigationBar";
-import {
-  HomeStackScreens,
-  ThemeColours,
-  ThemeColoursPrimary,
-} from "../../Constants/UI";
+import { ThemeColoursPrimary } from "../../Constants/UI";
+import { getPostsBySearch } from "../../Firebase/firebaseFireStore";
+import { setPosts } from "../../Redux/Slices/postsSlices";
+import store from "../../Redux/store";
+import { delay } from "../../Util/utility";
 
 const DrawerMenu = () => {
   return (
@@ -20,10 +29,55 @@ const DrawerMenu = () => {
 
 const HomeScreen = ({ navigation }: any) => {
   const [content, setContent] = useState("Explore");
+  const [searchText, setSearchText] = useState("");
+  const [showSearchBar, setShowSearchBar] = useState(false);
 
   const changeContent = useCallback((content: string) => {
     setContent(content);
   }, []);
+
+  const handleSearchBarChange = (
+    evt: NativeSyntheticEvent<TextInputChangeEventData>
+  ) => {
+    if (evt?.nativeEvent?.text != null) setSearchText(evt.nativeEvent.text);
+  };
+
+  const fetchPostsBySearch = async (searchText: string = "") => {
+    try {
+      const data = await getPostsBySearch(searchText);
+      setShowSearchBar(false);
+      await delay(200); // Delay to ensure pst dsiplay can only happen after searchText is reset
+      store.dispatch(setPosts(data));
+    } catch (error) {
+      Alert.alert("Error", "Error fetching posts");
+    }
+  };
+
+  const fetchNewItem = () => {
+    console.log("fetch new item");
+    if (searchText.trim() === "") return;
+    fetchPostsBySearch(searchText);
+    Keyboard.dismiss();
+  };
+
+  const handlePressSearchBtn = () => {
+    showSearchBar ? fetchNewItem() : setShowSearchBar((prev: boolean) => !prev);
+  };
+
+  const handlePressMenuBtn = (cb) => {
+    showSearchBar ? setShowSearchBar((prev: boolean) => !prev) : cb();
+  };
+
+  const handlePressInClearBtn = () => {
+    setSearchText(""); // Reset the searchText state
+    // Keyboard.dismiss(); // Optionally dismiss the keyboard
+  };
+
+  useEffect(() => {
+    if (!showSearchBar) {
+      setSearchText("");
+    }
+  }, [showSearchBar]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -31,10 +85,20 @@ const HomeScreen = ({ navigation }: any) => {
         {({ openDrawer }: any) => (
           <View style={styles.mainContent}>
             <TopNavigationBar
+              searchText={searchText}
+              showSearchBar={showSearchBar}
               setContent={changeContent}
-              drawerHandler={openDrawer}
+              handleSearchBarChange={handleSearchBarChange}
+              handlePressSearchBtn={handlePressSearchBtn}
+              handlePressMenuBtn={() => handlePressMenuBtn(openDrawer)}
+              handlePressInClearBtn={handlePressInClearBtn}
             />
-            <Contents content={content} navigation={navigation} />
+            <Contents
+              content={content}
+              navigation={navigation}
+              searchText={searchText}
+              showSearchBar={showSearchBar}
+            />
           </View>
         )}
       </DrawerNavigationBar>

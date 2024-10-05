@@ -8,14 +8,25 @@ import {
   Keyboard,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
+import AntDesign from "@expo/vector-icons/AntDesign";
 import { ThemeColoursPrimary, TopNavigationHomeButtons } from "../Constants/UI";
 
 const TopNavigationBar = (props: any) => {
-  const { setContent, drawerHandler } = props;
-  const [buttonStates, setButtonStates] = useState(TopNavigationHomeButtons);
-  const [showSearchBar, setShowSearchBar] = useState(false);
+  const {
+    //* status
+    searchText,
+    showSearchBar,
+    //* status updator
+    handleSearchBarChange,
+    setContent,
+    handlePressSearchBtn,
+    handlePressMenuBtn,
+    handlePressInClearBtn,
+  } = props;
+  const inputRef = useRef<TextInput>(null);
 
+  const [buttonStates, setButtonStates] = useState(TopNavigationHomeButtons);
   const [searchBarOpacity] = useState(new Animated.Value(0)); // Start with opacity 0 (invisible)
   const [searchBarTranslateX] = useState(new Animated.Value(10)); // Start with position off-screen
 
@@ -33,36 +44,33 @@ const TopNavigationBar = (props: any) => {
     setContent(clickedScreen);
   };
 
-  const toggleSearchBar = () => {
-    // Toggle the visibility of the search bar
-    setShowSearchBar((prev) => !prev);
+  //> Hooks
+  useEffect(() => {
+    if (showSearchBar && inputRef?.current) {
+      inputRef.current?.focus();
+    }
+  }, [showSearchBar]);
 
-    // Define the animation
+  //* Animate Search appreance based on showSearchBar
+  useEffect(() => {
     Animated.parallel([
       Animated.timing(searchBarOpacity, {
-        toValue: showSearchBar ? 0 : 1, // Fade out if it's currently visible, fade in otherwise
-        duration: showSearchBar ? 0 : 200, // Duration of 300 milliseconds
+        toValue: !showSearchBar ? 0 : 1, // Fade out if it's currently visible, fade in otherwise
+        duration: !showSearchBar ? 0 : 200, // Duration of 300 milliseconds
         useNativeDriver: true, // Use native driver for better performance
       }),
 
       Animated.timing(searchBarTranslateX, {
-        toValue: showSearchBar ? 10 : -2, // Move up if it's currently visible, move down otherwise
-        duration: showSearchBar ? 0 : 200, // Duration of 300 milliseconds
+        toValue: !showSearchBar ? 10 : -2, // Move up if it's currently visible, move down otherwise
+        duration: !showSearchBar ? 0 : 200, // Duration of 300 milliseconds
         useNativeDriver: true, // Use native driver for better performance
       }),
     ]).start();
-  };
-
-  const fetchNewItem = () => {
-    console.log("fetch new item");
-    Keyboard.dismiss();
-  };
+  }, [showSearchBar]);
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        onPress={showSearchBar ? toggleSearchBar : drawerHandler}
-      >
+      <TouchableOpacity onPress={handlePressMenuBtn}>
         <Ionicons
           name={showSearchBar ? "chevron-back" : "menu"}
           size={32}
@@ -81,7 +89,24 @@ const TopNavigationBar = (props: any) => {
           ]}
           pointerEvents={showSearchBar ? "auto" : "none"}
         >
-          <TextInput style={styles.input} placeholder="Search..." />
+          <View style={[styles.searchBarWrapper]}>
+            <TextInput
+              ref={inputRef}
+              style={styles.input}
+              placeholder="Search..."
+              value={searchText}
+              onChange={handleSearchBarChange}
+            />
+            {searchText.length > 0 && (
+              <TouchableOpacity
+                onPressIn={() => {
+                  handlePressInClearBtn();
+                }}
+              >
+                <AntDesign name="closecircleo" size={20} color="black" />
+              </TouchableOpacity>
+            )}
+          </View>
         </Animated.View>
         {!showSearchBar &&
           buttonStates.map((button) => (
@@ -100,9 +125,7 @@ const TopNavigationBar = (props: any) => {
             </TouchableOpacity>
           ))}
       </View>
-      <TouchableOpacity
-        onPress={showSearchBar ? fetchNewItem : toggleSearchBar}
-      >
+      <TouchableOpacity onPress={handlePressSearchBtn}>
         <Ionicons
           name="search"
           size={32}
@@ -155,6 +178,12 @@ const styles = StyleSheet.create({
     width: "70%",
     backgroundColor: ThemeColoursPrimary.LogoColour, // Set the underline color
     borderRadius: 18,
+  },
+  searchBarWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 8,
   },
   searchBar: {
     flexGrow: 1,
