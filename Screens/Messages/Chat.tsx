@@ -10,6 +10,7 @@ import {
   Keyboard,
   TouchableOpacity,
   Platform,
+  Dimensions,
 } from "react-native";
 import { Image } from "expo-image";
 import { ThemeColours, ThemeColoursPrimary } from "../../Constants/UI";
@@ -24,6 +25,8 @@ import {
   sendMessage,
 } from "../../Firebase/firebaseFireStore";
 import { formatRelativeTime } from "../../Util/utility";
+
+const { width: windowWidth } = Dimensions.get("window");
 
 const Chat = ({ route, navigation }: any) => {
   const { userId: currentUserId, userProfilePhotoURL } = useSelector(
@@ -107,6 +110,7 @@ const Chat = ({ route, navigation }: any) => {
           onContentSizeChange={() => {
             scrollViewRef.current?.scrollToEnd({ animated: false });
           }}
+          bounces={false}
         >
           {messages.map((message: any) => {
             return (
@@ -230,20 +234,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#f1f1f1",
     borderWidth: 1,
-    marginVertical: 8,
   },
   input: {
     height: 42,
     paddingLeft: 8,
     fontSize: 16,
-    width: "90%",
+    width: windowWidth * 0.9,
     color: ThemeColoursPrimary.SecondaryColour,
   },
   messageContainer: {
     flexDirection: "row",
-
-    marginTop: 6,
-    width: "60%",
+    marginVertical: 6,
+    width: windowWidth * 0.6,
     alignItems: "center",
     borderRadius: 8,
     backgroundColor: "transparent",

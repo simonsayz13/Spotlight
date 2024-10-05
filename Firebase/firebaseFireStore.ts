@@ -30,6 +30,7 @@ import store from "../Redux/store";
 import { addComment } from "../Redux/Slices/postsSlices";
 import { SetStateAction } from "react";
 import { sortConversationsByLastMessage } from "../Util/utility";
+import { UserDetails } from "../type/Messenger";
 
 const db = getFirestore(app);
 
@@ -357,4 +358,23 @@ export const conversationListener = (
 
   // Cleanup on component unmount
   return () => subscribeConversations();
+};
+
+export const searchUsers = async (searchQuery: string) => {
+  const userRef = collection(db, "users");
+  const q = query(userRef, where("display_name", ">=", searchQuery));
+  const querySnapshot = await getDocs(q);
+
+  const users: Array<UserDetails> = [];
+
+  querySnapshot.forEach((doc) => {
+    const { display_name, profile_picture_url } = doc.data();
+    users.push({
+      userId: doc.id,
+      display_name,
+      profile_picture_url,
+    });
+  });
+
+  return users;
 };
