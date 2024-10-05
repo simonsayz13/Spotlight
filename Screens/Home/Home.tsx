@@ -16,6 +16,7 @@ import { ThemeColoursPrimary } from "../../Constants/UI";
 import { getPostsBySearch } from "../../Firebase/firebaseFireStore";
 import { setPosts } from "../../Redux/Slices/postsSlices";
 import store from "../../Redux/store";
+import { delay } from "../../Util/utility";
 
 const DrawerMenu = () => {
   return (
@@ -45,6 +46,7 @@ const HomeScreen = ({ navigation }: any) => {
     try {
       const data = await getPostsBySearch(searchText);
       setShowSearchBar(false);
+      await delay(200); // Delay to ensure pst dsiplay can only happen after searchText is reset
       store.dispatch(setPosts(data));
     } catch (error) {
       Alert.alert("Error", "Error fetching posts");
@@ -66,8 +68,15 @@ const HomeScreen = ({ navigation }: any) => {
     showSearchBar ? setShowSearchBar((prev: boolean) => !prev) : cb();
   };
 
+  const handlePressInClearBtn = () => {
+    setSearchText(""); // Reset the searchText state
+    // Keyboard.dismiss(); // Optionally dismiss the keyboard
+  };
+
   useEffect(() => {
-    if (!showSearchBar) setSearchText("");
+    if (!showSearchBar) {
+      setSearchText("");
+    }
   }, [showSearchBar]);
 
   return (
@@ -82,6 +91,7 @@ const HomeScreen = ({ navigation }: any) => {
               handleSearchBarChange={handleSearchBarChange}
               handlePressSearchBtn={handlePressSearchBtn}
               handlePressMenuBtn={() => handlePressMenuBtn(openDrawer)}
+              handlePressInClearBtn={handlePressInClearBtn}
             />
             <Contents
               content={content}

@@ -132,6 +132,7 @@ export const getPostsBySearch = async (searchText: string = "") => {
       id: doc.id,
       ...doc.data(),
     }));
+
     return postsList;
   } catch (error) {
     return [];

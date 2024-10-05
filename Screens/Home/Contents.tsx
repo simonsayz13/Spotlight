@@ -35,6 +35,8 @@ const Contents = (props: any) => {
       postData: postData,
     });
   };
+
+  console.log("filteredPosts", filteredPosts);
   //> Hooks
   //* Hook for loading data
   useEffect(() => {
@@ -42,7 +44,9 @@ const Contents = (props: any) => {
   }, [content]);
 
   useEffect(() => {
-    if (posts) setFilteredPosts(posts);
+    if (posts) {
+      setFilteredPosts(posts);
+    }
   }, [posts]);
 
   //* Change the display of posts based on if search bar is active
@@ -56,6 +60,10 @@ const Contents = (props: any) => {
 
   //* Filter the posts whose tilte contain the search text
   useEffect(() => {
+    if (searchText === "") {
+      return setFilteredPosts([]);
+    } // Display blank when no search text
+    // Filter posts whose title contains search text
     const filtered = posts.filter((post) =>
       post?.title?.toLowerCase().includes(searchText.toLowerCase())
     );

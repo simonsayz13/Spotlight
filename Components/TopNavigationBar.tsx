@@ -5,9 +5,11 @@ import {
   StyleSheet,
   Animated,
   TextInput,
+  Keyboard,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useState, useRef, useEffect } from "react";
+import AntDesign from "@expo/vector-icons/AntDesign";
 import { ThemeColoursPrimary, TopNavigationHomeButtons } from "../Constants/UI";
 
 const TopNavigationBar = (props: any) => {
@@ -20,6 +22,7 @@ const TopNavigationBar = (props: any) => {
     setContent,
     handlePressSearchBtn,
     handlePressMenuBtn,
+    handlePressInClearBtn,
   } = props;
   const inputRef = useRef<TextInput>(null);
 
@@ -86,13 +89,24 @@ const TopNavigationBar = (props: any) => {
           ]}
           pointerEvents={showSearchBar ? "auto" : "none"}
         >
-          <TextInput
-            ref={inputRef}
-            style={styles.input}
-            placeholder="Search..."
-            value={searchText}
-            onChange={handleSearchBarChange}
-          />
+          <View style={[styles.searchBarWrapper]}>
+            <TextInput
+              ref={inputRef}
+              style={styles.input}
+              placeholder="Search..."
+              value={searchText}
+              onChange={handleSearchBarChange}
+            />
+            {searchText.length > 0 && (
+              <TouchableOpacity
+                onPressIn={() => {
+                  handlePressInClearBtn();
+                }}
+              >
+                <AntDesign name="closecircleo" size={20} color="black" />
+              </TouchableOpacity>
+            )}
+          </View>
         </Animated.View>
         {!showSearchBar &&
           buttonStates.map((button) => (
@@ -164,6 +178,12 @@ const styles = StyleSheet.create({
     width: "70%",
     backgroundColor: ThemeColoursPrimary.LogoColour, // Set the underline color
     borderRadius: 18,
+  },
+  searchBarWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 8,
   },
   searchBar: {
     flexGrow: 1,
