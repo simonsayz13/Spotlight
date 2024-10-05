@@ -36,7 +36,6 @@ const Contents = (props: any) => {
     });
   };
 
-  console.log("filteredPosts", filteredPosts);
   //> Hooks
   //* Hook for loading data
   useEffect(() => {
@@ -65,6 +64,7 @@ const Contents = (props: any) => {
     } // Display blank when no search text
     // Filter posts whose title contains search text
     const filtered = posts.filter((post) =>
+      //@ts-ignore
       post?.title?.toLowerCase().includes(searchText.toLowerCase())
     );
     setFilteredPosts(filtered);

@@ -10,7 +10,7 @@ import {
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { ThemeColoursPrimary } from "../Constants/UI";
 import { Image } from "expo-image";
-import { fetchUserDetails } from "../Firebase/firebaseFireStore";
+import { getUserDetails } from "../Firebase/firebaseFireStore";
 import { useSelector } from "react-redux";
 import { RootState } from "../Redux/store";
 
@@ -27,7 +27,7 @@ const PostCard = ({ postData, openPost, self }: any) => {
 
   const fetchUserData = async () => {
     try {
-      const userDetails = await fetchUserDetails(userId);
+      const userDetails = await getUserDetails(userId);
       setDisplayName(userDetails?.display_name);
     } catch (error) {}
   };

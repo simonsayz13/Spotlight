@@ -54,7 +54,6 @@ const HomeScreen = ({ navigation }: any) => {
   };
 
   const fetchNewItem = () => {
-    console.log("fetch new item");
     if (searchText.trim() === "") return;
     fetchPostsBySearch(searchText);
     Keyboard.dismiss();
@@ -64,7 +63,7 @@ const HomeScreen = ({ navigation }: any) => {
     showSearchBar ? fetchNewItem() : setShowSearchBar((prev: boolean) => !prev);
   };
 
-  const handlePressMenuBtn = (cb) => {
+  const handlePressMenuBtn = (cb: any) => {
     showSearchBar ? setShowSearchBar((prev: boolean) => !prev) : cb();
   };
 
