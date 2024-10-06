@@ -1,4 +1,4 @@
-import React, { memo, useRef, useState } from "react";
+import React, { memo, useEffect, useRef, useState } from "react";
 import {
   StyleSheet,
   View,
@@ -28,6 +28,8 @@ import { createPost } from "../../Firebase/firebaseFireStore";
 import ActivityLoader from "../../Components/ActivityLoader";
 import BottomSheet from "../../Components/BottomSheet";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import { getLocation, getLocationPermission } from "../../Util/LocationService";
+
 const { width, height } = Dimensions.get("window");
 
 const ImagePreviewDOM = memo(({ photoURI }: any) => {
@@ -70,7 +72,8 @@ const CreatePost = ({ navigation, route }: any) => {
       return Alert.alert("Not Signed in", "Please sign in to make a post");
     }
     setPosting(true);
-    const imageURL = await uploadImage(photoURI);
+    const imageURL = photoURI ? await uploadImage(photoURI) : {};
+    const locationCoordinates = isLocation ? await getLocation() : {};
     const timeStamp = new Date().toISOString();
     const postData = {
       media: [
@@ -89,6 +92,7 @@ const CreatePost = ({ navigation, route }: any) => {
       favourites: 0,
       comments: [],
       location: "Liverpool",
+      locationCoordinates,
     };
     await createPost(userId!, postData);
     navigation.setParams({ photoURI: undefined });
@@ -116,8 +120,15 @@ const CreatePost = ({ navigation, route }: any) => {
     setIsPrivate((previousState) => !previousState);
   const toggleCommentSwitch = () =>
     setIsComment((previousState) => !previousState);
-  const toggleLocationSwitch = () =>
-    setIsLocation((previousState) => !previousState);
+  const toggleLocationSwitch = async () => {
+    const locationServicePermission = await getLocationPermission();
+    console.log(locationServicePermission);
+    if (locationServicePermission !== "OK") {
+      Alert.alert("Error", locationServicePermission);
+    } else {
+      setIsLocation((previousState) => !previousState);
+    }
+  };
 
   const options = (
     <View>

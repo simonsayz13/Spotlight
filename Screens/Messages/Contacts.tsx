@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Keyboard,
   Dimensions,
+  Platform,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { MessagingStackScreens, ThemeColoursPrimary } from "../../Constants/UI";
@@ -104,7 +105,7 @@ const Contacts = ({ navigation }: any) => {
     <SafeAreaView style={styles.container}>
       <View style={styles.searchBarContainer}>
         <View style={styles.searchBar}>
-          <View style={{ flexDirection: "row" }}>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
             <Ionicons
               name="search"
               size={32}
@@ -227,29 +228,25 @@ const styles = StyleSheet.create({
     backgroundColor: ThemeColoursPrimary.PrimaryColour,
   },
   searchBarContainer: {
-    flexDirection: "row",
-    alignItems: "center",
     borderBottomWidth: 0.2,
     borderBottomColor: ThemeColoursPrimary.GreyColour,
-    paddingHorizontal: 16,
   },
   searchBar: {
-    flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
     backgroundColor: ThemeColoursPrimary.BackgroundColour,
     borderRadius: 10,
     borderColor: ThemeColoursPrimary.PrimaryColour,
     borderWidth: 1.0,
-    marginVertical: 6,
+    marginHorizontal: 12,
+    marginVertical: 8,
     paddingHorizontal: 8,
   },
   input: {
     height: 36,
     paddingLeft: 8,
     fontSize: 16,
-    width: windowWidth * 0.72,
+    width: Platform.OS === "ios" ? windowWidth * 0.76 : windowWidth * 0.74,
   },
   messageCardContainer: {
     flex: 1,

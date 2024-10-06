@@ -13,15 +13,40 @@ import {
   Animated,
   PanResponder,
   TouchableOpacity,
+  Alert,
+  Dimensions,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MapView, { Marker } from "react-native-maps";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { ThemeColours, ThemeColoursPrimary } from "../../Constants/UI";
+import { getLocation, getLocationPermission } from "../../Util/LocationService";
+import ActivityLoader from "../../Components/ActivityLoader";
+const { width: windowWidth, height: windowHeight } = Dimensions.get("window");
 const Map = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedMarker, setSelectedMarker] = useState(null);
+  const [currentCoordinate, setCurrentCoordinate] = useState(null);
+  const [gotLocation, setGotLocation] = useState(false);
   const slideAnim = useRef(new Animated.Value(300)).current;
+
+  const checkPermission = async () => {
+    const permission = await getLocationPermission();
+    if (permission !== "OK") {
+      Alert.alert("Error", permission);
+    }
+  };
+
+  const getCoordinates = async () => {
+    setGotLocation(true);
+    await getLocation(setCurrentCoordinate);
+    setGotLocation(false);
+  };
+
+  useEffect(() => {
+    checkPermission();
+    getCoordinates();
+  }, []);
 
   const modalPanResponder = useRef(
     PanResponder.create({
@@ -78,41 +103,55 @@ const Map = () => {
         style={styles.container}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        <View style={styles.searchBar}>
-          <Ionicons
-            name="search"
-            size={32}
-            color={ThemeColoursPrimary.SecondaryColour}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Search..."
-            placeholderTextColor={ThemeColoursPrimary.SecondaryColour}
-          />
-        </View>
-        <MapView style={styles.map}>
-          <Marker
-            coordinate={{
-              latitude: 53.405411,
-              longitude: -2.94934,
-              //@ts-ignore
-              latitudeDelta: 0.005, // Adjust zoom level (smaller = closer)
-              longitudeDelta: 0.005, // Adjust zoom level (smaller = closer)
-            }}
-            onPress={() =>
-              handleMarkerPress({
-                title: "Custom Title",
-                description: "Marker Description",
-              })
-            }
-          >
-            <FontAwesome5
-              name="map-marker-alt"
+        <View style={styles.searchBarContainer}>
+          <View style={styles.searchBar}>
+            <Ionicons
+              name="search"
               size={32}
-              color={ThemeColours.PrimaryColour}
+              color={ThemeColoursPrimary.SecondaryColour}
             />
-          </Marker>
-        </MapView>
+            <TextInput
+              style={styles.input}
+              placeholder="Search..."
+              placeholderTextColor={ThemeColoursPrimary.SecondaryColour}
+            />
+          </View>
+        </View>
+        <ActivityLoader indicator={gotLocation} text={"Locating..."} />
+        {currentCoordinate && (
+          <MapView
+            style={styles.map}
+            initialRegion={{
+              //@ts-ignore
+              latitude: currentCoordinate.latitude, // Initial latitude
+              //@ts-ignore
+              longitude: currentCoordinate.longitude, // Initial longitude
+              latitudeDelta: 0.09, // Controls the amount of zoom (smaller means more zoomed in)
+              longitudeDelta: 0.04, // Controls the horizontal zoom level (smaller means more zoomed in)
+            }}
+          >
+            <Marker
+              coordinate={{
+                //@ts-ignore
+                latitude: currentCoordinate.latitude,
+                //@ts-ignore
+                longitude: currentCoordinate.longitude,
+              }}
+              onPress={() =>
+                handleMarkerPress({
+                  title: "Custom Title",
+                  description: "Marker Description",
+                })
+              }
+            >
+              <FontAwesome5
+                name="map-marker-alt"
+                size={32}
+                color={ThemeColours.PrimaryColour}
+              />
+            </Marker>
+          </MapView>
+        )}
 
         {isModalVisible && (
           <Animated.View
@@ -144,18 +183,19 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: ThemeColoursPrimary.PrimaryColour,
   },
-  map: {
-    width: "100%",
-    height: "100%",
+
+  searchBarContainer: {
+    borderBottomWidth: 0.2,
+    borderBottomColor: ThemeColoursPrimary.GreyColour,
   },
   searchBar: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#f1f1f1",
+    backgroundColor: ThemeColoursPrimary.BackgroundColour,
     borderRadius: 10,
     borderColor: ThemeColoursPrimary.PrimaryColour,
     borderWidth: 1.0,
-    marginHorizontal: 26,
+    marginHorizontal: 12,
     marginVertical: 8,
     paddingHorizontal: 8,
   },
@@ -164,7 +204,11 @@ const styles = StyleSheet.create({
     paddingLeft: 8,
     color: ThemeColoursPrimary.SecondaryColour,
     fontSize: 16,
-    width: "90%",
+    width: Platform.OS === "ios" ? windowWidth * 0.76 : windowWidth * 0.74,
+  },
+  map: {
+    width: "100%",
+    height: "100%",
   },
   modalContainer: {
     position: "absolute",
