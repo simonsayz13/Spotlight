@@ -109,7 +109,7 @@ const TabNavigation = () => {
             );
           },
           tabBarStyle: { display: "none" },
-          title: "",
+          title: "Create",
         }}
       />
       <Tab.Screen

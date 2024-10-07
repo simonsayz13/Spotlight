@@ -383,7 +383,7 @@ export const conversationListener = (
 };
 
 export const searchUsers = async (searchQuery: string) => {
-  const userRef = collection(db, "users");
+  const userRef = collection(db, FireStoreCollections.Users);
   const q = query(userRef, where("display_name", ">=", searchQuery));
   const querySnapshot = await getDocs(q);
 
@@ -399,4 +399,28 @@ export const searchUsers = async (searchQuery: string) => {
   });
 
   return users;
+};
+
+export const getLocationPosts = async (setPosts: SetStateAction<any>) => {
+  const postsRef = collection(db, FireStoreCollections.Posts); // Reference to the 'posts' collection
+
+  // Create a query to find all documents where isLocation is true
+  const q = query(
+    postsRef,
+    where("isLocation", "==", true),
+    where("isPrivate", "==", false)
+  );
+
+  try {
+    const querySnapshot = await getDocs(q); // Execute the query
+    const locationPosts = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      postData: doc.data(),
+    })); // Map through docs
+    console.log(locationPosts);
+    return setPosts(locationPosts); // Return the array of posts with location enabled
+  } catch (error) {
+    console.error("Error fetching location posts: ", error);
+    return [];
+  }
 };

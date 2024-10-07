@@ -44,14 +44,15 @@ const ImagePreviewDOM = memo(({ photoURI }: any) => {
 });
 
 const CreatePost = ({ navigation, route }: any) => {
+  const { userId } = useSelector((state: RootState) => state.user);
   const photoURI = route.params?.photoURI;
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
-  const { userId } = useSelector((state: RootState) => state.user);
   const [posting, setPosting] = useState<boolean>(false);
   const [isComment, setIsComment] = useState<boolean>(false);
   const [isLocation, setIsLocation] = useState<boolean>(false);
   const [isPrivate, setIsPrivate] = useState<boolean>(false);
+  const [coordinates, setCoordinates] = useState<any>();
   const goBack = () => {
     navigation.setParams({ photoURI: undefined });
     setDescription("");
@@ -73,7 +74,7 @@ const CreatePost = ({ navigation, route }: any) => {
     }
     setPosting(true);
     const imageURL = photoURI ? await uploadImage(photoURI) : {};
-    const locationCoordinates = isLocation ? await getLocation() : {};
+    if (isLocation) await getLocation(setCoordinates);
     const timeStamp = new Date().toISOString();
     const postData = {
       media: [
@@ -91,10 +92,12 @@ const CreatePost = ({ navigation, route }: any) => {
       dislikes: 0,
       favourites: 0,
       comments: [],
-      location: "Liverpool",
-      locationCoordinates,
+      coordinates,
+      isComment,
+      isLocation,
+      isPrivate,
     };
-    await createPost(userId!, postData);
+    await createPost(userId, postData);
     navigation.setParams({ photoURI: undefined });
     setDescription("");
     setTitle("");
