@@ -67,7 +67,37 @@ export const getUserDetails = async (userId: string) => {
   try {
     const userProfileCollection = doc(db, FireStoreCollections.Users, userId);
     const userDoc = await getDoc(userProfileCollection);
-    if (userDoc.exists()) return userDoc.data();
+    // if (userDoc.exists()) return userDoc.data();
+
+    if (userDoc.exists()) {
+      const { followers: followersRef, followings: followingsRef } =
+        userDoc.data();
+
+      let followers = [];
+      let followings = [];
+
+      if (followersRef && followersRef.length > 0) {
+        // Retrieve all the users being followed
+        followers = await Promise.all(
+          followersRef.map(async (userRef) => {
+            const followerSnap = await getDoc(userRef);
+            return followerSnap.data();
+          })
+        );
+      }
+
+      if (followingsRef && followingsRef.length > 0) {
+        // Retrieve all the users being followed
+        followings = await Promise.all(
+          followingsRef.map(async (userRef) => {
+            const followingSnap = await getDoc(userRef);
+            return followingSnap.data();
+          })
+        );
+      }
+
+      return { ...userDoc.data(), followers, followings };
+    }
   } catch (error) {
     Alert.alert("Error", "Error fetchhing user profile");
   }
@@ -399,4 +429,20 @@ export const searchUsers = async (searchQuery: string) => {
   });
 
   return users;
+};
+
+export const getUserFollowList = async (userId: string) => {
+  try {
+    const userFollowsCollection = doc(
+      db,
+      `${FireStoreCollections.Users}/${userId}/follows`,
+      "gjWPISfsIAXzJrIiOXG4N74VmSf1"
+    );
+    const userFollowsDoc = await getDoc(userFollowsCollection);
+    if (userFollowsDoc.exists())
+      console.log("userDoc.data()", userFollowsDoc.data());
+  } catch (error) {
+    console.log("error.message", error.message);
+    Alert.alert("Error", "Error fetchhing user profile");
+  }
 };

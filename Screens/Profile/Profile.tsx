@@ -43,12 +43,19 @@ const Profile = ({ navigation, route }: any) => {
     userBio,
     userGender,
     userLocation,
-  } = useSelector((state: RootState) => state.user);
+    userFollowers,
+    userFollowings,
+  } = useSelector((state: RootState) => {
+    return state.user;
+  });
   const [postsData, setPostsData] = useState<Array<any>>([]);
   const [displayName, setDisplayName] = useState(userDisplayName);
   const [profilePicUrl, setProfilePicUrl] = useState(userProfilePhotoURL);
   const [bio, setBio] = useState(userBio);
   const [gender, setGender] = useState(userGender);
+  const [followers, setFollowers] = useState(userFollowers);
+  const [followings, setfollowings] = useState(userFollowings);
+
   useFocusEffect(
     useCallback(() => {
       // Define an async function within the callback
@@ -74,11 +81,21 @@ const Profile = ({ navigation, route }: any) => {
           }
         };
         fetchUser().then((data: any) => {
-          const { profile_picture_url, display_name, biography, gender } = data;
+          const {
+            profile_picture_url,
+            display_name,
+            biography,
+            gender,
+            followers,
+            followings,
+          } = data;
+
           setDisplayName(display_name);
           setProfilePicUrl(profile_picture_url);
           setBio(biography);
           setGender(gender);
+          setFollowers(followers);
+          setfollowings(followings);
         });
       }
     }, [userId]) // Include dependencies like userId if they change
@@ -175,16 +192,16 @@ const Profile = ({ navigation, route }: any) => {
         <Text style={styles.descriptionText}>
           {guestView
             ? bio ?? "No bio available"
-            : bio ?? "Add a bio in edit profile"}
+            : userBio ?? "Add a bio in edit profile"}
         </Text>
       </View>
       <View style={styles.userStatsContainer}>
         <View style={styles.statsView}>
-          <Text style={styles.statsCount}>4</Text>
+          <Text style={styles.statsCount}>{followings?.length}</Text>
           <Text style={styles.statsFont}>Following</Text>
         </View>
         <View style={styles.statsView}>
-          <Text style={styles.statsCount}>5</Text>
+          <Text style={styles.statsCount}>{followers?.length}</Text>
           <Text style={styles.statsFont}>Followers</Text>
         </View>
         <View style={styles.statsView}>

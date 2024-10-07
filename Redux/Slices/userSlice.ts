@@ -12,6 +12,8 @@ export const userSlice = createSlice({
     userLocation: null,
     userFavourites: [],
     userLiked: [],
+    userFollowers: [],
+    userFollowings: [],
   },
   reducers: {
     createUser: (state, action) => {
@@ -58,7 +60,10 @@ export const userSlice = createSlice({
         age,
         gender,
         location,
+        followers,
+        followings,
       } = action.payload;
+
       state.userDisplayName = display_name;
       state.userId = user_id;
       state.userProfilePhotoURL = profile_picture_url;
@@ -66,6 +71,8 @@ export const userSlice = createSlice({
       state.userAge = age;
       state.userGender = gender;
       state.userLocation = location;
+      state.userFollowers = followers;
+      state.userFollowings = followings;
     },
     setUserLiked: (state, action) => {
       const { postId } = action.payload;
