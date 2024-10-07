@@ -15,6 +15,7 @@ import {
   arrayUnion,
   addDoc,
   onSnapshot,
+  arrayRemove,
 } from "firebase/firestore";
 import app from "./FirebaseApp";
 import {
@@ -431,18 +432,32 @@ export const searchUsers = async (searchQuery: string) => {
   return users;
 };
 
-export const getUserFollowList = async (userId: string) => {
+export const addFollower = async (userId, followedUserId) => {
   try {
-    const userFollowsCollection = doc(
-      db,
-      `${FireStoreCollections.Users}/${userId}/follows`,
-      "gjWPISfsIAXzJrIiOXG4N74VmSf1"
-    );
-    const userFollowsDoc = await getDoc(userFollowsCollection);
-    if (userFollowsDoc.exists())
-      console.log("userDoc.data()", userFollowsDoc.data());
+    const userRef = doc(db, "users", userId); // Reference to user1
+    const followedUserRef = doc(db, "users", followedUserId); // Reference to user2
+
+    await updateDoc(userRef, {
+      followers: arrayUnion(followedUserRef), // Add reference to follows array
+    });
+
+    console.log("Followed successfully");
   } catch (error) {
-    console.log("error.message", error.message);
-    Alert.alert("Error", "Error fetchhing user profile");
+    console.error("Error adding follower:", error);
+  }
+};
+
+export const removeFollower = async (userId, followedUserId) => {
+  try {
+    const userRef = doc(db, "users", userId); // Reference to user1
+    const followedUserRef = doc(db, "users", followedUserId); // Reference to user2
+
+    await updateDoc(userRef, {
+      followers: arrayRemove(followedUserRef), // Add reference to follows array
+    });
+
+    console.log("Unfollowed successfully");
+  } catch (error) {
+    console.error("Error adding follower:", error);
   }
 };

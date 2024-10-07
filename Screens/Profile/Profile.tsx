@@ -26,6 +26,8 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import {
   getUserDetails,
   getPostsByUserId,
+  addFollower,
+  removeFollower,
 } from "../../Firebase/firebaseFireStore";
 import { useFocusEffect } from "@react-navigation/native";
 import { Image } from "expo-image";
@@ -48,6 +50,7 @@ const Profile = ({ navigation, route }: any) => {
   } = useSelector((state: RootState) => {
     return state.user;
   });
+  const [profileUserId, setProfileUserId] = useState(userId);
   const [postsData, setPostsData] = useState<Array<any>>([]);
   const [displayName, setDisplayName] = useState(userDisplayName);
   const [profilePicUrl, setProfilePicUrl] = useState(userProfilePhotoURL);
@@ -55,7 +58,9 @@ const Profile = ({ navigation, route }: any) => {
   const [gender, setGender] = useState(userGender);
   const [followers, setFollowers] = useState(userFollowers);
   const [followings, setfollowings] = useState(userFollowings);
-
+  const [isFollowed, setIsFollowed] = useState(false);
+  console.log("profileUserId", profileUserId);
+  console.log("isFollowed", isFollowed);
   useFocusEffect(
     useCallback(() => {
       // Define an async function within the callback
@@ -82,6 +87,7 @@ const Profile = ({ navigation, route }: any) => {
         };
         fetchUser().then((data: any) => {
           const {
+            user_id,
             profile_picture_url,
             display_name,
             biography,
@@ -89,13 +95,18 @@ const Profile = ({ navigation, route }: any) => {
             followers,
             followings,
           } = data;
-
+          console.log("data", data);
+          console.log("fololwers", followers);
           setDisplayName(display_name);
           setProfilePicUrl(profile_picture_url);
           setBio(biography);
           setGender(gender);
           setFollowers(followers);
           setfollowings(followings);
+          setProfileUserId(user_id);
+
+          followers.find((follower) => follower.user_id === userId) &&
+            setIsFollowed(true);
         });
       }
     }, [userId]) // Include dependencies like userId if they change
@@ -135,6 +146,28 @@ const Profile = ({ navigation, route }: any) => {
       userName: displayName,
       profilePicUrl,
     });
+  };
+
+  const handlePressFollowBtn = async () => {
+    try {
+      await addFollower(profileUserId, userId);
+      setIsFollowed(true);
+      setFollowers([...followers, { user_id: userId }]);
+    } catch (error) {
+      Alert.alert("Error", `${error}`);
+    }
+  };
+
+  const handlePressUnfollowBtn = async () => {
+    try {
+      await removeFollower(profileUserId, userId);
+      setIsFollowed(false);
+
+      const arr = followers.filter((follower) => follower.user_id !== userId);
+      setFollowers(arr);
+    } catch (error) {
+      Alert.alert("Error", `${error}`);
+    }
   };
   return (
     <SafeAreaView style={styles.container}>
@@ -209,9 +242,21 @@ const Profile = ({ navigation, route }: any) => {
           <Text style={styles.statsFont}>Likes & Favs</Text>
         </View>
         {guestView ? (
-          <TouchableOpacity style={styles.signOutButton}>
-            <Text style={styles.buttonText}>Follow</Text>
-          </TouchableOpacity>
+          isFollowed ? (
+            <TouchableOpacity
+              style={styles.signOutButton}
+              onPress={handlePressUnfollowBtn}
+            >
+              <Text style={styles.buttonText}>Unfollow</Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              style={styles.signOutButton}
+              onPress={handlePressFollowBtn}
+            >
+              <Text style={styles.buttonText}>Follow</Text>
+            </TouchableOpacity>
+          )
         ) : (
           <TouchableOpacity style={styles.signOutButton} onPress={handleLogout}>
             <Text style={styles.buttonText}>Sign out</Text>
