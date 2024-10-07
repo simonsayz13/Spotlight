@@ -133,6 +133,7 @@ const styles = StyleSheet.create({
   descriptionText: {
     fontSize: 14,
     marginTop: 4,
+    height: 40,
   },
   engagementRow: {
     flexDirection: "row",
