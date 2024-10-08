@@ -46,7 +46,6 @@ const PhotoBrowser = ({ navigation }: any) => {
   }, []);
 
   const handlePhotoPress = (uri: string) => {
-    console.log("Photo selected:", uri);
     navigation.navigate(PostStackScreens.CreatePost, {
       photoURI: uri,
     });
