@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   Platform,
   SafeAreaView,
   Alert,
+  Animated,
 } from "react-native";
 import { useSelector } from "react-redux";
 import { RootState } from "../../Redux/store";
@@ -50,6 +51,29 @@ const Profile = ({ navigation, route }: any) => {
   const [followings, setfollowings] = useState(null);
   const [isFollowed, setIsFollowed] = useState(false);
   const [ldgUserDetails, setLdgUserDetails] = useState(false);
+  const [ldgSuccUserDetails, setLdgSuccUserDetails] = useState(false);
+
+  let heightAnim = useRef(new Animated.Value(200)).current;
+
+  useEffect(() => {
+    if (ldgSuccUserDetails) {
+      Animated.timing(heightAnim, {
+        toValue: 250,
+        duration: 350,
+        useNativeDriver: false,
+      }).start();
+    }
+  }, [ldgSuccUserDetails]);
+
+  useEffect(() => {
+    if (ldgUserDetails) {
+      Animated.timing(heightAnim, {
+        toValue: 200,
+        duration: 350,
+        useNativeDriver: false,
+      }).start();
+    }
+  }, [ldgUserDetails]);
 
   useFocusEffect(
     useCallback(() => {
@@ -69,6 +93,7 @@ const Profile = ({ navigation, route }: any) => {
 
       const fetchUser = async () => {
         setLdgUserDetails(true);
+        setLdgSuccUserDetails(false);
         try {
           return await getUserDetails(id);
         } catch (error) {
@@ -86,8 +111,6 @@ const Profile = ({ navigation, route }: any) => {
           followers,
           followings,
         } = data;
-        console.log("data", data);
-        console.log("fololwers", followers);
         setDisplayName(display_name);
         setProfilePicUrl(profile_picture_url);
         setBio(biography);
@@ -101,6 +124,7 @@ const Profile = ({ navigation, route }: any) => {
           setIsFollowed(true);
 
         setLdgUserDetails(false);
+        setLdgSuccUserDetails(true);
       });
     }, []) // Include dependencies like userId if they change
   );
@@ -166,106 +190,113 @@ const Profile = ({ navigation, route }: any) => {
   };
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.profileDetails}>
-        {!ldgUserDetails && profilePicUrl ? (
-          <Image source={{ uri: profilePicUrl }} style={styles.image} />
-        ) : (
-          <FontAwesome6 name="circle-user" size={70} color="black" />
-        )}
-        <View
-          style={{
-            flexDirection: "row",
-            gap: 4,
-            alignItems: "center",
-            marginBottom: 2,
-          }}
-        >
-          <Text style={styles.userNameFont}>
-            {ldgUserDetails ? "-" : displayName}
-          </Text>
-          {!ldgUserDetails && gender === Gender.Male && (
-            <Ionicons name="male" size={20} color="#4bb9f3" />
+      <Animated.View
+        style={([styles.profileContainer], { height: heightAnim })}
+      >
+        <View style={styles.profileDetails}>
+          {!ldgUserDetails && profilePicUrl ? (
+            <Image source={{ uri: profilePicUrl }} style={styles.image} />
+          ) : (
+            <FontAwesome6 name="circle-user" size={70} color="black" />
           )}
-          {!ldgUserDetails && gender === Gender.Female && (
-            <Ionicons name="female" size={20} color="#f268df" />
+          <View
+            style={{
+              flexDirection: "row",
+              gap: 4,
+              alignItems: "center",
+              marginBottom: 2,
+            }}
+          >
+            <Text style={styles.userNameFont}>
+              {ldgUserDetails ? "-" : displayName}
+            </Text>
+            {!ldgUserDetails && gender === Gender.Male && (
+              <Ionicons name="male" size={20} color="#4bb9f3" />
+            )}
+            {!ldgUserDetails && gender === Gender.Female && (
+              <Ionicons name="female" size={20} color="#f268df" />
+            )}
+          </View>
+          <Text style={styles.metaDataFont}>IP Address: United Kingdom</Text>
+        </View>
+        <View style={styles.description}>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Text style={styles.descriptionTitle}>Bio</Text>
+            {guestView ? (
+              <TouchableOpacity onPressIn={openChat}>
+                <FontAwesome6
+                  name="envelope"
+                  size={24}
+                  color={ThemeColoursPrimary.SecondaryColour}
+                />
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity onPress={handleEdit}>
+                <AntDesign
+                  name="edit"
+                  size={24}
+                  color={ThemeColoursPrimary.SecondaryColour}
+                />
+              </TouchableOpacity>
+            )}
+          </View>
+          {!ldgUserDetails && (
+            <Text style={styles.descriptionText}>
+              {guestView
+                ? bio ?? "No bio available"
+                : userBio ?? "Add a bio in edit profile"}
+            </Text>
           )}
         </View>
-        <Text style={styles.metaDataFont}>IP Address: United Kingdom</Text>
-      </View>
-      <View style={styles.description}>
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <Text style={styles.descriptionTitle}>Bio</Text>
+        <View style={styles.userStatsContainer}>
+          <View style={styles.statsView}>
+            <Text style={styles.statsCount}>
+              {ldgUserDetails ? "-" : followings?.length}
+            </Text>
+            <Text style={styles.statsFont}>Following</Text>
+          </View>
+          <View style={styles.statsView}>
+            <Text style={styles.statsCount}>
+              {ldgUserDetails ? "-" : followers?.length}
+            </Text>
+            <Text style={styles.statsFont}>Followers</Text>
+          </View>
+          <View style={styles.statsView}>
+            <Text style={styles.statsCount}>666</Text>
+            <Text style={styles.statsFont}>Likes & Favs</Text>
+          </View>
           {guestView ? (
-            <TouchableOpacity onPressIn={openChat}>
-              <FontAwesome6
-                name="envelope"
-                size={24}
-                color={ThemeColoursPrimary.SecondaryColour}
-              />
-            </TouchableOpacity>
+            isFollowed ? (
+              <TouchableOpacity
+                style={styles.signOutButton}
+                onPress={handlePressUnfollowBtn}
+              >
+                <Text style={styles.buttonText}>Unfollow</Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                style={styles.signOutButton}
+                onPress={handlePressFollowBtn}
+              >
+                <Text style={styles.buttonText}>Follow</Text>
+              </TouchableOpacity>
+            )
           ) : (
-            <TouchableOpacity onPress={handleEdit}>
-              <AntDesign
-                name="edit"
-                size={24}
-                color={ThemeColoursPrimary.SecondaryColour}
-              />
+            <TouchableOpacity
+              style={styles.signOutButton}
+              onPress={handleLogout}
+            >
+              <Text style={styles.buttonText}>Sign out</Text>
             </TouchableOpacity>
           )}
         </View>
-        {!ldgUserDetails && (
-          <Text style={styles.descriptionText}>
-            {guestView
-              ? bio ?? "No bio available"
-              : userBio ?? "Add a bio in edit profile"}
-          </Text>
-        )}
-      </View>
-      <View style={styles.userStatsContainer}>
-        <View style={styles.statsView}>
-          <Text style={styles.statsCount}>
-            {ldgUserDetails ? "-" : followings?.length}
-          </Text>
-          <Text style={styles.statsFont}>Following</Text>
-        </View>
-        <View style={styles.statsView}>
-          <Text style={styles.statsCount}>
-            {ldgUserDetails ? "-" : followers?.length}
-          </Text>
-          <Text style={styles.statsFont}>Followers</Text>
-        </View>
-        <View style={styles.statsView}>
-          <Text style={styles.statsCount}>666</Text>
-          <Text style={styles.statsFont}>Likes & Favs</Text>
-        </View>
-        {guestView ? (
-          isFollowed ? (
-            <TouchableOpacity
-              style={styles.signOutButton}
-              onPress={handlePressUnfollowBtn}
-            >
-              <Text style={styles.buttonText}>Unfollow</Text>
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity
-              style={styles.signOutButton}
-              onPress={handlePressFollowBtn}
-            >
-              <Text style={styles.buttonText}>Follow</Text>
-            </TouchableOpacity>
-          )
-        ) : (
-          <TouchableOpacity style={styles.signOutButton} onPress={handleLogout}>
-            <Text style={styles.buttonText}>Sign out</Text>
-          </TouchableOpacity>
-        )}
-      </View>
+      </Animated.View>
       {/* Posts */}
       <View style={styles.userContentContainer}>
         <View style={styles.contentContainerSelectorBar}>
@@ -309,6 +340,7 @@ const styles = StyleSheet.create({
     backgroundColor: ThemeColoursPrimary.PrimaryColour,
     paddingTop: Platform.OS === "android" ? 8 : 0,
   },
+  profileContainer: {},
   profileDetails: {
     alignItems: "center",
     marginBottom: 10,

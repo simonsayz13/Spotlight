@@ -30,7 +30,7 @@ import { Alert } from "react-native";
 import store from "../Redux/store";
 import { addComment } from "../Redux/Slices/postsSlices";
 import { SetStateAction } from "react";
-import { sortConversationsByLastMessage } from "../Util/utility";
+import { delay, sortConversationsByLastMessage } from "../Util/utility";
 import { UserDetails } from "../type/Messenger";
 
 const db = getFirestore(app);
