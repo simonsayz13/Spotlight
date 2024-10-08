@@ -44,9 +44,7 @@ const CreatePost = ({ navigation, route }: any) => {
   const [photoArray, setPhotoArray] = useState<Array<string>>([]);
 
   const goBack = () => {
-    setPhotoArray([]);
-    setDescription("");
-    setTitle("");
+    resetStates();
     navigation.goBack();
   };
 
@@ -71,6 +69,9 @@ const CreatePost = ({ navigation, route }: any) => {
     setDescription("");
     setTitle("");
     setPosting(false);
+    setIsComment(false);
+    setIsLocation(false);
+    setIsPrivate(false);
   };
 
   const post = async () => {
