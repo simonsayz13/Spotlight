@@ -38,7 +38,7 @@ const Profile = ({ navigation, route }: any) => {
   const guestView = route?.params?.guestView;
   const opId = route?.params?.opId;
   const {
-    userId,
+    userId: appUserID,
     userDisplayName,
     userProfilePhotoURL,
     userAge,
@@ -50,14 +50,14 @@ const Profile = ({ navigation, route }: any) => {
   } = useSelector((state: RootState) => {
     return state.user;
   });
-  const [profileUserId, setProfileUserId] = useState(userId);
+  const [profileUserId, setProfileUserId] = useState(null);
   const [postsData, setPostsData] = useState<Array<any>>([]);
-  const [displayName, setDisplayName] = useState(userDisplayName);
-  const [profilePicUrl, setProfilePicUrl] = useState(userProfilePhotoURL);
-  const [bio, setBio] = useState(userBio);
-  const [gender, setGender] = useState(userGender);
-  const [followers, setFollowers] = useState(userFollowers);
-  const [followings, setfollowings] = useState(userFollowings);
+  const [displayName, setDisplayName] = useState("");
+  const [profilePicUrl, setProfilePicUrl] = useState("");
+  const [bio, setBio] = useState("");
+  const [gender, setGender] = useState("");
+  const [followers, setFollowers] = useState(null);
+  const [followings, setfollowings] = useState(null);
   const [isFollowed, setIsFollowed] = useState(false);
   console.log("profileUserId", profileUserId);
   console.log("isFollowed", isFollowed);
@@ -72,7 +72,7 @@ const Profile = ({ navigation, route }: any) => {
         }
       };
 
-      const id = guestView ? opId : userId;
+      const id = guestView ? opId : appUserID;
       fetchPosts(id).then((posts) => {
         setPostsData(posts!);
       });
@@ -105,11 +105,19 @@ const Profile = ({ navigation, route }: any) => {
           setfollowings(followings);
           setProfileUserId(user_id);
 
-          followers.find((follower) => follower.user_id === userId) &&
+          followers.find((follower) => follower.user_id === appUserID) &&
             setIsFollowed(true);
         });
+      } else {
+        setDisplayName(userDisplayName);
+        setProfilePicUrl(userProfilePhotoURL);
+        setBio(userBio);
+        setGender(userGender);
+        setFollowers(userFollowers);
+        setfollowings(userFollowings);
+        setProfileUserId(appUserID);
       }
-    }, [userId]) // Include dependencies like userId if they change
+    }, [appUserID]) // Include dependencies like userId if they change
   );
 
   const handlePress = (id: number) => {
@@ -150,9 +158,9 @@ const Profile = ({ navigation, route }: any) => {
 
   const handlePressFollowBtn = async () => {
     try {
-      await addFollower(profileUserId, userId);
+      await addFollower(profileUserId, appUserID);
       setIsFollowed(true);
-      setFollowers([...followers, { user_id: userId }]);
+      setFollowers([...followers, { user_id: appUserID }]);
     } catch (error) {
       Alert.alert("Error", `${error}`);
     }
@@ -160,10 +168,12 @@ const Profile = ({ navigation, route }: any) => {
 
   const handlePressUnfollowBtn = async () => {
     try {
-      await removeFollower(profileUserId, userId);
+      await removeFollower(profileUserId, appUserID);
       setIsFollowed(false);
 
-      const arr = followers.filter((follower) => follower.user_id !== userId);
+      const arr = followers.filter(
+        (follower) => follower.user_id !== appUserID
+      );
       setFollowers(arr);
     } catch (error) {
       Alert.alert("Error", `${error}`);
@@ -230,11 +240,11 @@ const Profile = ({ navigation, route }: any) => {
       </View>
       <View style={styles.userStatsContainer}>
         <View style={styles.statsView}>
-          <Text style={styles.statsCount}>{followings?.length}</Text>
+          <Text style={styles.statsCount}>{followings?.length || "-"}</Text>
           <Text style={styles.statsFont}>Following</Text>
         </View>
         <View style={styles.statsView}>
-          <Text style={styles.statsCount}>{followers?.length}</Text>
+          <Text style={styles.statsCount}>{followers?.length || "-"}</Text>
           <Text style={styles.statsFont}>Followers</Text>
         </View>
         <View style={styles.statsView}>

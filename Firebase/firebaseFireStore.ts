@@ -77,6 +77,7 @@ export const getUserDetails = async (userId: string) => {
       let followers = [];
       let followings = [];
 
+      //* Retrieve followers array
       if (followersRef && followersRef.length > 0) {
         // Retrieve all the users being followed
         followers = await Promise.all(
@@ -86,7 +87,7 @@ export const getUserDetails = async (userId: string) => {
           })
         );
       }
-
+      //* Retrieve followings array
       if (followingsRef && followingsRef.length > 0) {
         // Retrieve all the users being followed
         followings = await Promise.all(
@@ -432,13 +433,17 @@ export const searchUsers = async (searchQuery: string) => {
   return users;
 };
 
-export const addFollower = async (userId, followedUserId) => {
+export const addFollower = async (userId, followerUserId) => {
   try {
     const userRef = doc(db, "users", userId); // Reference to user1
-    const followedUserRef = doc(db, "users", followedUserId); // Reference to user2
+    const followerUserRef = doc(db, "users", followerUserId); // Reference to user2
 
     await updateDoc(userRef, {
-      followers: arrayUnion(followedUserRef), // Add reference to follows array
+      followers: arrayUnion(followerUserRef), // Add reference to followers array
+    });
+
+    await updateDoc(followerUserRef, {
+      followings: arrayUnion(userRef), // Add reference to followings array
     });
 
     console.log("Followed successfully");
@@ -447,13 +452,19 @@ export const addFollower = async (userId, followedUserId) => {
   }
 };
 
-export const removeFollower = async (userId, followedUserId) => {
+export const removeFollower = async (
+  userId: string,
+  followerUserId: string
+) => {
   try {
     const userRef = doc(db, "users", userId); // Reference to user1
-    const followedUserRef = doc(db, "users", followedUserId); // Reference to user2
+    const followerUserRef = doc(db, "users", followerUserId); // Reference to user2
 
     await updateDoc(userRef, {
-      followers: arrayRemove(followedUserRef), // Add reference to follows array
+      followers: arrayRemove(followerUserRef), // Remove reference from followers array
+    });
+    await updateDoc(followerUserRef, {
+      followings: arrayRemove(userRef), // Add reference to followings array
     });
 
     console.log("Unfollowed successfully");
