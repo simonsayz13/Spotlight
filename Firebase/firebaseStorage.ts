@@ -7,30 +7,34 @@ import { Platform } from "react-native";
 const storage = getStorage(app);
 
 export const uploadImages = async (uriArray: Array<string>) => {
-  const uploadPromises = uriArray.map(async (uri) => {
+  const downloadUrls: Array<string> = []; // Array to hold successful download URLs
+  for (const uri of uriArray) {
     const convertedUri =
       Platform.OS === "ios" ? await convertPhUriToFileUri(uri) : uri;
-    const fileName = convertedUri!.substring(
-      convertedUri!.lastIndexOf("/") + 1
-    );
-    const response = await fetch(convertedUri!);
 
-    const blob = await response.blob();
-    const storageRef = ref(storage, `posts/${fileName}`);
+    if (!convertedUri) {
+      continue;
+    }
+
+    const fileName = convertedUri.substring(convertedUri.lastIndexOf("/") + 1);
 
     try {
-      const snapshot = await uploadBytes(storageRef, blob);
-      const downloadUrl = await getDownloadURL(snapshot.ref);
-      console.log("Image uploaded to Firebase:", downloadUrl);
-      return downloadUrl;
+      const response = await fetch(convertedUri);
+      const blob = await response.blob();
+      const storageRef = ref(storage, `posts/${fileName}`);
+      try {
+        const snapshot = await uploadBytes(storageRef, blob);
+        const downloadUrl = await getDownloadURL(snapshot.ref);
+        downloadUrls.push(downloadUrl); // Add successful download URL to the array
+      } catch (error) {
+        console.error("Error uploading image:", error);
+      }
     } catch (error) {
-      console.log("Error uploading image:", error);
-      return null; // Return null for failed uploads
+      console.error("Error fetching image:", error);
     }
-  });
+  }
 
-  const downloadUrls = await Promise.all(uploadPromises);
-  return downloadUrls.filter((url) => url !== null); // Filter out any failed uploads
+  return downloadUrls;
 };
 
 export const uploadProfilePicture = async (userId: string, uri: string) => {

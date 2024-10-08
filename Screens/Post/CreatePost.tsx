@@ -29,6 +29,7 @@ import BottomSheet from "../../Components/BottomSheet";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import ImagePreviewCarousel from "../../Components/ImagePreviewCarousel";
 import { createMediaData } from "../../Util/utility";
+
 const { width, height } = Dimensions.get("window");
 
 const CreatePost = ({ navigation, route }: any) => {
