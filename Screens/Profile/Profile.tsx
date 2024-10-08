@@ -37,17 +37,7 @@ const Profile = ({ navigation, route }: any) => {
   const [buttonStates, setButtonStates] = useState(userContentSelectorButtons);
   const guestView = route?.params?.guestView;
   const opId = route?.params?.opId;
-  const {
-    userId: appUserID,
-    userDisplayName,
-    userProfilePhotoURL,
-    userAge,
-    userBio,
-    userGender,
-    userLocation,
-    userFollowers,
-    userFollowings,
-  } = useSelector((state: RootState) => {
+  const { userId: appUserID, userBio } = useSelector((state: RootState) => {
     return state.user;
   });
   const [profileUserId, setProfileUserId] = useState(null);
@@ -59,8 +49,8 @@ const Profile = ({ navigation, route }: any) => {
   const [followers, setFollowers] = useState(null);
   const [followings, setfollowings] = useState(null);
   const [isFollowed, setIsFollowed] = useState(false);
-  console.log("profileUserId", profileUserId);
-  console.log("isFollowed", isFollowed);
+  const [ldgUserDetails, setLdgUserDetails] = useState(false);
+
   useFocusEffect(
     useCallback(() => {
       // Define an async function within the callback
@@ -77,47 +67,42 @@ const Profile = ({ navigation, route }: any) => {
         setPostsData(posts!);
       });
 
-      if (guestView) {
-        const fetchUser = async () => {
-          try {
-            return await getUserDetails(opId);
-          } catch (error) {
-            Alert.alert("Error", `${error}`);
-          }
-        };
-        fetchUser().then((data: any) => {
-          const {
-            user_id,
-            profile_picture_url,
-            display_name,
-            biography,
-            gender,
-            followers,
-            followings,
-          } = data;
-          console.log("data", data);
-          console.log("fololwers", followers);
-          setDisplayName(display_name);
-          setProfilePicUrl(profile_picture_url);
-          setBio(biography);
-          setGender(gender);
-          setFollowers(followers);
-          setfollowings(followings);
-          setProfileUserId(user_id);
+      const fetchUser = async () => {
+        setLdgUserDetails(true);
+        try {
+          return await getUserDetails(id);
+        } catch (error) {
+          setLdgUserDetails(false);
+          Alert.alert("Error", `${error}`);
+        }
+      };
+      fetchUser().then((data: any) => {
+        const {
+          user_id,
+          profile_picture_url,
+          display_name,
+          biography,
+          gender,
+          followers,
+          followings,
+        } = data;
+        console.log("data", data);
+        console.log("fololwers", followers);
+        setDisplayName(display_name);
+        setProfilePicUrl(profile_picture_url);
+        setBio(biography);
+        setGender(gender);
+        setFollowers(followers);
+        setfollowings(followings);
+        setProfileUserId(user_id);
 
+        guestView &&
           followers.find((follower) => follower.user_id === appUserID) &&
-            setIsFollowed(true);
-        });
-      } else {
-        setDisplayName(userDisplayName);
-        setProfilePicUrl(userProfilePhotoURL);
-        setBio(userBio);
-        setGender(userGender);
-        setFollowers(userFollowers);
-        setfollowings(userFollowings);
-        setProfileUserId(appUserID);
-      }
-    }, [appUserID]) // Include dependencies like userId if they change
+          setIsFollowed(true);
+
+        setLdgUserDetails(false);
+      });
+    }, []) // Include dependencies like userId if they change
   );
 
   const handlePress = (id: number) => {
@@ -182,7 +167,7 @@ const Profile = ({ navigation, route }: any) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.profileDetails}>
-        {profilePicUrl ? (
+        {!ldgUserDetails && profilePicUrl ? (
           <Image source={{ uri: profilePicUrl }} style={styles.image} />
         ) : (
           <FontAwesome6 name="circle-user" size={70} color="black" />
@@ -195,11 +180,13 @@ const Profile = ({ navigation, route }: any) => {
             marginBottom: 2,
           }}
         >
-          <Text style={styles.userNameFont}>{displayName}</Text>
-          {gender === Gender.Male && (
+          <Text style={styles.userNameFont}>
+            {ldgUserDetails ? "-" : displayName}
+          </Text>
+          {!ldgUserDetails && gender === Gender.Male && (
             <Ionicons name="male" size={20} color="#4bb9f3" />
           )}
-          {gender === Gender.Female && (
+          {!ldgUserDetails && gender === Gender.Female && (
             <Ionicons name="female" size={20} color="#f268df" />
           )}
         </View>
@@ -232,19 +219,25 @@ const Profile = ({ navigation, route }: any) => {
             </TouchableOpacity>
           )}
         </View>
-        <Text style={styles.descriptionText}>
-          {guestView
-            ? bio ?? "No bio available"
-            : userBio ?? "Add a bio in edit profile"}
-        </Text>
+        {!ldgUserDetails && (
+          <Text style={styles.descriptionText}>
+            {guestView
+              ? bio ?? "No bio available"
+              : userBio ?? "Add a bio in edit profile"}
+          </Text>
+        )}
       </View>
       <View style={styles.userStatsContainer}>
         <View style={styles.statsView}>
-          <Text style={styles.statsCount}>{followings?.length || "-"}</Text>
+          <Text style={styles.statsCount}>
+            {ldgUserDetails ? "-" : followings?.length}
+          </Text>
           <Text style={styles.statsFont}>Following</Text>
         </View>
         <View style={styles.statsView}>
-          <Text style={styles.statsCount}>{followers?.length || "-"}</Text>
+          <Text style={styles.statsCount}>
+            {ldgUserDetails ? "-" : followers?.length}
+          </Text>
           <Text style={styles.statsFont}>Followers</Text>
         </View>
         <View style={styles.statsView}>
