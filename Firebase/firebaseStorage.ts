@@ -2,13 +2,14 @@ import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import app from "./FirebaseApp";
 import { FireStorageFolder } from "../Constants/dbReference";
 import { convertPhUriToFileUri } from "../Util/utility";
+import { Platform } from "react-native";
 // Create a root reference
 const storage = getStorage(app);
 
 export const uploadImages = async (uriArray: Array<string>) => {
-  console.log(uriArray);
   const uploadPromises = uriArray.map(async (uri) => {
-    const convertedUri = await convertPhUriToFileUri(uri);
+    const convertedUri =
+      Platform.OS === "ios" ? await convertPhUriToFileUri(uri) : uri;
     const fileName = convertedUri!.substring(
       convertedUri!.lastIndexOf("/") + 1
     );
