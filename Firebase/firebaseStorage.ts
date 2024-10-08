@@ -1,24 +1,35 @@
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import app from "./FirebaseApp";
 import { FireStorageFolder } from "../Constants/dbReference";
+import { convertPhUriToFileUri } from "../Util/utility";
 // Create a root reference
 const storage = getStorage(app);
 
-export const uploadImage = async (uri: string) => {
-  const fileName = uri.substring(uri.lastIndexOf("/") + 1);
+export const uploadImages = async (uriArray: Array<string>) => {
+  console.log(uriArray);
+  const uploadPromises = uriArray.map(async (uri) => {
+    const convertedUri = await convertPhUriToFileUri(uri);
+    const fileName = convertedUri!.substring(
+      convertedUri!.lastIndexOf("/") + 1
+    );
+    const response = await fetch(convertedUri!);
 
-  const response = await fetch(uri);
-  const blob = await response.blob();
-  const storageRef = ref(storage, `test/${fileName}`);
+    const blob = await response.blob();
+    const storageRef = ref(storage, `posts/${fileName}`);
 
-  try {
-    const snapshot = await uploadBytes(storageRef, blob);
-    const downloadUrl = await getDownloadURL(snapshot.ref);
-    console.log("Image uploaded to Firebase:", downloadUrl);
-    return downloadUrl;
-  } catch (error) {
-    console.log(error);
-  }
+    try {
+      const snapshot = await uploadBytes(storageRef, blob);
+      const downloadUrl = await getDownloadURL(snapshot.ref);
+      console.log("Image uploaded to Firebase:", downloadUrl);
+      return downloadUrl;
+    } catch (error) {
+      console.log("Error uploading image:", error);
+      return null; // Return null for failed uploads
+    }
+  });
+
+  const downloadUrls = await Promise.all(uploadPromises);
+  return downloadUrls.filter((url) => url !== null); // Filter out any failed uploads
 };
 
 export const uploadProfilePicture = async (userId: string, uri: string) => {

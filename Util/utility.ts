@@ -1,21 +1,5 @@
-import * as FileSystem from "expo-file-system";
-
-export const getFileUri = async (uri: string) => {
-  const fileName = uri.split("/").pop(); // Get the original file name
-  const fileUri = FileSystem.cacheDirectory + fileName!; // Cache directory path
-
-  // Check if the file already exists
-  const fileInfo = await FileSystem.getInfoAsync(fileUri);
-
-  if (!fileInfo.exists) {
-    await FileSystem.copyAsync({
-      from: uri,
-      to: fileUri,
-    });
-  }
-
-  return fileUri; // Return the file URI that can be used in <Image>
-};
+import { Image } from "react-native";
+import * as MediaLibrary from "expo-media-library";
 
 export const formatRelativeTime = (timeStamp: string) => {
   const givenDate = new Date(timeStamp);
@@ -62,4 +46,39 @@ export const sortConversationsByLastMessage = (conversations: any) => {
 
 export const delay = (ms: number = 0) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
+};
+
+const getImageDimensions = (
+  uri: string
+): Promise<{ width: number; height: number }> => {
+  return new Promise((resolve, reject) => {
+    Image.getSize(
+      uri,
+      (width: number, height: number) => resolve({ width, height }),
+      reject
+    );
+  });
+};
+
+export const createMediaData = async (
+  uploadedImageURLs: Array<string>
+): Promise<Array<Media>> => {
+  const mediaWithDimensions: Array<Media> = await Promise.all(
+    uploadedImageURLs.map(async (url) => {
+      const { width, height } = await getImageDimensions(url);
+      return {
+        type: "image",
+        media_url: url,
+        width,
+        height,
+      };
+    })
+  );
+  return mediaWithDimensions;
+};
+
+export const convertPhUriToFileUri = async (phUri: string) => {
+  const assetId = phUri.slice(5);
+  let returnedAssetInfo = await MediaLibrary.getAssetInfoAsync(assetId);
+  return returnedAssetInfo.localUri;
 };
