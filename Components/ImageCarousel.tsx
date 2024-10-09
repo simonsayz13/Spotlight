@@ -41,7 +41,7 @@ const ImageCarousel = ({ images }: any) => {
     hideTimeout.current = setTimeout(() => {
       Animated.timing(indicatorOpacity, {
         toValue: 0, // Fade out
-        duration: 300,
+        duration: 500,
         useNativeDriver: true,
       }).start(() => {
         setShowIndicator(false); // Hide after animation completes
@@ -82,6 +82,24 @@ const ImageCarousel = ({ images }: any) => {
     );
   };
 
+  const renderDots = (
+    <View style={styles.dotsContainer}>
+      {images.length > 0 &&
+        images.map((_: unknown, index: number) => {
+          const isActive = index === currentIndex;
+          return (
+            <View
+              key={index}
+              style={[
+                styles.dot,
+                isActive ? styles.activeDot : styles.inactiveDot,
+              ]}
+            />
+          );
+        })}
+    </View>
+  );
+
   return (
     <View style={styles.container}>
       {/* FlatList for horizontal scrolling */}
@@ -91,13 +109,13 @@ const ImageCarousel = ({ images }: any) => {
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
-        keyExtractor={(item) => item.media_url}
+        keyExtractor={(item) => item.media_url} // Ensure unique key for FlatList
         onScroll={handleScroll}
         scrollEventThrottle={16}
       />
 
       {/* Top-right indicator */}
-      {showIndicator && (
+      {images.length > 1 && showIndicator && (
         <Animated.View
           style={[styles.indicatorContainer, { opacity: indicatorOpacity }]}
         >
@@ -106,6 +124,9 @@ const ImageCarousel = ({ images }: any) => {
           </Text>
         </Animated.View>
       )}
+
+      {/* Dots Indicator */}
+      {images.length > 1 && renderDots}
     </View>
   );
 };
@@ -132,8 +153,29 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   indicatorText: {
-    color: "#fff",
+    color: ThemeColoursPrimary.PrimaryColour,
     fontSize: 14,
+  },
+  dotsContainer: {
+    flexDirection: "row",
+    marginTop: 6, // Spacing between the images and the dots
+  },
+  dot: {
+    alignSelf: "center",
+    width: 6,
+    height: 6,
+    borderRadius: 10,
+    marginHorizontal: 4,
+  },
+  activeDot: {
+    alignSelf: "center",
+    backgroundColor: ThemeColoursPrimary.LogoColour,
+    width: 10,
+    height: 10,
+    borderRadius: 10,
+  },
+  inactiveDot: {
+    backgroundColor: "gray",
   },
 });
 
