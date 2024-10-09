@@ -5,6 +5,7 @@ import { ThemeColoursPrimary } from "../Constants/UI";
 import CommentCard from "./CommentCard";
 import { formatRelativeTime } from "../Util/utility";
 import { useSelector } from "react-redux";
+import { selectCommentsByPostId } from "../Redux/Selectors/postSelector";
 
 const { width: windowWidth } = Dimensions.get("window");
 const MAX_HEIGHT = 500; // Define the maximum height for images
@@ -17,10 +18,7 @@ const MainPost = ({ postData, navigation }: any) => {
     height: 500,
   });
 
-  const comments = useSelector(
-    (state: any) =>
-      state.posts.posts.find((post: any) => post.id === postId)?.comments || []
-  );
+  const comments = useSelector(selectCommentsByPostId(postId));
 
   useEffect(() => {
     if (imageUrl) {

@@ -27,20 +27,22 @@ import { createPost } from "../../Firebase/firebaseFireStore";
 import ActivityLoader from "../../Components/ActivityLoader";
 import BottomSheet from "../../Components/BottomSheet";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import { getLocation, getLocationPermission } from "../../Util/LocationService";
 import ImagePreviewCarousel from "../../Components/ImagePreviewCarousel";
 import { createMediaData } from "../../Util/utility";
 
 const { width, height } = Dimensions.get("window");
 
 const CreatePost = ({ navigation, route }: any) => {
+  const { userId } = useSelector((state: RootState) => state.user);
   const photoURI = route.params?.photoURI;
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
-  const { userId } = useSelector((state: RootState) => state.user);
   const [posting, setPosting] = useState<boolean>(false);
   const [isComment, setIsComment] = useState<boolean>(false);
   const [isLocation, setIsLocation] = useState<boolean>(false);
   const [isPrivate, setIsPrivate] = useState<boolean>(false);
+  const [coordinates, setCoordinates] = useState<any>();
   const [photoArray, setPhotoArray] = useState<Array<string>>([]);
 
   const goBack = () => {
@@ -79,6 +81,7 @@ const CreatePost = ({ navigation, route }: any) => {
       return Alert.alert("Not Signed in", "Please sign in to make a post");
     }
     setPosting(true);
+    if (isLocation) await getLocation(setCoordinates);
     const uploadedImageURLs = await uploadImages(photoArray);
     const media = await createMediaData(uploadedImageURLs);
     const postData = {
@@ -90,6 +93,10 @@ const CreatePost = ({ navigation, route }: any) => {
       dislikes: 0,
       favourites: 0,
       comments: [],
+      coordinates,
+      isComment,
+      isLocation,
+      isPrivate,
     };
     await createPost(userId, postData);
     navigation.navigate("Me");
@@ -114,8 +121,15 @@ const CreatePost = ({ navigation, route }: any) => {
     setIsPrivate((previousState) => !previousState);
   const toggleCommentSwitch = () =>
     setIsComment((previousState) => !previousState);
-  const toggleLocationSwitch = () =>
-    setIsLocation((previousState) => !previousState);
+  const toggleLocationSwitch = async () => {
+    const locationServicePermission = await getLocationPermission();
+    console.log(locationServicePermission);
+    if (locationServicePermission !== "OK") {
+      Alert.alert("Error", locationServicePermission);
+    } else {
+      setIsLocation((previousState) => !previousState);
+    }
+  };
 
   const options = (
     <View>

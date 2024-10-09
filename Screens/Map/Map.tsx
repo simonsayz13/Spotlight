@@ -1,27 +1,52 @@
 import React, { useEffect, useState, useRef } from "react";
 import {
-  Button,
   SafeAreaView,
   StyleSheet,
   TextInput,
-  Text,
   View,
-  PermissionsAndroid,
   Platform,
   KeyboardAvoidingView,
-  Modal,
   Animated,
   PanResponder,
   TouchableOpacity,
+  Alert,
+  Dimensions,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MapView, { Marker } from "react-native-maps";
-import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
-import { ThemeColours, ThemeColoursPrimary } from "../../Constants/UI";
-const Map = () => {
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [selectedMarker, setSelectedMarker] = useState(null);
+import { ThemeColoursPrimary } from "../../Constants/UI";
+import { getLocation, getLocationPermission } from "../../Util/LocationService";
+import ActivityLoader from "../../Components/ActivityLoader";
+import { getLocationPosts } from "../../Firebase/firebaseFireStore";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import MapPostContent from "../../Components/MapPostContent";
+const { width: windowWidth, height: windowHeight } = Dimensions.get("window");
+
+const Map = ({ navigation }: any) => {
+  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+  const [selectedPost, setSelectedPost] = useState<any>(null);
+  const [currentCoordinate, setCurrentCoordinate] = useState<any>(null);
+  const [gotLocation, setGotLocation] = useState(false);
+  const [posts, setPosts] = useState([]);
   const slideAnim = useRef(new Animated.Value(300)).current;
+  const [mapRegion, setMapRegion] = useState<any>(null);
+  const mapRef = useRef<MapView>(null);
+
+  const initialise = async () => {
+    const permission = await getLocationPermission();
+    if (permission !== "OK") {
+      return Alert.alert("Error", permission);
+    }
+    setGotLocation(true);
+    await getLocation(setCurrentCoordinate);
+    await getLocationPosts(setPosts);
+    setGotLocation(false);
+    setMapRegion(currentCoordinate);
+  };
+
+  useEffect(() => {
+    initialise();
+  }, []);
 
   const modalPanResponder = useRef(
     PanResponder.create({
@@ -46,9 +71,24 @@ const Map = () => {
     })
   ).current;
 
-  const handleMarkerPress = (markerData: any) => {
-    setSelectedMarker(markerData);
+  const handleMarkerPress = (post: any) => {
+    setSelectedPost(post);
     setIsModalVisible(true);
+    const { latitude, longitude } = post.coordinates;
+    centreMap(latitude, longitude);
+  };
+
+  const centreMap = (latitude: number, longitude: number) => {
+    if (mapRef.current) {
+      mapRef.current.animateCamera(
+        {
+          center: { latitude, longitude },
+          altitude: 700, // Zoom level for Apple map
+          zoom: 7, // Adjust zoom level as needed for Google map
+        },
+        { duration: 800 }
+      );
+    }
   };
 
   const showModal = () => {
@@ -72,48 +112,78 @@ const Map = () => {
     }
   }, [isModalVisible]);
 
+  const centerMapToCurrentLocation = async () => {
+    await getLocation(setCurrentCoordinate);
+    hideModal();
+    if (currentCoordinate) {
+      const { latitude, longitude } = currentCoordinate;
+      centreMap(latitude, longitude);
+    }
+  };
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
         style={styles.container}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        <View style={styles.searchBar}>
-          <Ionicons
-            name="search"
-            size={32}
-            color={ThemeColoursPrimary.SecondaryColour}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Search..."
-            placeholderTextColor={ThemeColoursPrimary.SecondaryColour}
-          />
-        </View>
-        <MapView style={styles.map}>
-          <Marker
-            coordinate={{
-              latitude: 53.405411,
-              longitude: -2.94934,
-              //@ts-ignore
-              latitudeDelta: 0.005, // Adjust zoom level (smaller = closer)
-              longitudeDelta: 0.005, // Adjust zoom level (smaller = closer)
-            }}
-            onPress={() =>
-              handleMarkerPress({
-                title: "Custom Title",
-                description: "Marker Description",
-              })
-            }
-          >
-            <FontAwesome5
-              name="map-marker-alt"
+        <View style={styles.searchBarContainer}>
+          <View style={styles.searchBar}>
+            <Ionicons
+              name="search"
               size={32}
-              color={ThemeColours.PrimaryColour}
+              color={ThemeColoursPrimary.SecondaryColour}
             />
-          </Marker>
-        </MapView>
-
+            <TextInput
+              style={styles.input}
+              placeholder="Search..."
+              placeholderTextColor={ThemeColoursPrimary.SecondaryColour}
+            />
+          </View>
+        </View>
+        <ActivityLoader indicator={gotLocation} text={"Locating..."} />
+        {currentCoordinate && (
+          <MapView
+            ref={mapRef}
+            style={styles.map}
+            initialRegion={{
+              latitude: currentCoordinate.latitude, // Initial latitude
+              longitude: currentCoordinate.longitude, // Initial longitude
+              latitudeDelta: 0.02, // Controls the amount of zoom (smaller means more zoomed in)
+              longitudeDelta: 0.02, // Controls the horizontal zoom level (smaller means more zoomed in)
+            }}
+            region={mapRegion}
+            onRegionChangeComplete={(region) => {
+              setMapRegion(region);
+            }}
+            showsUserLocation={true}
+            showsPointsOfInterest={false}
+          >
+            {posts.map((post: any) => (
+              <Marker
+                key={post.id}
+                coordinate={{
+                  latitude: post.postData.coordinates.latitude,
+                  longitude: post.postData.coordinates.longitude,
+                }}
+                onPress={() => handleMarkerPress(post.postData)}
+              >
+                <MaterialCommunityIcons
+                  name="sign-text"
+                  size={32}
+                  color={ThemeColoursPrimary.LogoColour}
+                />
+              </Marker>
+            ))}
+          </MapView>
+        )}
+        <TouchableOpacity
+          style={styles.locateButton}
+          onPressIn={() => {
+            centerMapToCurrentLocation();
+          }}
+        >
+          <Ionicons name="locate" size={24} color="black" />
+        </TouchableOpacity>
         {isModalVisible && (
           <Animated.View
             style={[
@@ -123,13 +193,12 @@ const Map = () => {
             {...modalPanResponder.panHandlers}
           >
             <View style={styles.modalContent}>
-              {selectedMarker && (
-                <>
-                  <Text style={styles.modalTitle}>找旅游搭子</Text>
-                  <Text style={styles.modalDescription}>
-                    圣诞节 法国，意大利，西班牙都可
-                  </Text>
-                </>
+              {selectedPost && (
+                <MapPostContent
+                  postData={selectedPost}
+                  navigation={navigation}
+                  hideModal={hideModal}
+                />
               )}
             </View>
           </Animated.View>
@@ -144,18 +213,19 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: ThemeColoursPrimary.PrimaryColour,
   },
-  map: {
-    width: "100%",
-    height: "100%",
+
+  searchBarContainer: {
+    borderBottomWidth: 0.2,
+    borderBottomColor: ThemeColoursPrimary.GreyColour,
   },
   searchBar: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#f1f1f1",
+    backgroundColor: ThemeColoursPrimary.BackgroundColour,
     borderRadius: 10,
     borderColor: ThemeColoursPrimary.PrimaryColour,
     borderWidth: 1.0,
-    marginHorizontal: 26,
+    marginHorizontal: 12,
     marginVertical: 8,
     paddingHorizontal: 8,
   },
@@ -164,7 +234,11 @@ const styles = StyleSheet.create({
     paddingLeft: 8,
     color: ThemeColoursPrimary.SecondaryColour,
     fontSize: 16,
-    width: "90%",
+    width: Platform.OS === "ios" ? windowWidth * 0.76 : windowWidth * 0.74,
+  },
+  map: {
+    width: windowWidth,
+    height: windowHeight,
   },
   modalContainer: {
     position: "absolute",
@@ -175,25 +249,23 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 14,
     borderTopRightRadius: 14,
     padding: 16,
-    elevation: 5, // For Android shadow
+    elevation: 10, // For Android shadow
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: -2 },
+    shadowOffset: { width: 0, height: -1 },
     shadowOpacity: 0.2,
-    shadowRadius: 10,
-    height: "35%",
+    shadowRadius: 2,
+    height: windowHeight * 0.22,
   },
-  modalContent: {
-    // alignItems: "center",
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: ThemeColoursPrimary.SecondaryColour,
-  },
-  modalDescription: {
-    marginVertical: 10,
-    fontSize: 16,
-    color: ThemeColoursPrimary.SecondaryColour,
+  modalContent: {},
+  locateButton: {
+    position: "absolute",
+    top: 70,
+    left: 10,
+    // right: 10,
+    backgroundColor: ThemeColoursPrimary.PrimaryColour,
+    borderRadius: 25,
+    padding: 2,
+    elevation: 5,
   },
 });
 

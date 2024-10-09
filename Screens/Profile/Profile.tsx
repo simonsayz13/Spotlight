@@ -175,7 +175,7 @@ const Profile = ({ navigation, route }: any) => {
         <Text style={styles.descriptionText}>
           {guestView
             ? bio ?? "No bio available"
-            : bio ?? "Add a bio in edit profile"}
+            : userBio ?? "Add a bio in edit profile"}
         </Text>
       </View>
       <View style={styles.userStatsContainer}>
