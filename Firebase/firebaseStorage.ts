@@ -15,7 +15,9 @@ export const uploadImages = async (uriArray: Array<string>) => {
   const downloadUrls: Array<string> = []; // Array to hold successful download URLs
   for (const uri of uriArray) {
     const convertedUri =
-      Platform.OS === "ios" ? await convertPhUriToFileUri(uri) : uri;
+      Platform.OS === "ios" && uri.slice(0, 4) !== "file"
+        ? await convertPhUriToFileUri(uri)
+        : uri;
 
     if (!convertedUri) {
       continue;
