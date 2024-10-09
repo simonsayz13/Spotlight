@@ -78,10 +78,7 @@ export const createMediaData = async (
 };
 
 export const convertPhUriToFileUri = async (phUri: string) => {
-  console.log("phUri", phUri);
   const assetId = phUri.slice(5);
-  console.log("assetId ", assetId);
   let returnedAssetInfo = await MediaLibrary.getAssetInfoAsync(assetId);
-  console.log("returnedAssetInfo", returnedAssetInfo);
-  return returnedAssetInfo.localUri;
+  return returnedAssetInfo?.localUri;
 };
