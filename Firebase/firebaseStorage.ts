@@ -1,4 +1,10 @@
-import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
+import {
+  getDownloadURL,
+  getStorage,
+  ref,
+  uploadBytes,
+  uploadBytesResumable,
+} from "firebase/storage";
 import app from "./FirebaseApp";
 import { FireStorageFolder } from "../Constants/dbReference";
 // Create a root reference
@@ -31,7 +37,7 @@ export const uploadProfilePicture = async (userId: string, uri: string) => {
   );
 
   try {
-    const snapshot = await uploadBytes(storageRef, blob);
+    const snapshot = await uploadBytesResumable(storageRef, blob);
     const downloadUrl = await getDownloadURL(snapshot.ref);
     return downloadUrl;
   } catch (error) {

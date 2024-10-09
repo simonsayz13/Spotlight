@@ -83,7 +83,7 @@ export const getUserDetails = async (userId: string) => {
         followers = await Promise.all(
           followersRef.map(async (userRef) => {
             const followerSnap = await getDoc(userRef);
-            return followerSnap.data();
+            return followerSnap.data().user_id;
           })
         );
       }
@@ -93,7 +93,7 @@ export const getUserDetails = async (userId: string) => {
         followings = await Promise.all(
           followingsRef.map(async (userRef) => {
             const followingSnap = await getDoc(userRef);
-            return followingSnap.data();
+            return followingSnap.data().user_id;
           })
         );
       }
