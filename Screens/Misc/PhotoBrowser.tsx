@@ -10,7 +10,11 @@ import {
   Dimensions,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { MiscStackScreens, ThemeColoursPrimary } from "../../Constants/UI";
+import {
+  MiscStackScreens,
+  PostStackScreens,
+  ThemeColoursPrimary,
+} from "../../Constants/UI";
 import * as MediaLibrary from "expo-media-library";
 import { Image } from "expo-image";
 const { width } = Dimensions.get("window");
@@ -42,8 +46,9 @@ const PhotoBrowser = ({ navigation }: any) => {
   }, []);
 
   const handlePhotoPress = (uri: string) => {
-    console.log("Photo selected:", uri);
-    navigation.navigate(MiscStackScreens.ImageCropper, { uri: uri });
+    navigation.navigate(PostStackScreens.CreatePost, {
+      photoURI: uri,
+    });
   };
 
   const renderPhoto = ({ item }: any) => (

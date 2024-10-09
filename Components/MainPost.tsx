@@ -1,12 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Image,
-  Dimensions,
-} from "react-native";
+import { View, Text, StyleSheet, ScrollView, Dimensions } from "react-native";
 import { Image as ExpoImage } from "expo-image";
 import { ThemeColoursPrimary } from "../Constants/UI";
 import CommentCard from "./CommentCard";
@@ -18,7 +11,7 @@ const MAX_HEIGHT = 500; // Define the maximum height for images
 
 const MainPost = ({ postData, navigation }: any) => {
   const { title, description, timeStamp, id: postId } = postData;
-  const imageUrl = postData.media[0].media_url;
+  const imageUrl = postData.media[0]?.media_url;
   const [imageDimensions, setImageDimensions] = useState({
     width: windowWidth,
     height: 500,
@@ -31,28 +24,21 @@ const MainPost = ({ postData, navigation }: any) => {
 
   useEffect(() => {
     if (imageUrl) {
-      // Fetch the image dimensions
-      Image.getSize(
-        imageUrl,
-        (width, height) => {
-          let calculatedHeight = (windowWidth / width) * height; // Calculate height based on aspect ratio
-          let calculatedWidth = windowWidth;
+      const { width, height } = postData.media[0];
 
-          // Check if the calculated height exceeds the maximum height
-          if (calculatedHeight > MAX_HEIGHT) {
-            calculatedHeight = MAX_HEIGHT; // Set to max height
-            calculatedWidth = (MAX_HEIGHT / height) * width; // Recalculate width to maintain aspect ratio
-          }
+      let calculatedHeight = (windowWidth / width) * height; // Calculate height based on aspect ratio
+      let calculatedWidth = windowWidth;
 
-          setImageDimensions({
-            width: calculatedWidth,
-            height: calculatedHeight,
-          }); // Update dimensions
-        },
-        (error) => {
-          console.error("Error getting image size:", error);
-        }
-      );
+      // Check if the calculated height exceeds the maximum height
+      if (calculatedHeight > MAX_HEIGHT) {
+        calculatedHeight = MAX_HEIGHT; // Set to max height
+        calculatedWidth = (MAX_HEIGHT / height) * width; // Recalculate width to maintain aspect ratio
+      }
+
+      setImageDimensions({
+        width: calculatedWidth,
+        height: calculatedHeight,
+      });
     }
   }, [imageUrl]);
 

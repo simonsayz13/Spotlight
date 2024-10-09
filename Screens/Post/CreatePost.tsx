@@ -1,9 +1,8 @@
-import React, { memo, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   View,
   Text,
-  Image,
   SafeAreaView,
   TouchableOpacity,
   Dimensions,
@@ -20,7 +19,7 @@ import {
   ThemeColoursPrimary,
 } from "../../Constants/UI";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { uploadImage } from "../../Firebase/firebaseStorage";
+import { uploadImages } from "../../Firebase/firebaseStorage";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useSelector } from "react-redux";
 import { RootState } from "../../Redux/store";
@@ -28,18 +27,10 @@ import { createPost } from "../../Firebase/firebaseFireStore";
 import ActivityLoader from "../../Components/ActivityLoader";
 import BottomSheet from "../../Components/BottomSheet";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-const { width, height } = Dimensions.get("window");
+import ImagePreviewCarousel from "../../Components/ImagePreviewCarousel";
+import { createMediaData } from "../../Util/utility";
 
-const ImagePreviewDOM = memo(({ photoURI }: any) => {
-  return (
-    <View style={styles.imagePreviewContainer}>
-      <Image source={{ uri: photoURI }} style={styles.imageView} />
-      <TouchableOpacity style={styles.addImageContainer}>
-        <Ionicons name="add" size={42} color="black" />
-      </TouchableOpacity>
-    </View>
-  );
-});
+const { width, height } = Dimensions.get("window");
 
 const CreatePost = ({ navigation, route }: any) => {
   const photoURI = route.params?.photoURI;
@@ -50,10 +41,10 @@ const CreatePost = ({ navigation, route }: any) => {
   const [isComment, setIsComment] = useState<boolean>(false);
   const [isLocation, setIsLocation] = useState<boolean>(false);
   const [isPrivate, setIsPrivate] = useState<boolean>(false);
+  const [photoArray, setPhotoArray] = useState<Array<string>>([]);
+
   const goBack = () => {
-    navigation.setParams({ photoURI: undefined });
-    setDescription("");
-    setTitle("");
+    resetStates();
     navigation.goBack();
   };
 
@@ -65,37 +56,44 @@ const CreatePost = ({ navigation, route }: any) => {
     navigation.navigate(MiscStackScreens.PhotoBrowser);
   };
 
+  useEffect(() => {
+    if (photoURI) {
+      setPhotoArray((prevArray) => [...prevArray, photoURI]);
+      navigation.setParams({ photoURI: undefined });
+    }
+  }, [photoURI]);
+
+  const resetStates = () => {
+    navigation.setParams({ photoURI: undefined });
+    setPhotoArray([]);
+    setDescription("");
+    setTitle("");
+    setPosting(false);
+    setIsComment(false);
+    setIsLocation(false);
+    setIsPrivate(false);
+  };
+
   const post = async () => {
     if (!userId) {
       return Alert.alert("Not Signed in", "Please sign in to make a post");
     }
     setPosting(true);
-    const imageURL = await uploadImage(photoURI);
-    const timeStamp = new Date().toISOString();
+    const uploadedImageURLs = await uploadImages(photoArray);
+    const media = await createMediaData(uploadedImageURLs);
     const postData = {
-      media: [
-        {
-          type: "image",
-          media_url: imageURL,
-          width: 800,
-          height: 600,
-        },
-      ],
-      timeStamp,
+      media,
+      timeStamp: new Date().toISOString(),
       title,
       description,
       likes: 0,
       dislikes: 0,
       favourites: 0,
       comments: [],
-      location: "Liverpool",
     };
-    await createPost(userId!, postData);
-    navigation.setParams({ photoURI: undefined });
-    setDescription("");
-    setTitle("");
-    setPosting(false);
+    await createPost(userId, postData);
     navigation.navigate("Me");
+    resetStates();
   };
 
   const menuBar = (
@@ -182,7 +180,12 @@ const CreatePost = ({ navigation, route }: any) => {
             <Text style={styles.postButtonText}>Post</Text>
           </TouchableOpacity>
         </View>
-        {photoURI && <ImagePreviewDOM photoURI={photoURI} />}
+        {photoArray.length > 0 && (
+          <ImagePreviewCarousel
+            photoArray={photoArray}
+            setPhotoArray={setPhotoArray}
+          />
+        )}
 
         <View style={styles.titleInputContainer}>
           <TextInput
@@ -282,29 +285,6 @@ const styles = StyleSheet.create({
     width: width * 0.95,
     borderBottomWidth: 0.6,
     borderColor: ThemeColoursPrimary.SecondaryColour + "50",
-  },
-  imagePreviewContainer: {
-    marginTop: 20,
-    marginBottom: 20,
-    alignSelf: "flex-start",
-    marginHorizontal: 10,
-    flexDirection: "row",
-  },
-  imageView: {
-    width: 140,
-    height: 140,
-    borderRadius: 10,
-    marginRight: 6,
-  },
-  addImageContainer: {
-    width: 140,
-    height: 140,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: ThemeColoursPrimary.SecondaryColour,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: ThemeColoursPrimary.PrimaryColour,
   },
   menuBarContainer: {
     flexDirection: "row",
