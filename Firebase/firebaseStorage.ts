@@ -1,4 +1,9 @@
-import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
+import {
+  getDownloadURL,
+  getStorage,
+  ref,
+  uploadBytesResumable,
+} from "firebase/storage";
 import app from "./FirebaseApp";
 import { FireStorageFolder } from "../Constants/dbReference";
 import { convertPhUriToFileUri } from "../Util/utility";
@@ -23,7 +28,7 @@ export const uploadImages = async (uriArray: Array<string>) => {
       const blob = await response.blob();
       const storageRef = ref(storage, `posts/${fileName}`);
       try {
-        const snapshot = await uploadBytes(storageRef, blob);
+        const snapshot = await uploadBytesResumable(storageRef, blob);
         const downloadUrl = await getDownloadURL(snapshot.ref);
         downloadUrls.push(downloadUrl); // Add successful download URL to the array
       } catch (error) {
@@ -47,7 +52,7 @@ export const uploadProfilePicture = async (userId: string, uri: string) => {
   );
 
   try {
-    const snapshot = await uploadBytes(storageRef, blob);
+    const snapshot = await uploadBytesResumable(storageRef, blob);
     const downloadUrl = await getDownloadURL(snapshot.ref);
     return downloadUrl;
   } catch (error) {
