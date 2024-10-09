@@ -42,7 +42,7 @@ const CreatePost = ({ navigation, route }: any) => {
   const [isComment, setIsComment] = useState<boolean>(false);
   const [isLocation, setIsLocation] = useState<boolean>(false);
   const [isPrivate, setIsPrivate] = useState<boolean>(false);
-  const [coordinates, setCoordinates] = useState<any>();
+  const [coordinates, setCoordinates] = useState<any>({});
   const [photoArray, setPhotoArray] = useState<Array<string>>([]);
 
   const goBack = () => {
