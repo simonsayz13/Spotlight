@@ -47,8 +47,8 @@ const Profile = ({ navigation, route }: any) => {
   const [profilePicUrl, setProfilePicUrl] = useState("");
   const [bio, setBio] = useState("");
   const [gender, setGender] = useState("");
-  const [followers, setFollowers] = useState(null);
-  const [followings, setfollowings] = useState(null);
+  const [followers, setFollowers] = useState([]);
+  const [followings, setfollowings] = useState([]);
   const [isFollowed, setIsFollowed] = useState(false);
   const [ldgUserDetails, setLdgUserDetails] = useState(false);
   const [ldgSuccUserDetails, setLdgSuccUserDetails] = useState(false);
@@ -120,7 +120,7 @@ const Profile = ({ navigation, route }: any) => {
         setProfileUserId(user_id);
 
         guestView &&
-          followers.find((follower) => follower.user_id === appUserID) &&
+          followers?.find((follower) => follower.user_id === appUserID) &&
           setIsFollowed(true);
 
         setLdgUserDetails(false);
@@ -169,7 +169,7 @@ const Profile = ({ navigation, route }: any) => {
     try {
       await addFollower(profileUserId, appUserID);
       setIsFollowed(true);
-      setFollowers([...followers, { user_id: appUserID }]);
+      setFollowers([...followers, appUserID]);
     } catch (error) {
       Alert.alert("Error", `${error}`);
     }
@@ -180,8 +180,8 @@ const Profile = ({ navigation, route }: any) => {
       await removeFollower(profileUserId, appUserID);
       setIsFollowed(false);
 
-      const arr = followers.filter(
-        (follower) => follower.user_id !== appUserID
+      const arr = followers?.filter(
+        (followerUserId) => followerUserId !== appUserID
       );
       setFollowers(arr);
     } catch (error) {
