@@ -20,7 +20,7 @@ const PostCard = ({ postData, openPost, self }: any) => {
     (state: RootState) => state.user
   );
   const { title, user_id: userId, likes, id: postId } = postData;
-  const imageUrl = postData.media[0].media_url;
+  const imageUrl = postData.media[0]?.media_url;
 
   //@ts-ignore
   const liked = userLiked.includes(postId);
