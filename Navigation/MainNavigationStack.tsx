@@ -12,6 +12,7 @@ import Post from "../Screens/Home/Post";
 import Chat from "../Screens/Messages/Chat";
 import PhotoBrowser from "../Screens/Misc/PhotoBrowser";
 import {
+  CardStyleInterpolators,
   TransitionPresets,
   createStackNavigator,
 } from "@react-navigation/stack";
@@ -23,7 +24,16 @@ const MainStack = createStackNavigator();
 const MainNavigationStack = () => (
   <MainStack.Navigator screenOptions={{ headerShown: false }}>
     <MainStack.Screen name={"MainTab"} component={TabNavigation} />
-    <MainStack.Screen name={HomeStackScreens.Post} component={Post} />
+    <MainStack.Screen
+      name={HomeStackScreens.Post}
+      component={Post}
+      options={({ route }: any) => ({
+        cardStyleInterpolator:
+          route.params?.customAnimation === true
+            ? CardStyleInterpolators.forVerticalIOS
+            : CardStyleInterpolators.forHorizontalIOS,
+      })}
+    />
     <MainStack.Screen name={MessagingStackScreens.Chat} component={Chat} />
     <MainStack.Screen
       name={MiscStackScreens.PhotoBrowser}
