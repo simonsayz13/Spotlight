@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   Dimensions,
   StyleSheet,
@@ -16,15 +16,15 @@ const MAX_HEIGHT = 500; // Define the maximum height for images
 const ImageCarousel = ({ images }: any) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showIndicator, setShowIndicator] = useState(false);
-  const indicatorOpacity = new Animated.Value(0.4); // Create an Animated value for opacity
-  let hideTimeout: any = null;
+  const indicatorOpacity = useRef(new Animated.Value(0)).current; // Create a ref for opacity
+  const hideTimeout = useRef<any>(null); // Use a ref to hold the timeout ID
 
   const handleScroll = (event: any) => {
     // Show the indicator when scrolling starts
     setShowIndicator(true);
     Animated.timing(indicatorOpacity, {
       toValue: 0.4,
-      duration: 400,
+      duration: 1,
       useNativeDriver: true,
     }).start();
 
@@ -32,16 +32,16 @@ const ImageCarousel = ({ images }: any) => {
     const index = Math.round(event.nativeEvent.contentOffset.x / windowWidth);
     setCurrentIndex(index);
 
-    // Clear previous timeout and set a new one to hide the indicator
-    if (hideTimeout) {
-      clearTimeout(hideTimeout);
+    // Clear previous timeout
+    if (hideTimeout.current) {
+      clearTimeout(hideTimeout.current);
     }
 
     // Set timeout to hide the indicator after 3 seconds of inactivity
-    hideTimeout = setTimeout(() => {
+    hideTimeout.current = setTimeout(() => {
       Animated.timing(indicatorOpacity, {
         toValue: 0, // Fade out
-        duration: 500,
+        duration: 300,
         useNativeDriver: true,
       }).start(() => {
         setShowIndicator(false); // Hide after animation completes
@@ -52,7 +52,7 @@ const ImageCarousel = ({ images }: any) => {
   useEffect(() => {
     return () => {
       // Cleanup: Clear timeout on unmount to prevent memory leaks
-      if (hideTimeout) clearTimeout(hideTimeout);
+      if (hideTimeout.current) clearTimeout(hideTimeout.current);
     };
   }, []);
 
@@ -61,6 +61,7 @@ const ImageCarousel = ({ images }: any) => {
     const { width, height } = item;
     let calculatedHeight = (windowWidth / width) * height; // Calculate height based on aspect ratio
     let calculatedWidth = windowWidth;
+
     // If height exceeds max height, adjust the dimensions to fit within max height
     if (calculatedHeight > MAX_HEIGHT) {
       calculatedHeight = MAX_HEIGHT;
