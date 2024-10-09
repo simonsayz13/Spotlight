@@ -10,17 +10,21 @@ export const getLocationPermission = async () => {
   return "OK";
 };
 
-export const getLocation = async (setCoordinates?: SetStateAction<any>) => {
+export const getLocation = async (
+  setCoordinates?: SetStateAction<any>
+): Promise<any> => {
   try {
     const currentLocation = await Location.getCurrentPositionAsync({
       accuracy: Location.Accuracy.Low,
     });
-    if (currentLocation) {
-      setCoordinates({
-        longitude: currentLocation.coords.longitude,
-        latitude: currentLocation.coords.latitude,
-      });
+    const coordinates = {
+      latitude: currentLocation?.coords?.latitude,
+      longitude: currentLocation?.coords?.longitude,
+    };
+    if (setCoordinates) {
+      setCoordinates(coordinates);
     }
+    return coordinates;
   } catch (error) {
     return "Error getting location coordinates";
   }

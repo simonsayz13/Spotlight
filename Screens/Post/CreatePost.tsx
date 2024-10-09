@@ -42,7 +42,7 @@ const CreatePost = ({ navigation, route }: any) => {
   const [isComment, setIsComment] = useState<boolean>(false);
   const [isLocation, setIsLocation] = useState<boolean>(false);
   const [isPrivate, setIsPrivate] = useState<boolean>(false);
-  const [coordinates, setCoordinates] = useState<any>({});
+
   const [photoArray, setPhotoArray] = useState<Array<string>>([]);
 
   const goBack = () => {
@@ -77,11 +77,14 @@ const CreatePost = ({ navigation, route }: any) => {
   };
 
   const post = async () => {
+    let coordinates = {};
     if (!userId) {
       return Alert.alert("Not Signed in", "Please sign in to make a post");
     }
     setPosting(true);
-    if (isLocation) await getLocation(setCoordinates);
+    if (isLocation) {
+      coordinates = await getLocation();
+    }
     const uploadedImageURLs = await uploadImages(photoArray);
     const media = await createMediaData(uploadedImageURLs);
     const postData = {
@@ -121,14 +124,13 @@ const CreatePost = ({ navigation, route }: any) => {
     setIsPrivate((previousState) => !previousState);
   const toggleCommentSwitch = () =>
     setIsComment((previousState) => !previousState);
+
   const toggleLocationSwitch = async () => {
     const locationServicePermission = await getLocationPermission();
-    console.log(locationServicePermission);
     if (locationServicePermission !== "OK") {
-      Alert.alert("Error", locationServicePermission);
-    } else {
-      setIsLocation((previousState) => !previousState);
+      return Alert.alert("Error", locationServicePermission);
     }
+    setIsLocation((previousState) => !previousState);
   };
 
   const options = (
