@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   Platform,
   SafeAreaView,
   Alert,
+  Animated,
 } from "react-native";
 import { useSelector } from "react-redux";
 import { RootState } from "../../Redux/store";
@@ -26,6 +27,8 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import {
   getUserDetails,
   getPostsByUserId,
+  addFollower,
+  removeFollower,
 } from "../../Firebase/firebaseFireStore";
 import { useFocusEffect } from "@react-navigation/native";
 import { Image } from "expo-image";
@@ -35,20 +38,43 @@ const Profile = ({ navigation, route }: any) => {
   const [buttonStates, setButtonStates] = useState(userContentSelectorButtons);
   const guestView = route?.params?.guestView;
   const opId = route?.params?.opId;
-  const {
-    userId,
-    userDisplayName,
-    userProfilePhotoURL,
-    userAge,
-    userBio,
-    userGender,
-    userLocation,
-  } = useSelector((state: RootState) => state.user);
+  const { userId: appUserID, userBio } = useSelector((state: RootState) => {
+    return state.user;
+  });
+  const [profileUserId, setProfileUserId] = useState(null);
   const [postsData, setPostsData] = useState<Array<any>>([]);
-  const [displayName, setDisplayName] = useState(userDisplayName);
-  const [profilePicUrl, setProfilePicUrl] = useState(userProfilePhotoURL);
-  const [bio, setBio] = useState(userBio);
-  const [gender, setGender] = useState(userGender);
+  const [displayName, setDisplayName] = useState("");
+  const [profilePicUrl, setProfilePicUrl] = useState("");
+  const [bio, setBio] = useState("");
+  const [gender, setGender] = useState("");
+  const [followers, setFollowers] = useState([]);
+  const [followings, setfollowings] = useState([]);
+  const [isFollowed, setIsFollowed] = useState(false);
+  const [ldgUserDetails, setLdgUserDetails] = useState(false);
+  const [ldgSuccUserDetails, setLdgSuccUserDetails] = useState(false);
+
+  let heightAnim = useRef(new Animated.Value(200)).current;
+
+  useEffect(() => {
+    if (ldgSuccUserDetails) {
+      Animated.timing(heightAnim, {
+        toValue: 250,
+        duration: 350,
+        useNativeDriver: false,
+      }).start();
+    }
+  }, [ldgSuccUserDetails]);
+
+  useEffect(() => {
+    if (ldgUserDetails) {
+      Animated.timing(heightAnim, {
+        toValue: 200,
+        duration: 350,
+        useNativeDriver: false,
+      }).start();
+    }
+  }, [ldgUserDetails]);
+
   useFocusEffect(
     useCallback(() => {
       // Define an async function within the callback
@@ -60,28 +86,47 @@ const Profile = ({ navigation, route }: any) => {
         }
       };
 
-      const id = guestView ? opId : userId;
+      const id = guestView ? opId : appUserID;
       fetchPosts(id).then((posts) => {
         setPostsData(posts!);
       });
 
-      if (guestView) {
-        const fetchUser = async () => {
-          try {
-            return await getUserDetails(opId);
-          } catch (error) {
-            Alert.alert("Error", `${error}`);
-          }
-        };
-        fetchUser().then((data: any) => {
-          const { profile_picture_url, display_name, biography, gender } = data;
-          setDisplayName(display_name);
-          setProfilePicUrl(profile_picture_url);
-          setBio(biography);
-          setGender(gender);
-        });
-      }
-    }, [userId]) // Include dependencies like userId if they change
+      const fetchUser = async () => {
+        setLdgUserDetails(true);
+        setLdgSuccUserDetails(false);
+        try {
+          return await getUserDetails(id);
+        } catch (error) {
+          setLdgUserDetails(false);
+          Alert.alert("Error", `${error}`);
+        }
+      };
+      fetchUser().then((data: any) => {
+        const {
+          user_id,
+          profile_picture_url,
+          display_name,
+          biography,
+          gender,
+          followers,
+          followings,
+        } = data;
+        setDisplayName(display_name);
+        setProfilePicUrl(profile_picture_url);
+        setBio(biography);
+        setGender(gender);
+        setFollowers(followers);
+        setfollowings(followings);
+        setProfileUserId(user_id);
+
+        guestView &&
+          followers?.find((follower) => follower.user_id === appUserID) &&
+          setIsFollowed(true);
+
+        setLdgUserDetails(false);
+        setLdgSuccUserDetails(true);
+      });
+    }, []) // Include dependencies like userId if they change
   );
 
   const handlePress = (id: number) => {
@@ -119,88 +164,139 @@ const Profile = ({ navigation, route }: any) => {
       profilePicUrl,
     });
   };
+
+  const handlePressFollowBtn = async () => {
+    try {
+      await addFollower(profileUserId, appUserID);
+      setIsFollowed(true);
+      setFollowers([...followers, appUserID]);
+    } catch (error) {
+      Alert.alert("Error", `${error}`);
+    }
+  };
+
+  const handlePressUnfollowBtn = async () => {
+    try {
+      await removeFollower(profileUserId, appUserID);
+      setIsFollowed(false);
+
+      const arr = followers?.filter(
+        (followerUserId) => followerUserId !== appUserID
+      );
+      setFollowers(arr);
+    } catch (error) {
+      Alert.alert("Error", `${error}`);
+    }
+  };
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.profileDetails}>
-        {profilePicUrl ? (
-          <Image source={{ uri: profilePicUrl }} style={styles.image} />
-        ) : (
-          <FontAwesome6 name="circle-user" size={70} color="black" />
-        )}
-        <View
-          style={{
-            flexDirection: "row",
-            gap: 4,
-            alignItems: "center",
-            marginBottom: 2,
-          }}
-        >
-          <Text style={styles.userNameFont}>{displayName}</Text>
-          {gender === Gender.Male && (
-            <Ionicons name="male" size={20} color="#4bb9f3" />
-          )}
-          {gender === Gender.Female && (
-            <Ionicons name="female" size={20} color="#f268df" />
-          )}
-        </View>
-        <Text style={styles.metaDataFont}>IP Address: United Kingdom</Text>
-      </View>
-      <View style={styles.description}>
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <Text style={styles.descriptionTitle}>Bio</Text>
-          {guestView ? (
-            <TouchableOpacity onPressIn={openChat}>
-              <FontAwesome6
-                name="envelope"
-                size={24}
-                color={ThemeColoursPrimary.SecondaryColour}
-              />
-            </TouchableOpacity>
+      <Animated.View
+        style={([styles.profileContainer], { height: heightAnim })}
+      >
+        <View style={styles.profileDetails}>
+          {!ldgUserDetails && profilePicUrl ? (
+            <Image source={{ uri: profilePicUrl }} style={styles.image} />
           ) : (
-            <TouchableOpacity onPress={handleEdit}>
-              <AntDesign
-                name="edit"
-                size={24}
-                color={ThemeColoursPrimary.SecondaryColour}
-              />
+            <FontAwesome6 name="circle-user" size={70} color="black" />
+          )}
+          <View
+            style={{
+              flexDirection: "row",
+              gap: 4,
+              alignItems: "center",
+              marginBottom: 2,
+            }}
+          >
+            <Text style={styles.userNameFont}>
+              {ldgUserDetails ? "-" : displayName}
+            </Text>
+            {!ldgUserDetails && gender === Gender.Male && (
+              <Ionicons name="male" size={20} color="#4bb9f3" />
+            )}
+            {!ldgUserDetails && gender === Gender.Female && (
+              <Ionicons name="female" size={20} color="#f268df" />
+            )}
+          </View>
+          <Text style={styles.metaDataFont}>IP Address: United Kingdom</Text>
+        </View>
+        <View style={styles.description}>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Text style={styles.descriptionTitle}>Bio</Text>
+            {guestView ? (
+              <TouchableOpacity onPressIn={openChat}>
+                <FontAwesome6
+                  name="envelope"
+                  size={24}
+                  color={ThemeColoursPrimary.SecondaryColour}
+                />
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity onPress={handleEdit}>
+                <AntDesign
+                  name="edit"
+                  size={24}
+                  color={ThemeColoursPrimary.SecondaryColour}
+                />
+              </TouchableOpacity>
+            )}
+          </View>
+          {!ldgUserDetails && (
+            <Text style={styles.descriptionText}>
+              {guestView
+                ? bio ?? "No bio available"
+                : userBio ?? "Add a bio in edit profile"}
+            </Text>
+          )}
+        </View>
+        <View style={styles.userStatsContainer}>
+          <View style={styles.statsView}>
+            <Text style={styles.statsCount}>
+              {ldgUserDetails ? "-" : followings?.length}
+            </Text>
+            <Text style={styles.statsFont}>Following</Text>
+          </View>
+          <View style={styles.statsView}>
+            <Text style={styles.statsCount}>
+              {ldgUserDetails ? "-" : followers?.length}
+            </Text>
+            <Text style={styles.statsFont}>Followers</Text>
+          </View>
+          <View style={styles.statsView}>
+            <Text style={styles.statsCount}>666</Text>
+            <Text style={styles.statsFont}>Likes & Favs</Text>
+          </View>
+          {guestView ? (
+            isFollowed ? (
+              <TouchableOpacity
+                style={styles.signOutButton}
+                onPress={handlePressUnfollowBtn}
+              >
+                <Text style={styles.buttonText}>Unfollow</Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                style={styles.signOutButton}
+                onPress={handlePressFollowBtn}
+              >
+                <Text style={styles.buttonText}>Follow</Text>
+              </TouchableOpacity>
+            )
+          ) : (
+            <TouchableOpacity
+              style={styles.signOutButton}
+              onPress={handleLogout}
+            >
+              <Text style={styles.buttonText}>Sign out</Text>
             </TouchableOpacity>
           )}
         </View>
-        <Text style={styles.descriptionText}>
-          {guestView
-            ? bio ?? "No bio available"
-            : userBio ?? "Add a bio in edit profile"}
-        </Text>
-      </View>
-      <View style={styles.userStatsContainer}>
-        <View style={styles.statsView}>
-          <Text style={styles.statsCount}>4</Text>
-          <Text style={styles.statsFont}>Following</Text>
-        </View>
-        <View style={styles.statsView}>
-          <Text style={styles.statsCount}>5</Text>
-          <Text style={styles.statsFont}>Followers</Text>
-        </View>
-        <View style={styles.statsView}>
-          <Text style={styles.statsCount}>666</Text>
-          <Text style={styles.statsFont}>Likes & Favs</Text>
-        </View>
-        {guestView ? (
-          <TouchableOpacity style={styles.signOutButton}>
-            <Text style={styles.buttonText}>Follow</Text>
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity style={styles.signOutButton} onPress={handleLogout}>
-            <Text style={styles.buttonText}>Sign out</Text>
-          </TouchableOpacity>
-        )}
-      </View>
+      </Animated.View>
       {/* Posts */}
       <View style={styles.userContentContainer}>
         <View style={styles.contentContainerSelectorBar}>
@@ -244,6 +340,7 @@ const styles = StyleSheet.create({
     backgroundColor: ThemeColoursPrimary.PrimaryColour,
     paddingTop: Platform.OS === "android" ? 8 : 0,
   },
+  profileContainer: {},
   profileDetails: {
     alignItems: "center",
     marginBottom: 10,

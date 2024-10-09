@@ -15,6 +15,7 @@ import {
   arrayUnion,
   addDoc,
   onSnapshot,
+  arrayRemove,
 } from "firebase/firestore";
 import app from "./FirebaseApp";
 import {
@@ -29,7 +30,7 @@ import { Alert } from "react-native";
 import store from "../Redux/store";
 import { addComment } from "../Redux/Slices/postsSlices";
 import { SetStateAction } from "react";
-import { sortConversationsByLastMessage } from "../Util/utility";
+import { delay, sortConversationsByLastMessage } from "../Util/utility";
 import { UserDetails } from "../type/Messenger";
 
 const db = getFirestore(app);
@@ -67,7 +68,38 @@ export const getUserDetails = async (userId: string) => {
   try {
     const userProfileCollection = doc(db, FireStoreCollections.Users, userId);
     const userDoc = await getDoc(userProfileCollection);
-    if (userDoc.exists()) return userDoc.data();
+    // if (userDoc.exists()) return userDoc.data();
+
+    if (userDoc.exists()) {
+      const { followers: followersRef, followings: followingsRef } =
+        userDoc.data();
+
+      let followers = [];
+      let followings = [];
+
+      //* Retrieve followers array
+      if (followersRef && followersRef.length > 0) {
+        // Retrieve all the users being followed
+        followers = await Promise.all(
+          followersRef.map(async (userRef) => {
+            const followerSnap = await getDoc(userRef);
+            return followerSnap.data().user_id;
+          })
+        );
+      }
+      //* Retrieve followings array
+      if (followingsRef && followingsRef.length > 0) {
+        // Retrieve all the users being followed
+        followings = await Promise.all(
+          followingsRef.map(async (userRef) => {
+            const followingSnap = await getDoc(userRef);
+            return followingSnap.data().user_id;
+          })
+        );
+      }
+
+      return { ...userDoc.data(), followers, followings };
+    }
   } catch (error) {
     Alert.alert("Error", "Error fetchhing user profile");
   }
@@ -399,6 +431,46 @@ export const searchUsers = async (searchQuery: string) => {
   });
 
   return users;
+};
+
+export const addFollower = async (userId: string, followerUserId: string) => {
+  try {
+    const userRef = doc(db, "users", userId); // Reference to user1
+    const followerUserRef = doc(db, "users", followerUserId); // Reference to user2
+
+    await updateDoc(userRef, {
+      followers: arrayUnion(followerUserRef), // Add reference to followers array
+    });
+
+    await updateDoc(followerUserRef, {
+      followings: arrayUnion(userRef), // Add reference to followings array
+    });
+
+    console.log("Followed successfully");
+  } catch (error) {
+    console.error("Error adding follower:", error);
+  }
+};
+
+export const removeFollower = async (
+  userId: string,
+  followerUserId: string
+) => {
+  try {
+    const userRef = doc(db, "users", userId); // Reference to user1
+    const followerUserRef = doc(db, "users", followerUserId); // Reference to user2
+
+    await updateDoc(userRef, {
+      followers: arrayRemove(followerUserRef), // Remove reference from followers array
+    });
+    await updateDoc(followerUserRef, {
+      followings: arrayRemove(userRef), // Add reference to followings array
+    });
+
+    console.log("Unfollowed successfully");
+  } catch (error) {
+    console.error("Error adding follower:", error);
+  }
 };
 
 export const getLocationPosts = async (setPosts: SetStateAction<any>) => {
