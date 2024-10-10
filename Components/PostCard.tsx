@@ -5,7 +5,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   Platform,
-  Image as RNImage,
 } from "react-native";
 
 import AntDesign from "@expo/vector-icons/AntDesign";
@@ -15,7 +14,7 @@ import { getUserDetails } from "../Firebase/firebaseFireStore";
 import { useSelector } from "react-redux";
 import { RootState } from "../Redux/store";
 
-const PostCard = ({ postData, openPost, self }: any) => {
+const PostCard = React.memo(({ postData, openPost, self }: any) => {
   const [displayName, setDisplayName] = useState("");
   const [imageHeight, setImageHeight] = useState(200); // Default height
   const { userDisplayName, userLiked } = useSelector(
@@ -41,8 +40,7 @@ const PostCard = ({ postData, openPost, self }: any) => {
 
   // Image load handler
   const onImageLoad = (event: any) => {
-    const { width, height } = event.nativeEvent.source;
-    // Calculate the height relative to a fixed width (48% of the container)
+    const { width, height } = event.source;
     const calculatedHeight = (height / width) * 150;
     setImageHeight(calculatedHeight);
   };
@@ -56,7 +54,7 @@ const PostCard = ({ postData, openPost, self }: any) => {
       }}
     >
       {imageUrl ? (
-        <RNImage
+        <Image
           style={[styles.image, { height: imageHeight }]} // Dynamic height
           source={{
             uri: imageUrl,
@@ -94,7 +92,7 @@ const PostCard = ({ postData, openPost, self }: any) => {
       </View>
     </TouchableOpacity>
   );
-};
+});
 
 const styles = StyleSheet.create({
   card: {
