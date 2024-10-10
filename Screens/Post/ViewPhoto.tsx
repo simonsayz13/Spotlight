@@ -29,20 +29,17 @@ const ViewPhoto = ({ navigation, route }: any) => {
   return (
     <View style={styles.container}>
       <StatusBar hidden />
+
       <View style={styles.imageContainer}>
-        <Image
-          source={{ uri: photoURI }}
-          style={styles.imageView}
-          contentFit="contain"
-        >
-          <TouchableOpacity style={styles.backButtonView} onPressIn={goBack}>
-            <Ionicons
-              name="chevron-back"
-              size={32}
-              color={ThemeColoursPrimary.PrimaryColour}
-            />
-          </TouchableOpacity>
-        </Image>
+        <Image source={{ uri: photoURI }} style={styles.imageView} />
+
+        <TouchableOpacity style={styles.backButtonView} onPressIn={goBack}>
+          <Ionicons
+            name="chevron-back"
+            size={32}
+            color={ThemeColoursPrimary.PrimaryColour}
+          />
+        </TouchableOpacity>
       </View>
 
       <View style={styles.bottomButtonsContainer}>
@@ -59,11 +56,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: ThemeColoursPrimary.SecondaryColour,
   },
-  topBarContainer: {
-    padding: 8,
-    flexDirection: "row",
-    alignItems: "center",
-  },
   imageContainer: {
     flex: 0.88,
     justifyContent: "center",
@@ -73,15 +65,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "flex-end",
-    bottom: 0,
-    width: windowWidth,
     paddingTop: 6,
     marginBottom: 28,
   },
   backButtonView: {
-    flexDirection: "row",
-    top: Platform.OS === "ios" ? 50 : 20,
-    left: 20,
+    position: "absolute", // Position over the image
+    top: Platform.OS === "ios" ? 50 : 20, // Adjust as necessary
+    left: 16,
     alignItems: "center",
     padding: 8,
   },

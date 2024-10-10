@@ -11,17 +11,12 @@ import {
 import Post from "../Screens/Home/Post";
 import Chat from "../Screens/Messages/Chat";
 import PhotoBrowser from "../Screens/Misc/PhotoBrowser";
-import {
-  CardStyleInterpolators,
-  TransitionPresets,
-  createStackNavigator,
-} from "@react-navigation/stack";
 import ImageCropScreen from "../Screens/Misc/ImageCropper";
 import { CreatePost } from "../Screens/Post/CreatePost";
 import Profile from "../Screens/Profile/Profile";
 import { Camera } from "../Screens/Post/Camera";
 import { ViewPhoto } from "../Screens/Post/ViewPhoto";
-const MainStack = createStackNavigator();
+const MainStack = createNativeStackNavigator();
 
 const MainNavigationStack = () => (
   <MainStack.Navigator screenOptions={{ headerShown: false }}>
@@ -30,10 +25,10 @@ const MainNavigationStack = () => (
       name={HomeStackScreens.Post}
       component={Post}
       options={({ route }: any) => ({
-        cardStyleInterpolator:
+        animation:
           route.params?.customAnimation === true
-            ? CardStyleInterpolators.forVerticalIOS
-            : CardStyleInterpolators.forHorizontalIOS,
+            ? "slide_from_bottom"
+            : "slide_from_right",
       })}
     />
     <MainStack.Screen name={MessagingStackScreens.Chat} component={Chat} />
@@ -41,8 +36,8 @@ const MainNavigationStack = () => (
       name={MiscStackScreens.PhotoBrowser}
       component={PhotoBrowser}
       options={{
-        gestureDirection: "vertical",
-        presentation: "modal",
+        presentation: "modal", // Equivalent to gestureDirection: 'vertical'
+        animation: "slide_from_bottom",
       }}
     />
     <MainStack.Screen
@@ -54,7 +49,7 @@ const MainNavigationStack = () => (
       name={PostStackScreens.CreatePost}
       component={CreatePost}
       options={{
-        cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS,
+        animation: "slide_from_bottom",
       }}
     />
     <MainStack.Screen name={PostStackScreens.Camera} component={Camera} />
