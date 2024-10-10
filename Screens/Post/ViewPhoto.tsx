@@ -47,7 +47,7 @@ const ViewPhoto = ({ navigation, route }: any) => {
 
       <View style={styles.bottomButtonsContainer}>
         <TouchableOpacity style={styles.submitButton} onPressIn={goNext}>
-          <Text style={styles.submitButtonText}>Confirm</Text>
+          <Text style={styles.submitButtonText}>Select</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -63,7 +63,6 @@ const styles = StyleSheet.create({
     padding: 8,
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "transparent",
   },
   imageContainer: {
     flex: 0.88,
@@ -86,27 +85,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 8,
   },
-  title: {
-    flex: 1,
-    textAlign: "center",
-    fontSize: 20,
-    fontWeight: "bold",
-    color: ThemeColoursPrimary.SecondaryColour,
-  },
-  placeholder: {
-    width: 32, // same width as the backButton to balance the layout
-  },
   imageView: {
-    width: windowWidth,
+    width: "100%",
     height: "100%",
   },
   submitButton: {
-    width: 78,
+    width: 68,
     backgroundColor: ThemeColoursPrimary.ThirdColour,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 8,
-    height: 38,
+    height: 36,
     marginRight: 20,
   },
   submitButtonText: {

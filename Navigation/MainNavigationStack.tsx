@@ -19,6 +19,8 @@ import {
 import ImageCropScreen from "../Screens/Misc/ImageCropper";
 import { CreatePost } from "../Screens/Post/CreatePost";
 import Profile from "../Screens/Profile/Profile";
+import { Camera } from "../Screens/Post/Camera";
+import { ViewPhoto } from "../Screens/Post/ViewPhoto";
 const MainStack = createStackNavigator();
 
 const MainNavigationStack = () => (
@@ -48,6 +50,15 @@ const MainNavigationStack = () => (
       component={ImageCropScreen}
     />
     <MainStack.Screen name={ProfileStackScreens.Profile} component={Profile} />
+    <MainStack.Screen
+      name={PostStackScreens.CreatePost}
+      component={CreatePost}
+      options={{
+        cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS,
+      }}
+    />
+    <MainStack.Screen name={PostStackScreens.Camera} component={Camera} />
+    <MainStack.Screen name={PostStackScreens.ViewPhoto} component={ViewPhoto} />
   </MainStack.Navigator>
 );
 
