@@ -1,14 +1,14 @@
 import {
   Button,
+  Dimensions,
   Platform,
-  SafeAreaView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
 import { CameraView as ExpoCamera, useCameraPermissions } from "expo-camera";
-import { CameraType } from "expo-camera/legacy";
+import { CameraType, FlashMode } from "expo-camera/legacy";
 import { useRef, useState } from "react";
 import React from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -17,8 +17,11 @@ import {
   ThemeColours,
   ThemeColoursPrimary,
 } from "../../Constants/UI";
+import { StatusBar } from "expo-status-bar";
+const { width: windowWidth, height: windowHeight } = Dimensions.get("window");
 const Camera = ({ navigation }: any) => {
   const [facing, setFacing] = useState<CameraType>(CameraType.back);
+  const [flash, setFlash] = useState<FlashMode>(FlashMode.off);
   const [permission, requestPermission] = useCameraPermissions();
   const [isCameraReady, setIsCameraReady] = useState(false);
   const cameraRef = useRef<ExpoCamera>(null);
@@ -53,12 +56,16 @@ const Camera = ({ navigation }: any) => {
       current === CameraType.front ? CameraType.back : CameraType.front
     );
   };
+  const toggleFlash = () => {
+    setFlash((current) =>
+      current === FlashMode.off ? FlashMode.on : FlashMode.off
+    );
+  };
 
   const toggleCapture = async () => {
     if (cameraRef.current && isCameraReady) {
       try {
         const photo = await cameraRef.current.takePictureAsync();
-        console.log("Picture taken:", photo?.uri);
         navigation.navigate(PostStackScreens.ViewPhoto, {
           photoURI: photo?.uri,
         });
@@ -70,40 +77,51 @@ const Camera = ({ navigation }: any) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ExpoCamera
-        ref={cameraRef}
-        style={styles.camera}
-        facing={facing}
-        onCameraReady={onCameraReady}
-      >
-        <View style={styles.topButtonsContainer}>
-          <TouchableOpacity onPress={handleBackButton}>
-            <Ionicons
-              name="chevron-back"
-              size={32}
-              color={ThemeColours.SecondaryColour}
-            />
-          </TouchableOpacity>
-          <View>
-            <TouchableOpacity onPress={toggleCameraFacing}>
+    <View style={styles.container}>
+      <StatusBar hidden />
+      <View style={styles.cameraContainer}>
+        <ExpoCamera
+          ref={cameraRef}
+          style={styles.camera}
+          facing={facing}
+          onCameraReady={onCameraReady}
+          //@ts-ignore
+          flash={flash}
+        >
+          <View style={styles.topButtonsContainer}>
+            <TouchableOpacity onPress={handleBackButton}>
               <Ionicons
-                name="camera-reverse-outline"
+                name="close"
                 size={32}
-                color={ThemeColours.SecondaryColour}
+                color={ThemeColoursPrimary.PrimaryColour}
               />
             </TouchableOpacity>
+            <View></View>
           </View>
+        </ExpoCamera>
+      </View>
+      <View style={styles.bottomButtonsContainer}>
+        <TouchableOpacity onPress={toggleFlash}>
+          <Ionicons
+            name={flash === FlashMode.off ? "flash-off" : "flash"}
+            size={28}
+            color={ThemeColoursPrimary.PrimaryColour}
+          />
+        </TouchableOpacity>
+        <View style={styles.captureRing}>
+          <TouchableOpacity onPress={toggleCapture}>
+            <View style={styles.captureButton} />
+          </TouchableOpacity>
         </View>
-        <View style={styles.bottomButtonsContainer}>
-          <View style={styles.captureRing}>
-            <TouchableOpacity onPress={toggleCapture}>
-              <View style={styles.captureButton} />
-            </TouchableOpacity>
-          </View>
-        </View>
-      </ExpoCamera>
-    </SafeAreaView>
+        <TouchableOpacity onPress={toggleCameraFacing}>
+          <Ionicons
+            name="camera-reverse-outline"
+            size={32}
+            color={ThemeColoursPrimary.PrimaryColour}
+          />
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 };
 
@@ -112,29 +130,33 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: ThemeColoursPrimary.SecondaryColour,
   },
-  message: {
-    textAlign: "center",
-    paddingBottom: 10,
+  cameraContainer: {
+    flex: 0.88, // Set 80% height for the camera
+    justifyContent: "center",
   },
   camera: {
     flex: 1,
   },
+  message: {
+    textAlign: "center",
+    paddingBottom: 10,
+  },
   topButtonsContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    top: Platform.OS === "ios" ? 50 : 20,
+    left: 20,
     alignItems: "center",
     padding: 8,
-    backgroundColor: ThemeColoursPrimary.SecondaryColour,
   },
   bottomButtonsContainer: {
-    flex: 1,
+    flex: 0.12,
+    flexDirection: "row",
     alignItems: "center",
-    position: "absolute",
-    height: 100,
     justifyContent: "center",
     bottom: 0,
-    width: "100%",
-    backgroundColor: ThemeColoursPrimary.SecondaryColour,
+    width: windowWidth,
+    paddingTop: 6,
+    marginBottom: 28,
   },
   text: {
     fontSize: 24,
@@ -149,6 +171,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderColor: ThemeColours.SecondaryColour,
+    marginHorizontal: 90,
   },
   captureButton: {
     height: 60,
