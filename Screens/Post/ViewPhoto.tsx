@@ -3,12 +3,16 @@ import {
   StyleSheet,
   View,
   Text,
-  Image,
-  SafeAreaView,
   TouchableOpacity,
+  Dimensions,
+  Platform,
 } from "react-native";
 import { PostStackScreens, ThemeColoursPrimary } from "../../Constants/UI";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { Image } from "expo-image";
+import { StatusBar } from "expo-status-bar";
+
+const { width: windowWidth, height: windowHeight } = Dimensions.get("window");
 const ViewPhoto = ({ navigation, route }: any) => {
   const { photoURI } = route.params;
 
@@ -23,58 +27,71 @@ const ViewPhoto = ({ navigation, route }: any) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.topBarContainer}>
-        <TouchableOpacity onPressIn={goBack} style={styles.button}>
+    <View style={styles.container}>
+      <StatusBar hidden />
+
+      <View style={styles.imageContainer}>
+        <Image source={{ uri: photoURI }} style={styles.imageView} />
+
+        <TouchableOpacity style={styles.backButtonView} onPressIn={goBack}>
           <Ionicons
             name="chevron-back"
             size={32}
-            color={ThemeColoursPrimary.SecondaryColour}
-          />
-        </TouchableOpacity>
-        <Text style={styles.title}>Photo View</Text>
-        <TouchableOpacity onPressIn={goNext} style={styles.button}>
-          <Ionicons
-            name="chevron-forward"
-            size={32}
-            color={ThemeColoursPrimary.SecondaryColour}
+            color={ThemeColoursPrimary.PrimaryColour}
           />
         </TouchableOpacity>
       </View>
-      <Image source={{ uri: photoURI }} style={styles.imageView} />
-    </SafeAreaView>
+
+      <View style={styles.bottomButtonsContainer}>
+        <TouchableOpacity style={styles.submitButton} onPressIn={goNext}>
+          <Text style={styles.submitButtonText}>Select</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: ThemeColoursPrimary.PrimaryColour,
+    backgroundColor: ThemeColoursPrimary.SecondaryColour,
   },
-  topBarContainer: {
-    padding: 8,
+  imageContainer: {
+    flex: 0.88,
+    justifyContent: "center",
+  },
+  bottomButtonsContainer: {
+    flex: 0.12,
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: ThemeColoursPrimary.PrimaryColour,
+    justifyContent: "flex-end",
+    paddingTop: 6,
+    marginBottom: 28,
   },
-  button: {
-    width: 32, // same width as the icon
-  },
-  title: {
-    flex: 1,
-    textAlign: "center",
-    fontSize: 20,
-    fontWeight: "bold",
-    color: ThemeColoursPrimary.SecondaryColour,
-  },
-  placeholder: {
-    width: 32, // same width as the backButton to balance the layout
+  backButtonView: {
+    position: "absolute", // Position over the image
+    top: Platform.OS === "ios" ? 50 : 20, // Adjust as necessary
+    left: 16,
+    alignItems: "center",
+    padding: 8,
   },
   imageView: {
     width: "100%",
     height: "100%",
+  },
+  submitButton: {
+    width: 68,
+    backgroundColor: ThemeColoursPrimary.ThirdColour,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 8,
+    height: 36,
+    marginRight: 20,
+  },
+  submitButtonText: {
+    fontSize: 17,
+    fontWeight: "bold",
+    color: ThemeColoursPrimary.PrimaryColour,
   },
 });
 
