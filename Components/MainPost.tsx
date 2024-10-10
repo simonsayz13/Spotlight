@@ -8,7 +8,7 @@ import { useSelector } from "react-redux";
 import { selectCommentsByPostId } from "../Redux/Selectors/postSelector";
 
 const { width: windowWidth } = Dimensions.get("window");
-const MAX_HEIGHT = 500; // Define the maximum height for images
+const MAX_HEIGHT = 550; // Define the maximum height for images
 
 const MainPost = ({ postData, navigation }: any) => {
   const { title, description, timeStamp, id: postId } = postData;
@@ -109,11 +109,9 @@ const styles = StyleSheet.create({
     width: "100%",
     justifyContent: "center",
     alignItems: "center",
-    // backgroundColor: "#e1e4e8",
   },
   image: {
     width: "100%",
-    height: undefined,
   },
   postTitleContainer: {
     marginVertical: 8,
