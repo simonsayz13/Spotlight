@@ -1,11 +1,9 @@
 import React from "react";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import TabNavigation from "./TabNavigation";
 import {
   HomeStackScreens,
   MessagingStackScreens,
   MiscStackScreens,
-  PostStackScreens,
   ProfileStackScreens,
 } from "../Constants/UI";
 import Post from "../Screens/Home/Post";
@@ -13,11 +11,9 @@ import Chat from "../Screens/Messages/Chat";
 import PhotoBrowser from "../Screens/Misc/PhotoBrowser";
 import {
   CardStyleInterpolators,
-  TransitionPresets,
   createStackNavigator,
 } from "@react-navigation/stack";
 import ImageCropScreen from "../Screens/Misc/ImageCropper";
-import { CreatePost } from "../Screens/Post/CreatePost";
 import Profile from "../Screens/Profile/Profile";
 const MainStack = createStackNavigator();
 
