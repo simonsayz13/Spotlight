@@ -13,13 +13,11 @@ import {
   Timestamp,
   deleteDoc,
   arrayUnion,
-  addDoc,
   onSnapshot,
   arrayRemove,
 } from "firebase/firestore";
 import app from "./FirebaseApp";
 import {
-  FireStorageFolder,
   FireStoreAction,
   FireStoreCollections,
   FireStorePostField,
@@ -30,7 +28,7 @@ import { Alert } from "react-native";
 import store from "../Redux/store";
 import { addComment } from "../Redux/Slices/postsSlices";
 import { SetStateAction } from "react";
-import { delay, sortConversationsByLastMessage } from "../Util/utility";
+import { sortConversationsByLastMessage } from "../Util/utility";
 import { UserDetails } from "../type/Messenger";
 
 const db = getFirestore(app);

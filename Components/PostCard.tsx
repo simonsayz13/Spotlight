@@ -19,7 +19,14 @@ const PostCard = ({ postData, openPost, self }: any) => {
   const { userDisplayName, userLiked } = useSelector(
     (state: RootState) => state.user
   );
-  const { title, user_id: userId, likes, id: postId } = postData;
+  const {
+    title,
+    user_id: userId,
+    likes,
+    id: postId,
+    userProfilePic,
+  } = postData;
+
   const imageUrl = postData.media[0]?.media_url;
 
   //@ts-ignore
@@ -62,7 +69,13 @@ const PostCard = ({ postData, openPost, self }: any) => {
 
       <View style={styles.content}>
         <Text style={styles.title}>{title}</Text>
-        <View style={styles.userLikes}>
+        <View style={styles.cardDetails}>
+          <Image
+            source={{
+              uri: userProfilePic,
+            }}
+            style={styles.profilePicture}
+          />
           <Text style={styles.userFont}>
             {self ? userDisplayName : displayName}
           </Text>
@@ -121,16 +134,23 @@ const styles = StyleSheet.create({
     color: ThemeColoursPrimary.SecondaryColour,
     opacity: 0.7,
   },
-  userLikes: {
+  cardDetails: {
     flex: 1,
     flexDirection: "row",
-    justifyContent: "space-between",
+    alignItems: "center",
   },
   likes: {
+    marginLeft: "auto",
     flexDirection: "row",
     alignItems: "center",
     gap: 1.6,
     opacity: 0.7,
+  },
+  profilePicture: {
+    width: 18,
+    height: 18,
+    borderRadius: 20,
+    marginRight: 4,
   },
 });
 

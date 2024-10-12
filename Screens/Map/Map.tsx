@@ -11,11 +11,10 @@ import {
   TouchableOpacity,
   Alert,
   Dimensions,
-  Text,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MapView, { Marker } from "react-native-maps";
-import { ThemeColoursPrimary } from "../../Constants/UI";
+import { HomeStackScreens, ThemeColoursPrimary } from "../../Constants/UI";
 import { getLocation, getLocationPermission } from "../../Util/LocationService";
 import ActivityLoader from "../../Components/ActivityLoader";
 import {
@@ -27,7 +26,6 @@ import MapPostContent from "../../Components/MapPostContent";
 const { width: windowWidth, height: windowHeight } = Dimensions.get("window");
 
 const Map = ({ navigation }: any) => {
-  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const [selectedPost, setSelectedPost] = useState<any>(null);
   const [currentCoordinate, setCurrentCoordinate] = useState<any>(null);
   const [gotLocation, setGotLocation] = useState(false);
@@ -35,7 +33,6 @@ const Map = ({ navigation }: any) => {
   const slideAnim = useRef(new Animated.Value(300)).current;
   const [mapRegion, setMapRegion] = useState<any>(null);
   const mapRef = useRef<MapView>(null);
-
   const initialise = async () => {
     const permission = await getLocationPermission();
     if (permission !== "OK") {
@@ -45,8 +42,7 @@ const Map = ({ navigation }: any) => {
     await getLocation(setCurrentCoordinate);
     const fetchedPosts = await getLocationPosts(); // Assuming this returns an array of posts
     const postsWithUserDetails = await Promise.all(
-      fetchedPosts.map(async (post) => {
-        //@ts-ignore
+      fetchedPosts.map(async (post: any) => {
         const userDetails = await getUserDetails(post.postData.user_id); // Assuming user_id is available in post
         return {
           ...post.postData,
@@ -80,35 +76,13 @@ const Map = ({ navigation }: any) => {
       onPanResponderRelease: (_, gestureState) => {
         const { dy, vy } = gestureState;
         if (dy > 100 || vy > 1) {
-          // Close the modal if dragged down significantly
           hideModal();
         } else {
-          // Otherwise, return to the top position
           showModal();
         }
       },
     })
   ).current;
-
-  const handleMarkerPress = (post: any) => {
-    setSelectedPost(post);
-    setIsModalVisible(true);
-    const { latitude, longitude } = post.coordinates;
-    centreMap(latitude, longitude);
-  };
-
-  const centreMap = (latitude: number, longitude: number) => {
-    if (mapRef.current) {
-      mapRef.current.animateCamera(
-        {
-          center: { latitude, longitude },
-          altitude: 1000, // Zoom level for Apple map
-          zoom: 7, // Adjust zoom level as needed for Google map
-        },
-        { duration: 800 }
-      );
-    }
-  };
 
   const showModal = () => {
     Animated.spring(slideAnim, {
@@ -121,15 +95,28 @@ const Map = ({ navigation }: any) => {
     Animated.spring(slideAnim, {
       toValue: 300, // Offscreen position
       useNativeDriver: true,
-    }).start(() => {
-      setIsModalVisible(false); // Hide modal after animation
-    });
+    }).start();
   };
-  useEffect(() => {
-    if (isModalVisible) {
-      showModal();
+
+  const handleMarkerPress = (post: any) => {
+    showModal();
+    setSelectedPost(post);
+    const { latitude, longitude } = post.coordinates;
+    centreMap(latitude, longitude);
+  };
+
+  const centreMap = (latitude: number, longitude: number) => {
+    if (mapRef.current) {
+      mapRef.current.animateCamera(
+        {
+          center: { latitude, longitude },
+          altitude: 1200, // Zoom level for Apple map
+          zoom: 7, // Adjust zoom level as needed for Google map
+        },
+        { duration: 800 }
+      );
     }
-  }, [isModalVisible]);
+  };
 
   const centerMapToCurrentLocation = async () => {
     await getLocation(setCurrentCoordinate);
@@ -139,6 +126,7 @@ const Map = ({ navigation }: any) => {
       centreMap(latitude, longitude);
     }
   };
+
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
@@ -205,26 +193,22 @@ const Map = ({ navigation }: any) => {
             <Ionicons name="locate" size={24} color="black" />
           </TouchableOpacity>
         )}
-        {isModalVisible && (
-          <Animated.View
-            style={[
-              styles.modalContainer,
-              { transform: [{ translateY: slideAnim }] },
-            ]}
-            {...modalPanResponder.panHandlers}
-          >
-            <View style={styles.panIndicator} />
-            <View style={styles.modalContent}>
-              {selectedPost && (
-                <MapPostContent
-                  postData={selectedPost}
-                  navigation={navigation}
-                  hideModal={hideModal}
-                />
-              )}
-            </View>
-          </Animated.View>
-        )}
+        <Animated.View
+          style={[
+            styles.modalContainer,
+            { transform: [{ translateY: slideAnim }] },
+          ]}
+          {...modalPanResponder.panHandlers}
+        >
+          <View style={styles.panIndicator} />
+          {selectedPost && (
+            <MapPostContent
+              postData={selectedPost}
+              navigation={navigation}
+              hideModal={hideModal}
+            />
+          )}
+        </Animated.View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -287,7 +271,6 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     height: windowHeight * 0.22,
   },
-  modalContent: {},
   locateButton: {
     position: "absolute",
     top: 70,
