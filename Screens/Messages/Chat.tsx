@@ -10,9 +10,10 @@ import {
   TouchableOpacity,
   Platform,
   Dimensions,
+  FlatList,
 } from "react-native";
 import { Image } from "expo-image";
-import { ThemeColoursPrimary } from "../../Constants/UI";
+import { ProfileStackScreens, ThemeColoursPrimary } from "../../Constants/UI";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../Redux/store";
@@ -20,21 +21,19 @@ import {
   createOrGetChatRoom,
   messageListener,
   sendMessage,
-} from "../../Firebase/firebaseFireStore";
-import { formatRelativeTime } from "../../Util/utility";
+} from "../../Firebase/FirebaseChat";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useIsFocused } from "@react-navigation/native"; // Hook for detecting focus
 import { selectMessagesByChatRoomId } from "../../Redux/Selectors/messagesSelector";
-
-const { width: windowWidth } = Dimensions.get("window");
+import Message from "../../Components/Message";
 
 const Chat = ({ route, navigation }: any) => {
-  const { userId: currentUserId, userProfilePhotoURL } = useSelector(
+  const { userId: currentUserId } = useSelector(
     (state: RootState) => state.user
   );
-  const { userId, userName, profilePicUrl } = route.params;
-  const scrollViewRef = useRef<ScrollView>(null);
-  const [chatRoomId, setChatRoomId] = useState("");
+  const { userId, userName, profilePicUrl, conversationId } = route.params;
+  const FlatListRef = useRef<FlatList>(null);
+  const [chatRoomId, setChatRoomId] = useState(conversationId);
   const [message, setMessage] = useState<string>("");
   const [inputHeight, setInputHeight] = useState(40);
   const textInputRef = useRef<TextInput>(null);
@@ -65,24 +64,33 @@ const Chat = ({ route, navigation }: any) => {
     return () => {
       unsubscribe(); // Unsubscribe from Firestore listener
     };
-  }, [chatRoomId]);
+  }, [chatRoomId, dispatch]);
 
   const handleSendMessage = async () => {
-    setMessage("");
-    setInputHeight(32);
-    await sendMessage(chatRoomId, currentUserId!, message, dispatch);
-    if (textInputRef.current) {
-      textInputRef.current.clear();
+    if (message) {
+      setMessage("");
+      setInputHeight(40);
+      await sendMessage(chatRoomId, currentUserId!, message);
+      if (textInputRef.current) {
+        textInputRef.current.clear();
+      }
     }
   };
 
-  const scrollToBottom = () => {
-    scrollViewRef.current?.scrollToEnd({ animated: true });
+  const scrollToBottom = (animated: boolean) => {
+    FlatListRef.current?.scrollToEnd({ animated });
   };
 
   const handleContentSizeChange = (event: any) => {
     const { height } = event.nativeEvent.contentSize;
     setInputHeight(Math.min(Math.max(40, height + 20), 120)); // Min height 40, Max height 120
+  };
+
+  const goToProfile = () => {
+    navigation.navigate(ProfileStackScreens.Profile, {
+      guestView: true,
+      opId: userId,
+    });
   };
 
   return (
@@ -99,88 +107,43 @@ const Chat = ({ route, navigation }: any) => {
               color={ThemeColoursPrimary.SecondaryColour}
             />
           </TouchableOpacity>
-          <Image
-            source={
-              profilePicUrl
-                ? { uri: profilePicUrl }
-                : require("../../assets/test_image/mock_profile_picture.png")
-            }
-            style={styles.profileImage}
-          />
-
-          <View style={styles.usernameActivityContainer}>
-            <Text style={styles.userNameText}>{userName}</Text>
-            <Text style={styles.activityStatusText}>Active Today</Text>
-          </View>
+          <TouchableOpacity
+            onPressIn={goToProfile}
+            activeOpacity={1}
+            style={styles.profileContainer}
+          >
+            <Image
+              source={
+                profilePicUrl
+                  ? { uri: profilePicUrl }
+                  : require("../../assets/test_image/mock_profile_picture.png")
+              }
+              style={styles.profileImage}
+            />
+            <View style={styles.usernameActivityContainer}>
+              <Text style={styles.userNameText}>{userName}</Text>
+              <Text style={styles.activityStatusText}>Active Today</Text>
+            </View>
+          </TouchableOpacity>
         </View>
 
-        <ScrollView
-          ref={scrollViewRef}
-          contentContainerStyle={styles.scrollView}
-          onContentSizeChange={() =>
-            scrollViewRef.current?.scrollToEnd({ animated: false })
-          }
-          onLayout={scrollToBottom}
-          bounces={false}
-        >
-          {messages.map((message: any) => {
-            return (
-              <View
-                key={message.id + message.timestamp}
-                style={[
-                  styles.messageContainer,
-                  {
-                    flexDirection:
-                      message.senderId === currentUserId
-                        ? "row-reverse"
-                        : "row",
-                    alignSelf:
-                      message.senderId === currentUserId
-                        ? "flex-end"
-                        : "flex-start", // Snap to right or left
-                  },
-                ]}
-              >
-                {!userProfilePhotoURL && !profilePicUrl ? (
-                  <Image
-                    source={require("../../assets/test_image/mock_profile_picture.png")}
-                    style={styles.chatProfileImage}
-                  />
-                ) : (
-                  <Image
-                    source={
-                      message.senderId === currentUserId
-                        ? {
-                            uri: userProfilePhotoURL!,
-                          }
-                        : profilePicUrl
-                        ? { uri: profilePicUrl }
-                        : require("../../assets/test_image/mock_profile_picture.png")
-                    }
-                    style={styles.chatProfileImage}
-                  />
-                )}
-
-                <Text
-                  style={[
-                    styles.messageText,
-                    {
-                      marginLeft: message.senderId === currentUserId ? 0 : 4,
-                      marginRight: message.senderId === currentUserId ? 4 : 0,
-                    },
-                  ]}
-                >
-                  {message.text}
-                </Text>
-                <View style={styles.timeStampContainer}>
-                  <Text style={styles.timeStampText}>
-                    {formatRelativeTime(message.timestamp)}
-                  </Text>
-                </View>
-              </View>
-            );
+        <FlatList
+          ref={FlatListRef}
+          data={messages}
+          keyExtractor={(message) => message.id}
+          renderItem={({ item: message }) => (
+            <Message message={message} profilePicUrl={profilePicUrl} />
+          )}
+          style={styles.messagesList}
+          onContentSizeChange={() => scrollToBottom(true)}
+          initialScrollIndex={messages.length > 0 ? messages.length - 1 : 0}
+          getItemLayout={(_, index) => ({
+            length: 100,
+            offset: 100 * index,
+            index,
           })}
-        </ScrollView>
+          onLayout={() => scrollToBottom(true)}
+        />
 
         <View style={styles.messageBarContainer}>
           <View style={styles.messageBar}>
@@ -193,7 +156,6 @@ const Chat = ({ route, navigation }: any) => {
               value={message}
               multiline
               onContentSizeChange={handleContentSizeChange}
-              // scrollEnabled={false} // Prevent internal scroll
               textAlignVertical="center"
             />
           </View>
@@ -209,6 +171,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: ThemeColoursPrimary.PrimaryColour,
+  },
+  messagesList: {
+    flex: 1,
+    paddingHorizontal: 8,
   },
   topBarContainer: {
     flexDirection: "row",
@@ -233,10 +199,6 @@ const styles = StyleSheet.create({
   },
   KeyboardAvoidingView: {
     flex: 1,
-  },
-  scrollView: {
-    flexGrow: 1,
-    paddingHorizontal: 8,
   },
   messageBarContainer: {
     flexDirection: "row",
@@ -266,39 +228,15 @@ const styles = StyleSheet.create({
     paddingVertical: Platform.OS === "ios" ? 10 : 0,
     height: "100%",
   },
-  messageContainer: {
-    flexDirection: "row",
-    marginVertical: 6,
-    width: windowWidth * 0.6,
-    alignItems: "center",
-    borderRadius: 8,
-    backgroundColor: "transparent",
-  },
-  messageText: {
-    padding: 6,
-    fontSize: 14,
-    fontWeight: "500",
-    borderRadius: 8,
-    borderWidth: 1.3,
-    borderColor: ThemeColoursPrimary.SecondaryColour,
-    backgroundColor: ThemeColoursPrimary.PrimaryColour,
-    color: ThemeColoursPrimary.SecondaryColour,
-    overflow: "hidden",
-  },
-  timeStampContainer: {
-    padding: 6, // Optional: Add some padding
-  },
-  timeStampText: { fontSize: 10, color: ThemeColoursPrimary.SecondaryColour },
   profileImage: {
     width: 50, // Width and height should be the same
     height: 50,
     borderRadius: 50, // Half of the width or height for a perfect circle
     marginRight: 4,
   },
-  chatProfileImage: {
-    width: 40, // Width and height should be the same
-    height: 40,
-    borderRadius: 50, // Half of the width or height for a perfect circle
+  profileContainer: {
+    flexDirection: "row",
+    alignItems: "center",
   },
 });
 export default Chat;
