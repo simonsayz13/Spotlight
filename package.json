@@ -43,6 +43,7 @@
     "redux-persist": "^6.0.0",
     "reselect": "^5.1.1",
     "uuid": "^10.0.0",
+    "@shopify/flash-list": "1.6.4",
     "expo-av": "~14.0.7"
   },
   "devDependencies": {

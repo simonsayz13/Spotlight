@@ -64,6 +64,14 @@ const styles = StyleSheet.create({
   scrollView: {
     flexGrow: 1,
   },
+  imageContainer: {
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  image: {
+    width: "100%",
+  },
   postTitleContainer: {
     marginVertical: 8,
     marginHorizontal: 8,

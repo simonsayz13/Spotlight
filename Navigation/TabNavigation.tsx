@@ -4,6 +4,7 @@ import {
   TouchableOpacity,
   Dimensions,
   Platform,
+  KeyboardAvoidingView,
 } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import HomeStack from "./Stacks/HomeStack";
@@ -15,11 +16,15 @@ import { PostStackScreens, ThemeColoursPrimary } from "../Constants/UI";
 import MessagingStackScreen from "./Stacks/MessagingStack";
 
 const Tab = createBottomTabNavigator();
-const { width } = Dimensions.get("window");
+const { width, height } = Dimensions.get("window");
 
 const TabNavigation = ({ navigation }: any) => {
   return (
-    <>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "undefined" : "height"}
+      keyboardVerticalOffset={Platform.OS === "android" ? -60 : 0}
+    >
       {/* Main Tab Navigator */}
       <Tab.Navigator
         initialRouteName="Home"
@@ -117,7 +122,7 @@ const TabNavigation = ({ navigation }: any) => {
           color={ThemeColoursPrimary.LogoColour}
         />
       </TouchableOpacity>
-    </>
+    </KeyboardAvoidingView>
   );
 };
 
