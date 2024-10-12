@@ -11,13 +11,17 @@ import {
   TouchableOpacity,
   Alert,
   Dimensions,
+  Text,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MapView, { Marker } from "react-native-maps";
 import { ThemeColoursPrimary } from "../../Constants/UI";
 import { getLocation, getLocationPermission } from "../../Util/LocationService";
 import ActivityLoader from "../../Components/ActivityLoader";
-import { getLocationPosts } from "../../Firebase/firebaseFireStore";
+import {
+  getLocationPosts,
+  getUserDetails,
+} from "../../Firebase/firebaseFireStore";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import MapPostContent from "../../Components/MapPostContent";
 const { width: windowWidth, height: windowHeight } = Dimensions.get("window");
@@ -39,7 +43,22 @@ const Map = ({ navigation }: any) => {
     }
     setGotLocation(true);
     await getLocation(setCurrentCoordinate);
-    await getLocationPosts(setPosts);
+    const fetchedPosts = await getLocationPosts(); // Assuming this returns an array of posts
+    const postsWithUserDetails = await Promise.all(
+      fetchedPosts.map(async (post) => {
+        //@ts-ignore
+        const userDetails = await getUserDetails(post.postData.user_id); // Assuming user_id is available in post
+        return {
+          ...post.postData,
+          id: post.id,
+          //@ts-ignore
+          userDisplayName: userDetails.display_name,
+          //@ts-ignore
+          userProfilePic: userDetails.profile_picture_url,
+        };
+      })
+    );
+    setPosts(postsWithUserDetails);
     setGotLocation(false);
     setMapRegion(currentCoordinate);
   };
@@ -83,7 +102,7 @@ const Map = ({ navigation }: any) => {
       mapRef.current.animateCamera(
         {
           center: { latitude, longitude },
-          altitude: 700, // Zoom level for Apple map
+          altitude: 1000, // Zoom level for Apple map
           zoom: 7, // Adjust zoom level as needed for Google map
         },
         { duration: 800 }
@@ -162,10 +181,10 @@ const Map = ({ navigation }: any) => {
               <Marker
                 key={post.id}
                 coordinate={{
-                  latitude: post.postData.coordinates.latitude,
-                  longitude: post.postData.coordinates.longitude,
+                  latitude: post.coordinates.latitude,
+                  longitude: post.coordinates.longitude,
                 }}
-                onPress={() => handleMarkerPress(post.postData)}
+                onPress={() => handleMarkerPress(post)}
               >
                 <MaterialCommunityIcons
                   name="sign-text"
@@ -176,14 +195,16 @@ const Map = ({ navigation }: any) => {
             ))}
           </MapView>
         )}
-        <TouchableOpacity
-          style={styles.locateButton}
-          onPressIn={() => {
-            centerMapToCurrentLocation();
-          }}
-        >
-          <Ionicons name="locate" size={24} color="black" />
-        </TouchableOpacity>
+        {Platform.OS === "ios" && (
+          <TouchableOpacity
+            style={styles.locateButton}
+            onPressIn={() => {
+              centerMapToCurrentLocation();
+            }}
+          >
+            <Ionicons name="locate" size={24} color="black" />
+          </TouchableOpacity>
+        )}
         {isModalVisible && (
           <Animated.View
             style={[
@@ -192,6 +213,7 @@ const Map = ({ navigation }: any) => {
             ]}
             {...modalPanResponder.panHandlers}
           >
+            <View style={styles.panIndicator} />
             <View style={styles.modalContent}>
               {selectedPost && (
                 <MapPostContent
@@ -213,7 +235,15 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: ThemeColoursPrimary.PrimaryColour,
   },
-
+  panIndicator: {
+    alignSelf: "center",
+    borderWidth: 1,
+    width: 38,
+    height: 4,
+    borderRadius: 10,
+    backgroundColor: ThemeColoursPrimary.SecondaryColour,
+    marginBottom: 6,
+  },
   searchBarContainer: {
     borderBottomWidth: 0.2,
     borderBottomColor: ThemeColoursPrimary.GreyColour,
@@ -248,7 +278,8 @@ const styles = StyleSheet.create({
     backgroundColor: ThemeColoursPrimary.PrimaryColour,
     borderTopLeftRadius: 14,
     borderTopRightRadius: 14,
-    padding: 16,
+    paddingVertical: 6,
+    paddingHorizontal: 8,
     elevation: 10, // For Android shadow
     shadowColor: "#000",
     shadowOffset: { width: 0, height: -1 },

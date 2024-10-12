@@ -1,26 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import { ProfileStackScreens, ThemeColoursPrimary } from "../Constants/UI";
-import { getUserDetails } from "../Firebase/firebaseFireStore";
 import { Image } from "expo-image";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-const TopNavigationBarPost = ({ navigation, userId }: any) => {
-  const [profilePicUrl, setProfilePicUrl] = useState("");
-  const [displayName, setDisplayName] = useState("");
-
-  const fetchUserData = async () => {
-    try {
-      const userDetails = await getUserDetails(userId);
-      setDisplayName(userDetails?.display_name);
-      setProfilePicUrl(userDetails?.profile_picture_url);
-    } catch (error) {}
-  };
-  useEffect(() => {
-    fetchUserData();
-  }, [userId]);
+const TopNavigationBarPost = ({ navigation, postData }: any) => {
+  const { userDisplayName, userProfilePic, user_id: userId } = postData;
 
   const goToProfile = () => {
     navigation.navigate(ProfileStackScreens.Profile, {
@@ -44,16 +31,16 @@ const TopNavigationBarPost = ({ navigation, userId }: any) => {
           />
         </TouchableOpacity>
         <TouchableOpacity style={styles.userWrapper} onPressIn={goToProfile}>
-          {profilePicUrl ? (
+          {userProfilePic ? (
             <Image
-              source={{ uri: profilePicUrl }}
+              source={{ uri: userProfilePic }}
               style={styles.profileImage}
             />
           ) : (
             <FontAwesome6 name="circle-user" size={40} color="black" />
           )}
 
-          <Text style={styles.usernameText}>{displayName}</Text>
+          <Text style={styles.usernameText}>{userDisplayName}</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.followShareWrapper}>

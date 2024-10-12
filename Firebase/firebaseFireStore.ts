@@ -97,11 +97,10 @@ export const getUserDetails = async (userId: string) => {
           })
         );
       }
-
       return { ...userDoc.data(), followers, followings };
     }
   } catch (error) {
-    Alert.alert("Error", "Error fetchhing user profile");
+    Alert.alert("Error", "Error fetching user profile");
   }
 };
 
@@ -473,7 +472,7 @@ export const removeFollower = async (
   }
 };
 
-export const getLocationPosts = async (setPosts: SetStateAction<any>) => {
+export const getLocationPosts = async () => {
   const postsRef = collection(db, FireStoreCollections.Posts); // Reference to the 'posts' collection
 
   // Create a query to find all documents where isLocation is true
@@ -489,8 +488,8 @@ export const getLocationPosts = async (setPosts: SetStateAction<any>) => {
       id: doc.id,
       postData: doc.data(),
     })); // Map through docs
-    console.log(locationPosts);
-    return setPosts(locationPosts); // Return the array of posts with location enabled
+
+    return locationPosts; // Return the array of posts with location enabled
   } catch (error) {
     console.error("Error fetching location posts: ", error);
     return [];
