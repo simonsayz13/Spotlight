@@ -19,7 +19,6 @@ import {
 } from "firebase/firestore";
 import app from "./FirebaseApp";
 import {
-  FireStorageFolder,
   FireStoreAction,
   FireStoreCollections,
   FireStorePostField,
@@ -32,6 +31,8 @@ import { addComment } from "../Redux/Slices/postsSlices";
 import { SetStateAction } from "react";
 import { delay, sortConversationsByLastMessage } from "../Util/utility";
 import { UserDetails } from "../type/Messenger";
+import { setMessages } from "../Redux/Slices/chatSlices";
+import { useSelector } from "react-redux";
 
 const db = getFirestore(app);
 
@@ -331,7 +332,8 @@ export const createOrGetChatRoom = async (
 export const sendMessage = async (
   chatId: string,
   senderId: string,
-  text: string
+  text: string,
+  dispatch: any
 ) => {
   try {
     // Reference the chat room document
@@ -364,18 +366,14 @@ export const sendMessage = async (
       },
     });
 
-    return { id: newMessageRef.id, ...newMessage };
+    // dispatch(addMessage({ chatRoomId: chatId, message: newMessage }));
   } catch (error) {
     console.error("Error sending message: ", error);
     return null;
   }
 };
 
-export const messageListener = (
-  chatId: string,
-  // setChatDetails: SetStateAction<any>,
-  setMessages: SetStateAction<any>
-) => {
+export const messageListener = (chatId: string, dispatch: any) => {
   const chatDocRef = doc(db, FireStoreCollections.Chats, chatId);
 
   // Reference the `messages` sub-collection within the specific chat document
@@ -383,14 +381,14 @@ export const messageListener = (
   const messagesQuery = query(messagesRef, orderBy("timestamp", "asc"));
 
   // Attach a listener to get real-time updates on the messages
-  const subscribeMessages = onSnapshot(messagesQuery, (querySnapshot) => {
+  const unsubscribe = onSnapshot(messagesQuery, (querySnapshot) => {
     const messagesList = querySnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
-    setMessages(messagesList);
+    dispatch(setMessages({ chatRoomId: chatId, messages: messagesList }));
   });
-  return () => subscribeMessages();
+  return () => unsubscribe();
 };
 
 export const conversationListener = (
@@ -489,7 +487,6 @@ export const getLocationPosts = async (setPosts: SetStateAction<any>) => {
       id: doc.id,
       postData: doc.data(),
     })); // Map through docs
-    console.log(locationPosts);
     return setPosts(locationPosts); // Return the array of posts with location enabled
   } catch (error) {
     console.error("Error fetching location posts: ", error);
