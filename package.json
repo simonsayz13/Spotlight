@@ -19,7 +19,9 @@
     "@react-navigation/native-stack": "^6.11.0",
     "@react-navigation/stack": "^6.4.1",
     "@reduxjs/toolkit": "^2.2.7",
+    "@shopify/flash-list": "1.6.4",
     "expo": "~51.0.28",
+    "expo-av": "~14.0.7",
     "expo-camera": "~15.0.15",
     "expo-file-system": "~17.0.1",
     "expo-image": "~1.12.15",
@@ -42,9 +44,7 @@
     "react-redux": "^9.1.2",
     "redux-persist": "^6.0.0",
     "reselect": "^5.1.1",
-    "uuid": "^10.0.0",
-    "@shopify/flash-list": "1.6.4",
-    "expo-av": "~14.0.7"
+    "uuid": "^10.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

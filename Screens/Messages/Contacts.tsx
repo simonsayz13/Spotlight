@@ -15,11 +15,8 @@ import { ScrollView } from "react-native-gesture-handler";
 import { useSelector } from "react-redux";
 import { RootState } from "../../Redux/store";
 import { useEffect, useRef, useState } from "react";
-import {
-  conversationListener,
-  getUserDetails,
-  searchUsers,
-} from "../../Firebase/firebaseFireStore";
+import { getUserDetails, searchUsers } from "../../Firebase/firebaseFireStore";
+import { conversationListener } from "../../Firebase/FirebaseChat";
 import { formatRelativeTime } from "../../Util/utility";
 import { Image } from "expo-image";
 import AntDesign from "@expo/vector-icons/AntDesign";
@@ -37,7 +34,7 @@ const Contacts = ({ navigation }: any) => {
     [key: string]: UserDetails;
   }>({});
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [filteredUsers, setFilteredUsers] = useState<Array<UserDetails>>([]);
+  const [filteredUsers, setFilteredUsers] = useState<Array<any>>([]);
   const [isDropdownVisible, setIsDropdownVisible] = useState<boolean>(false);
   const textInputRef = useRef<TextInput>(null);
   useEffect(() => {
@@ -56,12 +53,14 @@ const Contacts = ({ navigation }: any) => {
   const goToChat = (
     userId: string,
     userName: string,
-    profilePicUrl: string
+    profilePicUrl: string,
+    conversationId: string
   ) => {
     navigation.navigate(MessagingStackScreens.Chat, {
       userId,
       userName,
       profilePicUrl,
+      conversationId,
     });
     clearSearch();
   };
@@ -90,9 +89,15 @@ const Contacts = ({ navigation }: any) => {
     const fetchUsers = async () => {
       if (searchQuery.length > 0) {
         const results = await searchUsers(searchQuery);
-        setFilteredUsers(
-          results.filter((user) => user.userId !== currentUserId)
-        );
+        const conversationMap = userConversationMap(); // Create the map
+
+        const filtered = results
+          .filter((user) => user.userId !== currentUserId)
+          .map((user) => ({
+            ...user,
+            conversationId: conversationMap[user.userId] || "", // Attach conversationId if exists
+          }));
+        setFilteredUsers(filtered);
       } else {
         setFilteredUsers([]);
       }
@@ -100,6 +105,16 @@ const Contacts = ({ navigation }: any) => {
 
     fetchUsers();
   }, [searchQuery]);
+
+  const userConversationMap = () => {
+    const map: { [key: string]: string } = {};
+    conversations.forEach((conversation) => {
+      conversation.participants.forEach((userId: string) => {
+        map[userId] = conversation.id; // Map userId to conversationId
+      });
+    });
+    return map;
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -144,7 +159,8 @@ const Contacts = ({ navigation }: any) => {
                   goToChat(
                     user.userId,
                     user.display_name!,
-                    user.profile_picture_url!
+                    user.profile_picture_url!,
+                    user.conversationId
                   );
                   Keyboard.dismiss(); // Hide the keyboard when navigating
                 }}
@@ -181,7 +197,12 @@ const Contacts = ({ navigation }: any) => {
               <TouchableOpacity
                 key={`key_${userId}`}
                 onPress={() => {
-                  goToChat(userId, displayName!, profile_picture_url!);
+                  goToChat(
+                    userId,
+                    displayName!,
+                    profile_picture_url!,
+                    conversation.id
+                  );
                 }}
               >
                 <View style={styles.messageCardContainer}>
