@@ -33,6 +33,7 @@ import {
 import { useFocusEffect } from "@react-navigation/native";
 import { Image } from "expo-image";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import { MasonryFlashList } from "@shopify/flash-list";
 
 const Profile = ({ navigation, route }: any) => {
   const [buttonStates, setButtonStates] = useState(userContentSelectorButtons);
@@ -188,6 +189,13 @@ const Profile = ({ navigation, route }: any) => {
       Alert.alert("Error", `${error}`);
     }
   };
+
+  const renderItem = ({ item }: any) => (
+    <View style={styles.cardContainer}>
+      <PostCard postData={item} openPost={openPost} navigation={navigation} />
+    </View>
+  );
+
   return (
     <SafeAreaView style={styles.container}>
       <Animated.View
@@ -317,7 +325,16 @@ const Profile = ({ navigation, route }: any) => {
           ))}
         </View>
 
-        <ScrollView contentContainerStyle={styles.scrollView}>
+        <MasonryFlashList
+          data={postsData}
+          keyExtractor={(post) => post.id}
+          renderItem={renderItem}
+          estimatedItemSize={10} // Estimated size for optimal performance
+          numColumns={2} // Setting 2 columns for masonry layout
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.flashListContainer}
+        />
+        {/* <ScrollView contentContainerStyle={styles.scrollView}>
           {postsData.map((post) => {
             return (
               <PostCard
@@ -328,7 +345,7 @@ const Profile = ({ navigation, route }: any) => {
               />
             );
           })}
-        </ScrollView>
+        </ScrollView> */}
       </View>
     </SafeAreaView>
   );
@@ -452,6 +469,14 @@ const styles = StyleSheet.create({
     width: 100, // Width and height should be the same
     height: 100,
     borderRadius: 50, // Half of the width or height for a perfect circle
+  },
+  flashListContainer: {
+    paddingHorizontal: 2, // Padding on the sides
+  },
+  cardContainer: {
+    flex: 1,
+    marginHorizontal: 2, // Horizontal gap between the cards
+    marginBottom: 4, // Vertical gap between rows
   },
 });
 

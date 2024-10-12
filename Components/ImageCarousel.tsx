@@ -11,7 +11,7 @@ import { Image } from "expo-image";
 import { ThemeColoursPrimary } from "../Constants/UI";
 
 const { width: windowWidth } = Dimensions.get("window");
-const MAX_HEIGHT = 500; // Define the maximum height for images
+const MAX_HEIGHT = 550; // Define the maximum height for images
 
 const ImageCarousel = ({ images }: any) => {
   const [currentIndex, setCurrentIndex] = useState(0);
