@@ -171,7 +171,7 @@ const Profile = ({ navigation, route }: any) => {
   const openFollowerScreen = (postData: any) => {
     console.log("=========>");
     navigation.navigate(ProfileStackScreens.FollowerList, {
-      // screen: ProfileStackScreens.FollowerList,
+      displayName,
       followers: followers,
     });
   };

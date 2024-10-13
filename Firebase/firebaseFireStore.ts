@@ -59,13 +59,20 @@ export const updateProfileField = async (
   }
 };
 
-export const getUserDetails = async (userId: string) => {
+export const getUserDetails = async (
+  userId: string,
+  hasFollowInfo: boolean = true
+) => {
+  console.log("userId", userId);
   try {
     const userProfileCollection = doc(db, FireStoreCollections.Users, userId);
     const userDoc = await getDoc(userProfileCollection);
     // if (userDoc.exists()) return userDoc.data();
 
     if (userDoc.exists()) {
+      if (!hasFollowInfo) {
+        return { ...userDoc.data(), followers: [], followings: [] };
+      }
       const { followers: followersRef, followings: followingsRef } =
         userDoc.data();
 
