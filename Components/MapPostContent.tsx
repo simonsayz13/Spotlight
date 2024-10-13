@@ -1,35 +1,34 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import { getUserDetails } from "../Firebase/firebaseFireStore";
 import { Image } from "expo-image";
-import { HomeStackScreens, ThemeColoursPrimary } from "../Constants/UI";
+import {
+  HomeStackScreens,
+  NavigationTabs,
+  ProfileStackScreens,
+  ThemeColoursPrimary,
+} from "../Constants/UI";
 import { formatRelativeTime } from "../Util/utility";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { useSelector } from "react-redux";
 const MapPostContent = ({ postData, navigation, hideModal }: any) => {
+  const { userId: appUserId } = useSelector((state: RootState) => {
+    return state.user;
+  });
   const {
     title,
     description,
     likes,
     timeStamp,
-    user_id: userId,
-    id,
     favourites,
     comments,
+    userDisplayName,
+    userProfilePic,
+    user_id,
   } = postData;
-  const [userDisplayName, setUserDisplayName] = useState();
-  const [userProfilePic, setUserProfilePic] = useState();
   const memoizedPostData = useMemo(() => postData, [postData]);
-  const fetchUserDetails = async () => {
-    const data = await getUserDetails(userId);
-    setUserDisplayName(data!.display_name);
-    setUserProfilePic(data!.profile_picture_url);
-  };
-
-  useEffect(() => {
-    fetchUserDetails();
-  }, [id]);
 
   const handleExpandPostPress = () => {
     hideModal();
@@ -39,22 +38,47 @@ const MapPostContent = ({ postData, navigation, hideModal }: any) => {
     }); // Pass postId and any necessary data
   };
 
+  const handleUserProfilePress = () => {
+    hideModal();
+    console.log(postData);
+    appUserId === user_id
+      ? navigation.navigate(NavigationTabs.Me)
+      : navigation.navigate(ProfileStackScreens.ViewProfile, {
+          userId: user_id,
+        });
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.userInfoContainer}>
-        <Image source={{ uri: userProfilePic }} style={styles.profileImage} />
-        <Text style={styles.userNameText}>{userDisplayName}</Text>
+        <TouchableOpacity
+          style={styles.userInfoContainer}
+          activeOpacity={1}
+          onPressIn={handleUserProfilePress}
+        >
+          <Image source={{ uri: userProfilePic }} style={styles.profileImage} />
+          <Text style={styles.userNameText}>{userDisplayName}</Text>
+        </TouchableOpacity>
         <View style={styles.separatorDot} />
         <Text style={styles.timeStampFont}>
           {formatRelativeTime(timeStamp)}
         </Text>
-
-        <TouchableOpacity
-          style={{ marginLeft: "auto" }}
-          onPressIn={handleExpandPostPress}
-        >
-          <MaterialCommunityIcons name="arrow-expand" size={28} color="black" />
-        </TouchableOpacity>
+        <View style={styles.actionsContainer}>
+          <TouchableOpacity>
+            <MaterialIcons
+              name="directions"
+              size={30}
+              color={ThemeColoursPrimary.SecondaryColour}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity onPressIn={handleExpandPostPress}>
+            <MaterialCommunityIcons
+              name="arrow-expand"
+              size={28}
+              color={ThemeColoursPrimary.SecondaryColour}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
       <Text style={styles.titleText} numberOfLines={1} ellipsizeMode="tail">
         {title}
@@ -100,6 +124,12 @@ const MapPostContent = ({ postData, navigation, hideModal }: any) => {
 
 const styles = StyleSheet.create({
   container: {},
+  actionsContainer: {
+    marginLeft: "auto",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
   userInfoContainer: {
     flexDirection: "row",
     alignItems: "center",

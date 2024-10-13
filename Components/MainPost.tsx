@@ -24,9 +24,11 @@ const MainPost = ({ postData, navigation }: any) => {
         <View style={styles.postTitleContainer}>
           <Text style={styles.postTitleText}>{title}</Text>
         </View>
-        <View style={styles.postDescriptionContainer}>
-          <Text style={styles.postDescriptionText}>{description}</Text>
-        </View>
+        {description && (
+          <View style={styles.postDescriptionContainer}>
+            <Text style={styles.postDescriptionText}>{description}</Text>
+          </View>
+        )}
         <View style={styles.userMetaDataContainer}>
           <Text style={styles.userMetaDataText}>
             Posted {formatRelativeTime(timeStamp)}

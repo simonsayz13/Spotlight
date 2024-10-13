@@ -10,6 +10,10 @@ export const userContentSelectorButtons = [
   { id: 3, label: "Liked", clicked: false },
 ];
 
+export const guestContentSelectorButtons = [
+  { id: 1, label: "Posts", clicked: true },
+];
+
 export enum HomeStackScreens {
   Home = "home",
   Post = "post",
@@ -21,6 +25,13 @@ export enum ProfileStackScreens {
   Profile = "profile",
   LoginSignUp = "loginsignup",
   EditProfile = "editprofile",
+  ViewProfile = "viewprofile",
+}
+export enum NavigationTabs {
+  Me = "me",
+  Messages = "messages",
+  Contents = "contents",
+  Map = "map",
 }
 
 export enum MessagingStackScreens {

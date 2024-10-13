@@ -12,7 +12,11 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Map } from "../Screens/Map/Map";
 import ProfileStack from "./Stacks/ProfileStack";
-import { PostStackScreens, ThemeColoursPrimary } from "../Constants/UI";
+import {
+  NavigationTabs,
+  PostStackScreens,
+  ThemeColoursPrimary,
+} from "../Constants/UI";
 import MessagingStackScreen from "./Stacks/MessagingStack";
 
 const Tab = createBottomTabNavigator();
@@ -22,12 +26,12 @@ const TabNavigation = ({ navigation }: any) => {
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
-      behavior={Platform.OS === "ios" ? "undefined" : "height"}
+      behavior={Platform.OS === "ios" ? undefined : "height"}
       keyboardVerticalOffset={Platform.OS === "android" ? -60 : 0}
     >
       {/* Main Tab Navigator */}
       <Tab.Navigator
-        initialRouteName="Home"
+        initialRouteName={NavigationTabs.Contents}
         screenOptions={{
           tabBarHideOnKeyboard: true,
           headerShown: false,
@@ -55,7 +59,7 @@ const TabNavigation = ({ navigation }: any) => {
         }}
       >
         <Tab.Screen
-          name="Home"
+          name={NavigationTabs.Contents}
           component={HomeStack}
           options={{
             tabBarIcon: ({ focused }) => (
@@ -68,7 +72,7 @@ const TabNavigation = ({ navigation }: any) => {
           }}
         />
         <Tab.Screen
-          name="Map"
+          name={NavigationTabs.Map}
           component={Map}
           options={{
             tabBarIcon: ({ focused }) => (
@@ -82,7 +86,7 @@ const TabNavigation = ({ navigation }: any) => {
           }}
         />
         <Tab.Screen
-          name="Messages"
+          name={NavigationTabs.Messages}
           component={MessagingStackScreen}
           options={{
             tabBarIcon: ({ focused }) => (
@@ -96,7 +100,7 @@ const TabNavigation = ({ navigation }: any) => {
           }}
         />
         <Tab.Screen
-          name="Me"
+          name={NavigationTabs.Me}
           component={ProfileStack}
           options={{
             tabBarIcon: ({ focused }) => (

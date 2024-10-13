@@ -13,35 +13,38 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../Redux/store";
 import {
   Gender,
+  guestContentSelectorButtons,
   HomeStackScreens,
-  ProfileStackScreens,
+  MessagingStackScreens,
   ThemeColoursPrimary,
-  userContentSelectorButtons,
 } from "../../Constants/UI";
-import { logOut } from "../../Firebase/firebaseAuth";
 import PostCard from "../../Components/PostCard";
-import AntDesign from "@expo/vector-icons/AntDesign";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {
   getUserDetails,
   getPostsByUserId,
+  addFollower,
+  removeFollower,
 } from "../../Firebase/firebaseFireStore";
+import { useFocusEffect } from "@react-navigation/native";
 import { Image } from "expo-image";
-import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { MasonryFlashList } from "@shopify/flash-list";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-const Profile = ({ navigation, route }: any) => {
-  const [buttonStates, setButtonStates] = useState(userContentSelectorButtons);
-  const { userId, userBio } = useSelector((state: RootState) => {
+import AntDesign from "@expo/vector-icons/AntDesign";
+const ViewProfile = ({ navigation, route }: any) => {
+  const { userId: appUserID } = useSelector((state: RootState) => {
     return state.user;
   });
+  const [buttonStates, setButtonStates] = useState(guestContentSelectorButtons);
+  const userId = route?.params?.userId;
+  const [profileUserId, setProfileUserId] = useState(null);
   const [postsData, setPostsData] = useState<Array<any>>([]);
   const [displayName, setDisplayName] = useState("");
   const [profilePicUrl, setProfilePicUrl] = useState("");
-  const [bio, setBio] = useState(userBio);
+  const [bio, setBio] = useState("");
   const [gender, setGender] = useState("");
   const [followers, setFollowers] = useState([]);
   const [followings, setfollowings] = useState([]);
+  const [isFollowed, setIsFollowed] = useState(false);
   const [ldgUserDetails, setLdgUserDetails] = useState(false);
   const [ldgSuccUserDetails, setLdgSuccUserDetails] = useState(false);
 
@@ -69,7 +72,7 @@ const Profile = ({ navigation, route }: any) => {
 
   const fetchPosts = async () => {
     try {
-      const fetchedPosts = await getPostsByUserId(userId!);
+      const fetchedPosts = await getPostsByUserId(userId);
       const postsWithUserDetails = await Promise.all(
         fetchedPosts.map(async (post: any) => {
           const userDetails = await getUserDetails(post.user_id); // Assuming user_id is available in post
@@ -101,6 +104,7 @@ const Profile = ({ navigation, route }: any) => {
     fetchPosts();
     fetchUser().then((data: any) => {
       const {
+        user_id,
         profile_picture_url,
         display_name,
         biography,
@@ -114,6 +118,9 @@ const Profile = ({ navigation, route }: any) => {
       setGender(gender);
       setFollowers(followers);
       setfollowings(followings);
+      setProfileUserId(user_id);
+      followers?.find((follower) => follower.user_id === appUserID) &&
+        setIsFollowed(true);
       setLdgUserDetails(false);
       setLdgSuccUserDetails(true);
     });
@@ -131,19 +138,45 @@ const Profile = ({ navigation, route }: any) => {
     );
   };
 
-  const handleLogout = () => {
-    logOut();
-    navigation.replace(ProfileStackScreens.LoginSignUp);
-  };
-
-  const handleEdit = () => {
-    navigation.navigate(ProfileStackScreens.EditProfile);
-  };
-
   const openPost = (postData: any) => {
     navigation.navigate(HomeStackScreens.Post, {
       postData: postData,
     });
+  };
+
+  const openChat = () => {
+    navigation.navigate(MessagingStackScreens.Chat, {
+      userId,
+      userName: displayName,
+      profilePicUrl,
+    });
+  };
+
+  const handlePressFollowBtn = async () => {
+    try {
+      await addFollower(profileUserId, appUserID);
+      setIsFollowed(true);
+      setFollowers([...followers, appUserID]);
+    } catch (error) {
+      Alert.alert("Error", `${error}`);
+    }
+  };
+
+  const handlePressUnfollowBtn = async () => {
+    try {
+      await removeFollower(profileUserId, appUserID);
+      setIsFollowed(false);
+
+      const arr = followers?.filter(
+        (followerUserId) => followerUserId !== appUserID
+      );
+      setFollowers(arr);
+    } catch (error) {
+      Alert.alert("Error", `${error}`);
+    }
+  };
+  const handleBackButtonPress = () => {
+    navigation.goBack();
   };
 
   const renderItem = ({ item }: any) => (
@@ -154,12 +187,23 @@ const Profile = ({ navigation, route }: any) => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <TouchableOpacity
+        onPress={handleBackButtonPress}
+        style={styles.backButton}
+      >
+        <Ionicons
+          name="chevron-back"
+          size={32}
+          color={ThemeColoursPrimary.SecondaryColour}
+        />
+      </TouchableOpacity>
       <Animated.View style={(styles.profileContainer, { height: heightAnim })}>
         <View style={styles.profileDetails}>
           {!ldgUserDetails && profilePicUrl ? (
             <Image source={{ uri: profilePicUrl }} style={styles.image} />
           ) : (
-            <FontAwesome6 name="circle-user" size={70} color="black" />
+            <View style={styles.image} />
+            // <FontAwesome6 name="circle-user" size={70} color="black" />
           )}
           <View
             style={{
@@ -179,7 +223,7 @@ const Profile = ({ navigation, route }: any) => {
               <Ionicons name="female" size={20} color="#f268df" />
             )}
           </View>
-          <Text style={styles.metaDataFont}>IP Address: United Kingdom</Text>
+          <Text style={styles.metaDataFont}>Location: United Kingdom</Text>
         </View>
         <View style={styles.description}>
           <View
@@ -193,7 +237,7 @@ const Profile = ({ navigation, route }: any) => {
           </View>
           {!ldgUserDetails && (
             <Text style={styles.descriptionText}>
-              {bio ?? "Add a bio in edit profile"}
+              {bio ?? "No bio available"}
             </Text>
           )}
         </View>
@@ -214,19 +258,26 @@ const Profile = ({ navigation, route }: any) => {
             <Text style={styles.statsCount}>666</Text>
             <Text style={styles.statsFont}>Likes & Favs</Text>
           </View>
-
           <View style={styles.interactionContainer}>
-            <TouchableOpacity style={styles.button} onPress={handleEdit}>
+            {isFollowed ? (
+              <TouchableOpacity
+                style={styles.button}
+                onPress={handlePressUnfollowBtn}
+              >
+                <Text style={styles.buttonText}>Unfollow</Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                style={styles.button}
+                onPress={handlePressFollowBtn}
+              >
+                <Text style={styles.buttonText}>Follow</Text>
+              </TouchableOpacity>
+            )}
+            <TouchableOpacity onPressIn={openChat} style={styles.button}>
               <AntDesign
-                name="edit"
-                size={19}
-                color={ThemeColoursPrimary.PrimaryColour}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={handleLogout}>
-              <MaterialIcons
-                name="logout"
-                size={20}
+                name="message1"
+                size={18}
                 color={ThemeColoursPrimary.PrimaryColour}
               />
             </TouchableOpacity>
@@ -252,7 +303,6 @@ const Profile = ({ navigation, route }: any) => {
             </TouchableOpacity>
           ))}
         </View>
-
         <MasonryFlashList
           data={postsData}
           keyExtractor={(post) => post.id}
@@ -324,7 +374,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
-    height: 34,
+    height: 36,
   },
   buttonText: {
     fontSize: 16,
@@ -337,8 +387,8 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 14,
     borderTopRightRadius: 14,
     elevation: 5, // For Android shadow
-    shadowOffset: { width: 0, height: -1 },
-    shadowOpacity: 0.2,
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.05,
     shadowRadius: 2,
     backgroundColor: ThemeColoursPrimary.PrimaryColour,
   },
@@ -346,14 +396,13 @@ const styles = StyleSheet.create({
     height: 34,
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
+    paddingBottom: 4,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 12,
     borderBottomWidth: 0.4,
     borderBottomColor: ThemeColoursPrimary.GreyColour,
   },
-
   menuButton: {
     fontSize: 16,
     fontWeight: "normal",
@@ -386,8 +435,14 @@ const styles = StyleSheet.create({
   },
   cardContainer: {
     flex: 1,
-    marginHorizontal: 2, // Horizontal gap between the cards
     marginVertical: 4,
+    marginHorizontal: 2, // Horizontal gap between the cards
+  },
+  backButton: {
+    position: "absolute",
+    top: 56,
+    left: 14,
+    zIndex: 10, // Ensure it's on top of other elements
   },
   interactionContainer: {
     flexDirection: "row",
@@ -396,4 +451,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Profile;
+export default ViewProfile;
