@@ -3,17 +3,25 @@ import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
-import { ProfileStackScreens, ThemeColoursPrimary } from "../Constants/UI";
+import {
+  NavigationTabs,
+  ProfileStackScreens,
+  ThemeColoursPrimary,
+} from "../Constants/UI";
 import { Image } from "expo-image";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import { useSelector } from "react-redux";
 const TopNavigationBarPost = ({ navigation, postData }: any) => {
   const { userDisplayName, userProfilePic, user_id: userId } = postData;
-
+  const { userId: appUserId } = useSelector((state: RootState) => {
+    return state.user;
+  });
   const goToProfile = () => {
-    navigation.navigate(ProfileStackScreens.Profile, {
-      guestView: true,
-      opId: userId,
-    });
+    userId === appUserId
+      ? navigation.navigate(NavigationTabs.Me)
+      : navigation.navigate(ProfileStackScreens.ViewProfile, {
+          userId,
+        });
   };
 
   return (
@@ -30,7 +38,7 @@ const TopNavigationBarPost = ({ navigation, postData }: any) => {
             color={ThemeColoursPrimary.SecondaryColour}
           />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.userWrapper} onPressIn={goToProfile}>
+        <TouchableOpacity style={styles.userWrapper} onPress={goToProfile}>
           {userProfilePic ? (
             <Image
               source={{ uri: userProfilePic }}

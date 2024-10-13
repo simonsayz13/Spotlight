@@ -16,6 +16,7 @@ import { Camera } from "../Screens/Post/Camera";
 import { ViewPhoto } from "../Screens/Post/ViewPhoto";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { CreatePost } from "../Screens/Post/CreatePost";
+import ViewProfile from "../Screens/Profile/ViewProfile";
 const MainStack = createNativeStackNavigator();
 
 const MainNavigationStack = () => (
@@ -54,6 +55,10 @@ const MainNavigationStack = () => (
     />
     <MainStack.Screen name={PostStackScreens.Camera} component={Camera} />
     <MainStack.Screen name={PostStackScreens.ViewPhoto} component={ViewPhoto} />
+    <MainStack.Screen
+      name={ProfileStackScreens.ViewProfile}
+      component={ViewProfile}
+    />
   </MainStack.Navigator>
 );
 

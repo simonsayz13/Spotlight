@@ -1,13 +1,22 @@
 import React, { useMemo } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Image } from "expo-image";
-import { HomeStackScreens, ThemeColoursPrimary } from "../Constants/UI";
+import {
+  HomeStackScreens,
+  NavigationTabs,
+  ProfileStackScreens,
+  ThemeColoursPrimary,
+} from "../Constants/UI";
 import { formatRelativeTime } from "../Util/utility";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { useSelector } from "react-redux";
 const MapPostContent = ({ postData, navigation, hideModal }: any) => {
+  const { userId: appUserId } = useSelector((state: RootState) => {
+    return state.user;
+  });
   const {
     title,
     description,
@@ -17,8 +26,8 @@ const MapPostContent = ({ postData, navigation, hideModal }: any) => {
     comments,
     userDisplayName,
     userProfilePic,
+    user_id,
   } = postData;
-
   const memoizedPostData = useMemo(() => postData, [postData]);
 
   const handleExpandPostPress = () => {
@@ -29,11 +38,27 @@ const MapPostContent = ({ postData, navigation, hideModal }: any) => {
     }); // Pass postId and any necessary data
   };
 
+  const handleUserProfilePress = () => {
+    hideModal();
+    console.log(postData);
+    appUserId === user_id
+      ? navigation.navigate(NavigationTabs.Me)
+      : navigation.navigate(ProfileStackScreens.ViewProfile, {
+          userId: user_id,
+        });
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.userInfoContainer}>
-        <Image source={{ uri: userProfilePic }} style={styles.profileImage} />
-        <Text style={styles.userNameText}>{userDisplayName}</Text>
+        <TouchableOpacity
+          style={styles.userInfoContainer}
+          activeOpacity={1}
+          onPressIn={handleUserProfilePress}
+        >
+          <Image source={{ uri: userProfilePic }} style={styles.profileImage} />
+          <Text style={styles.userNameText}>{userDisplayName}</Text>
+        </TouchableOpacity>
         <View style={styles.separatorDot} />
         <Text style={styles.timeStampFont}>
           {formatRelativeTime(timeStamp)}
