@@ -30,7 +30,7 @@ import { Image } from "expo-image";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { MasonryFlashList } from "@shopify/flash-list";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-const Profile = ({ navigation, route }: any) => {
+const Profile = ({ navigation }: any) => {
   const [buttonStates, setButtonStates] = useState(userContentSelectorButtons);
   const { userId, userBio } = useSelector((state: RootState) => {
     return state.user;

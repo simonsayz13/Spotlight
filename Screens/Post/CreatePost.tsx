@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   StyleSheet,
   View,
@@ -15,21 +15,25 @@ import {
 } from "react-native";
 import {
   MiscStackScreens,
+  NavigationTabs,
   PostStackScreens,
   ThemeColoursPrimary,
 } from "../../Constants/UI";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { uploadImages } from "../../Firebase/firebaseStorage";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+
 import { useSelector } from "react-redux";
 import { RootState } from "../../Redux/store";
 import { createPost } from "../../Firebase/firebaseFireStore";
 import ActivityLoader from "../../Components/ActivityLoader";
 import BottomSheet from "../../Components/BottomSheet";
-import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { getLocation, getLocationPermission } from "../../Util/LocationService";
 import ImagePreviewCarousel from "../../Components/ImagePreviewCarousel";
 import { createMediaData } from "../../Util/utility";
+import BottomDrawer from "../../Components/BottomDrawer";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import TagSelection from "../../Components/TagSelection";
+import PostOptionsMenuBar from "../../Components/PostOptionsMenuBar";
 
 const { width, height } = Dimensions.get("window");
 
@@ -42,9 +46,9 @@ const CreatePost = ({ navigation, route }: any) => {
   const [isComment, setIsComment] = useState<boolean>(false);
   const [isLocation, setIsLocation] = useState<boolean>(false);
   const [isPrivate, setIsPrivate] = useState<boolean>(false);
-
   const [photoArray, setPhotoArray] = useState<Array<string>>([]);
 
+  const bottomDrawerRef = useRef<any>(null);
   const goBack = () => {
     resetStates();
     navigation.goBack();
@@ -102,23 +106,9 @@ const CreatePost = ({ navigation, route }: any) => {
       isPrivate,
     };
     await createPost(userId, postData);
-    navigation.navigate("Me");
+    navigation.navigate(NavigationTabs.Me);
     resetStates();
   };
-
-  const menuBar = (
-    <View style={styles.menuBarContainer}>
-      <TouchableOpacity onPressIn={goToCamera}>
-        <MaterialCommunityIcons name="camera" size={34} color="black" />
-      </TouchableOpacity>
-      <TouchableOpacity onPressIn={goToPhotoBrowser}>
-        <MaterialCommunityIcons name="image-plus" size={34} color="black" />
-      </TouchableOpacity>
-      <TouchableOpacity>
-        <FontAwesome6 name="hashtag" size={30} color="black" />
-      </TouchableOpacity>
-    </View>
-  );
 
   const togglePrivateSwitch = () =>
     setIsPrivate((previousState) => !previousState);
@@ -131,6 +121,22 @@ const CreatePost = ({ navigation, route }: any) => {
       return Alert.alert("Error", locationServicePermission);
     }
     setIsLocation((previousState) => !previousState);
+  };
+
+  const handleHideDrawer = () => {
+    if (bottomDrawerRef.current) {
+      bottomDrawerRef.current.hideDrawer();
+    }
+  };
+
+  const handleShowDrawer = () => {
+    if (bottomDrawerRef.current) {
+      bottomDrawerRef.current.showDrawer();
+    }
+  };
+
+  const handleSetTags = () => {
+    handleHideDrawer();
   };
 
   const options = (
@@ -181,58 +187,69 @@ const CreatePost = ({ navigation, route }: any) => {
   );
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <SafeAreaView style={styles.container}>
-        <View style={styles.topBarContainer}>
-          <TouchableOpacity onPressIn={goBack} style={styles.closeButton}>
-            <Ionicons
-              name="close"
-              size={32}
-              color={ThemeColoursPrimary.SecondaryColour}
-            />
-          </TouchableOpacity>
-          <Text style={styles.title}>Create a post</Text>
-          <TouchableOpacity style={styles.postButton} onPressIn={post}>
-            <Text style={styles.postButtonText}>Post</Text>
-          </TouchableOpacity>
-        </View>
-        {photoArray.length > 0 && (
-          <ImagePreviewCarousel
-            photoArray={photoArray}
-            setPhotoArray={setPhotoArray}
+    <SafeAreaView style={styles.container}>
+      <View style={styles.topBarContainer}>
+        <TouchableOpacity onPressIn={goBack} style={styles.closeButton}>
+          <Ionicons
+            name="close"
+            size={32}
+            color={ThemeColoursPrimary.SecondaryColour}
           />
-        )}
+        </TouchableOpacity>
+        <Text style={styles.title}>Create a post</Text>
+        <TouchableOpacity style={styles.postButton} onPressIn={post}>
+          <Text style={styles.buttonText}>Post</Text>
+        </TouchableOpacity>
+      </View>
+      {photoArray.length > 0 && (
+        <ImagePreviewCarousel
+          photoArray={photoArray}
+          setPhotoArray={setPhotoArray}
+        />
+      )}
 
-        <View style={styles.titleInputContainer}>
+      <View style={styles.titleInputContainer}>
+        <TextInput
+          style={styles.titleTextInput}
+          placeholder="Add a title..."
+          onChangeText={(text) => {
+            setTitle(text);
+          }}
+        >
+          {title}
+        </TextInput>
+      </View>
+      <View style={styles.divider}></View>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View style={styles.descriptionInputContainer}>
           <TextInput
-            style={styles.titleTextInput}
-            placeholder="Add a title..."
+            style={styles.descriptionTextInput}
+            placeholder="Add a description..."
+            multiline={true}
             onChangeText={(text) => {
-              setTitle(text);
+              setDescription(text);
             }}
           >
-            {title}
+            {description}
           </TextInput>
         </View>
-        <View style={styles.divider}></View>
-        <View>
-          <View style={styles.descriptionInputContainer}>
-            <TextInput
-              style={styles.descriptionTextInput}
-              placeholder="Add a description..."
-              multiline={true}
-              onChangeText={(text) => {
-                setDescription(text);
-              }}
-            >
-              {description}
-            </TextInput>
-          </View>
-        </View>
-        <ActivityLoader indicator={posting} text={"Posting..."} />
-        <BottomSheet menuBar={menuBar}>{options}</BottomSheet>
-      </SafeAreaView>
-    </TouchableWithoutFeedback>
+      </TouchableWithoutFeedback>
+      <ActivityLoader indicator={posting} text={"Posting..."} />
+      <BottomSheet
+        menuBar={
+          <PostOptionsMenuBar
+            goToCamera={goToCamera}
+            goToPhotoBrowser={goToPhotoBrowser}
+            handleShowDrawer={handleShowDrawer}
+          />
+        }
+      >
+        {options}
+      </BottomSheet>
+      <BottomDrawer heightPercentage={0.5} ref={bottomDrawerRef}>
+        <TagSelection handleSetTags={handleSetTags} />
+      </BottomDrawer>
+    </SafeAreaView>
   );
 };
 
@@ -262,13 +279,14 @@ const styles = StyleSheet.create({
   },
   postButton: {
     width: 60,
-    backgroundColor: ThemeColoursPrimary.ThirdColour,
+    backgroundColor: ThemeColoursPrimary.LogoColour,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 8,
     height: 34,
+    marginLeft: "auto",
   },
-  postButtonText: {
+  buttonText: {
     fontSize: 18,
     fontWeight: "bold",
     color: ThemeColoursPrimary.PrimaryColour,
@@ -301,11 +319,6 @@ const styles = StyleSheet.create({
     width: width * 0.95,
     borderBottomWidth: 0.6,
     borderColor: ThemeColoursPrimary.SecondaryColour + "50",
-  },
-  menuBarContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 14,
   },
   optionsItemContainer: {
     paddingVertical: Platform.OS === "ios" ? 16 : 8,

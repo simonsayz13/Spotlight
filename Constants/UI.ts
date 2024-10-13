@@ -14,6 +14,15 @@ export const guestContentSelectorButtons = [
   { id: 1, label: "Posts", clicked: true },
 ];
 
+export const Tags = [
+  { id: 1, label: "Trending", icon: "🔥", checked: false },
+  { id: 2, label: "Dating", icon: "❤️", checked: false },
+  { id: 3, label: "Event", icon: "📅", checked: false },
+  { id: 4, label: "Discussion", icon: "💬", checked: false },
+  { id: 5, label: "Deals", icon: "🛍️", checked: false },
+  { id: 6, label: "Recommendations", icon: "🏡", checked: false },
+];
+
 export enum HomeStackScreens {
   Home = "home",
   Post = "post",

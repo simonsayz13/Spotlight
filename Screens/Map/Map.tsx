@@ -14,7 +14,7 @@ import {
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MapView, { Marker } from "react-native-maps";
-import { HomeStackScreens, ThemeColoursPrimary } from "../../Constants/UI";
+import { ThemeColoursPrimary } from "../../Constants/UI";
 import { getLocation, getLocationPermission } from "../../Util/LocationService";
 import ActivityLoader from "../../Components/ActivityLoader";
 import {
