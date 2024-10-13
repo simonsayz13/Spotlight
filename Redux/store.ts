@@ -11,13 +11,19 @@ import {
   REGISTER,
 } from "redux-persist/es/constants";
 import postsReducer from "./Slices/postsSlices";
+import chatReducer from "./Slices/chatSlices";
 
 const persistConfig = {
   key: "root",
   storage: AsyncStorage,
   blacklist: ["posts"],
 };
-const rootReducer = combineReducers({ user: userReducer, posts: postsReducer });
+
+const rootReducer = combineReducers({
+  user: userReducer,
+  posts: postsReducer,
+  chats: chatReducer,
+});
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 

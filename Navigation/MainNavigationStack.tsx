@@ -1,5 +1,4 @@
 import React from "react";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import TabNavigation from "./TabNavigation";
 import {
   HomeStackScreens,
@@ -11,15 +10,13 @@ import {
 import Post from "../Screens/Home/Post";
 import Chat from "../Screens/Messages/Chat";
 import PhotoBrowser from "../Screens/Misc/PhotoBrowser";
-import {
-  CardStyleInterpolators,
-  TransitionPresets,
-  createStackNavigator,
-} from "@react-navigation/stack";
 import ImageCropScreen from "../Screens/Misc/ImageCropper";
-import { CreatePost } from "../Screens/Post/CreatePost";
 import Profile from "../Screens/Profile/Profile";
-const MainStack = createStackNavigator();
+import { Camera } from "../Screens/Post/Camera";
+import { ViewPhoto } from "../Screens/Post/ViewPhoto";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { CreatePost } from "../Screens/Post/CreatePost";
+const MainStack = createNativeStackNavigator();
 
 const MainNavigationStack = () => (
   <MainStack.Navigator screenOptions={{ headerShown: false }}>
@@ -28,10 +25,10 @@ const MainNavigationStack = () => (
       name={HomeStackScreens.Post}
       component={Post}
       options={({ route }: any) => ({
-        cardStyleInterpolator:
+        animation:
           route.params?.customAnimation === true
-            ? CardStyleInterpolators.forVerticalIOS
-            : CardStyleInterpolators.forHorizontalIOS,
+            ? "slide_from_bottom"
+            : "slide_from_right",
       })}
     />
     <MainStack.Screen name={MessagingStackScreens.Chat} component={Chat} />
@@ -39,8 +36,8 @@ const MainNavigationStack = () => (
       name={MiscStackScreens.PhotoBrowser}
       component={PhotoBrowser}
       options={{
-        gestureDirection: "vertical",
-        presentation: "modal",
+        presentation: "modal", // Equivalent to gestureDirection: 'vertical'
+        animation: "slide_from_bottom",
       }}
     />
     <MainStack.Screen
@@ -48,6 +45,15 @@ const MainNavigationStack = () => (
       component={ImageCropScreen}
     />
     <MainStack.Screen name={ProfileStackScreens.Profile} component={Profile} />
+    <MainStack.Screen
+      name={PostStackScreens.CreatePost}
+      component={CreatePost}
+      options={{
+        animation: "slide_from_bottom",
+      }}
+    />
+    <MainStack.Screen name={PostStackScreens.Camera} component={Camera} />
+    <MainStack.Screen name={PostStackScreens.ViewPhoto} component={ViewPhoto} />
   </MainStack.Navigator>
 );
 

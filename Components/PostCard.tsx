@@ -14,8 +14,9 @@ import { getUserDetails } from "../Firebase/firebaseFireStore";
 import { useSelector } from "react-redux";
 import { RootState } from "../Redux/store";
 
-const PostCard = ({ postData, openPost, self }: any) => {
+const PostCard = React.memo(({ postData, openPost, self }: any) => {
   const [displayName, setDisplayName] = useState("");
+  const [imageHeight, setImageHeight] = useState(200); // Default height
   const { userDisplayName, userLiked } = useSelector(
     (state: RootState) => state.user
   );
@@ -28,6 +29,7 @@ const PostCard = ({ postData, openPost, self }: any) => {
   const fetchUserData = async () => {
     try {
       const userDetails = await getUserDetails(userId);
+      //@ts-ignore
       setDisplayName(userDetails?.display_name);
     } catch (error) {}
   };
@@ -35,6 +37,13 @@ const PostCard = ({ postData, openPost, self }: any) => {
   useEffect(() => {
     fetchUserData();
   }, [userId]);
+
+  // Image load handler
+  const onImageLoad = (event: any) => {
+    const { width, height } = event.source;
+    const calculatedHeight = (height / width) * 150;
+    setImageHeight(calculatedHeight);
+  };
 
   return (
     <TouchableOpacity
@@ -46,17 +55,18 @@ const PostCard = ({ postData, openPost, self }: any) => {
     >
       {imageUrl ? (
         <Image
-          style={styles.image}
+          style={[styles.image, { height: imageHeight }]} // Dynamic height
           source={{
             uri: imageUrl,
           }}
+          onLoad={onImageLoad} // Set image height after load
         />
       ) : (
         <Image
           source={{
             uri: "https://archive.org/download/placeholder-image/placeholder-image.jpg",
           }}
-          style={styles.image}
+          style={[styles.image, { height: 100 }]} // Default placeholder height
         />
       )}
 
@@ -82,7 +92,7 @@ const PostCard = ({ postData, openPost, self }: any) => {
       </View>
     </TouchableOpacity>
   );
-};
+});
 
 const styles = StyleSheet.create({
   card: {
@@ -99,11 +109,10 @@ const styles = StyleSheet.create({
         elevation: 2, // Android's elevation property
       },
     }),
-    width: "48%",
+    width: "100%", // Adjust the width to fit multiple cards in a row
   },
   image: {
-    width: "100%",
-    height: 200,
+    width: "100%", // Ensure the image takes up full width
     borderTopLeftRadius: 4,
     borderTopRightRadius: 4,
   },

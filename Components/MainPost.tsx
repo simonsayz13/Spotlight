@@ -1,44 +1,17 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, ScrollView, Dimensions } from "react-native";
-import { Image as ExpoImage } from "expo-image";
+import React from "react";
+import { View, Text, StyleSheet, ScrollView } from "react-native";
+
 import { ThemeColoursPrimary } from "../Constants/UI";
 import CommentCard from "./CommentCard";
 import { formatRelativeTime } from "../Util/utility";
 import { useSelector } from "react-redux";
 import { selectCommentsByPostId } from "../Redux/Selectors/postSelector";
-
-const { width: windowWidth } = Dimensions.get("window");
-const MAX_HEIGHT = 500; // Define the maximum height for images
+import ImageCarousel from "./ImageCarousel";
 
 const MainPost = ({ postData, navigation }: any) => {
   const { title, description, timeStamp, id: postId } = postData;
-  const imageUrl = postData?.media[0]?.media_url;
-  const [imageDimensions, setImageDimensions] = useState({
-    width: windowWidth,
-    height: 500,
-  });
 
   const comments = useSelector(selectCommentsByPostId(postId));
-
-  useEffect(() => {
-    if (imageUrl) {
-      const { width, height } = postData.media[0];
-
-      let calculatedHeight = (windowWidth / width) * height; // Calculate height based on aspect ratio
-      let calculatedWidth = windowWidth;
-
-      // Check if the calculated height exceeds the maximum height
-      if (calculatedHeight > MAX_HEIGHT) {
-        calculatedHeight = MAX_HEIGHT; // Set to max height
-        calculatedWidth = (MAX_HEIGHT / height) * width; // Recalculate width to maintain aspect ratio
-      }
-
-      setImageDimensions({
-        width: calculatedWidth,
-        height: calculatedHeight,
-      });
-    }
-  }, [imageUrl]);
 
   return (
     <ScrollView
@@ -46,21 +19,7 @@ const MainPost = ({ postData, navigation }: any) => {
       bounces={false}
       overScrollMode="never"
     >
-      <View style={styles.imageContainer}>
-        {imageUrl ? (
-          <ExpoImage
-            source={{ uri: imageUrl }}
-            style={{
-              width: imageDimensions.width,
-              height: imageDimensions.height,
-            }}
-            // resizeMode="contain"
-            contentFit="contain"
-          />
-        ) : (
-          <></>
-        )}
-      </View>
+      {postData.media.length > 0 && <ImageCarousel images={postData.media} />}
       <View style={styles.postContentContainer}>
         <View style={styles.postTitleContainer}>
           <Text style={styles.postTitleText}>{title}</Text>
@@ -109,11 +68,9 @@ const styles = StyleSheet.create({
     width: "100%",
     justifyContent: "center",
     alignItems: "center",
-    // backgroundColor: "#e1e4e8",
   },
   image: {
     width: "100%",
-    height: undefined,
   },
   postTitleContainer: {
     marginVertical: 8,
