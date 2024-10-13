@@ -21,6 +21,7 @@ export enum ProfileStackScreens {
   Profile = "profile",
   LoginSignUp = "loginsignup",
   EditProfile = "editprofile",
+  FollowerList = "followerList",
 }
 
 export enum MessagingStackScreens {

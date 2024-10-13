@@ -12,7 +12,7 @@ const MAX_HEIGHT = 500; // Define the maximum height for images
 
 const MainPost = ({ postData, navigation }: any) => {
   const { title, description, timeStamp, id: postId } = postData;
-  const imageUrl = postData.media[0]?.media_url;
+  const imageUrl = postData?.media[0]?.media_url;
   const [imageDimensions, setImageDimensions] = useState({
     width: windowWidth,
     height: 500,

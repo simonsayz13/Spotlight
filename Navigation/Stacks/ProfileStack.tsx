@@ -8,6 +8,7 @@ import Profile from "../../Screens/Profile/Profile";
 import { useSelector } from "react-redux";
 import { RootState } from "../../Redux/store";
 import EditProfile from "../../Screens/Profile/EditProfile";
+import FollowerList from "../../Screens/Profile/FollowerList";
 
 const ProfileStack = createNativeStackNavigator();
 
@@ -39,6 +40,10 @@ const ProfileStackScreen = () => {
       <ProfileStack.Screen
         name={ProfileStackScreens.EditProfile}
         component={EditProfile}
+      />
+      <ProfileStack.Screen
+        name={ProfileStackScreens.FollowerList}
+        component={FollowerList}
       />
     </ProfileStack.Navigator>
   );

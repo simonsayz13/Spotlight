@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   Alert,
   Animated,
+  Pressable,
 } from "react-native";
 import { useSelector } from "react-redux";
 import { RootState } from "../../Redux/store";
@@ -33,6 +34,7 @@ import {
 import { useFocusEffect } from "@react-navigation/native";
 import { Image } from "expo-image";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import ProfileStackScreen from "../../Navigation/Stacks/ProfileStack";
 
 const Profile = ({ navigation, route }: any) => {
   const [buttonStates, setButtonStates] = useState(userContentSelectorButtons);
@@ -165,6 +167,14 @@ const Profile = ({ navigation, route }: any) => {
     });
   };
 
+  const openFollowerScreen = (postData: any) => {
+    console.log("=========>");
+    navigation.navigate(ProfileStackScreens.FollowerList, {
+      // screen: ProfileStackScreens.FollowerList,
+      followers: followers,
+    });
+  };
+
   const handlePressFollowBtn = async () => {
     try {
       await addFollower(profileUserId, appUserID);
@@ -255,12 +265,12 @@ const Profile = ({ navigation, route }: any) => {
           )}
         </View>
         <View style={styles.userStatsContainer}>
-          <View style={styles.statsView}>
+          <Pressable style={styles.statsView} onPress={openFollowerScreen}>
             <Text style={styles.statsCount}>
               {ldgUserDetails ? "-" : followings?.length}
             </Text>
             <Text style={styles.statsFont}>Following</Text>
-          </View>
+          </Pressable>
           <View style={styles.statsView}>
             <Text style={styles.statsCount}>
               {ldgUserDetails ? "-" : followers?.length}
