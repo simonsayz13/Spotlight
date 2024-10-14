@@ -41,7 +41,8 @@ const Map = ({ navigation }: any) => {
   const [heading, setHeading] = useState(0); // Track heading (bearing)
   const activityFilterDrawerRef = useRef<any>(null);
   const [selectedTag, setSelectedTag] = useState<any>(null);
-  const [animatedWidth] = useState(new Animated.Value(40)); // For animation width
+  const animatedWidth = useRef(new Animated.Value(40)).current; // For animation width
+  const opacityAnim = useRef(new Animated.Value(0)).current;
 
   const initialise = async () => {
     const permission = await getLocationPermission();
@@ -169,12 +170,25 @@ const Map = ({ navigation }: any) => {
     const newTag = tag ? (tag.id === selectedTag?.id ? null : tag) : null;
     setSelectedTag(newTag); // Deselect if clicked again
     if (newTag) {
-      Animated.timing(animatedWidth, {
-        toValue: newTag.label.length * 12 + 46, // Dynamically calculate width based on label length
-        duration: 300,
-        useNativeDriver: false,
-      }).start();
+      Animated.parallel([
+        Animated.timing(opacityAnim, {
+          toValue: 1, // Fully visible
+          duration: 300, // Animation duration
+          useNativeDriver: true,
+        }),
+        Animated.timing(animatedWidth, {
+          toValue: newTag.label.length * 12 + 46, // Dynamically calculate width based on label length
+          duration: 300,
+          useNativeDriver: false,
+        }),
+      ]).start();
     } else {
+      opacityAnim.setValue(0);
+      Animated.timing(opacityAnim, {
+        toValue: 0, // Fully visible
+        duration: 300, // Animation duration
+        useNativeDriver: true,
+      }).start();
       Animated.timing(animatedWidth, {
         toValue: 40,
         duration: 300,
@@ -203,7 +217,6 @@ const Map = ({ navigation }: any) => {
             region={mapRegion}
             onRegionChangeComplete={(region) => {
               setMapRegion(region);
-              // setHeading(region.heading || 0);
               onRegionChangeComplete();
             }}
             showsUserLocation={true}
@@ -255,7 +268,13 @@ const Map = ({ navigation }: any) => {
                 />
               </TouchableOpacity>
             ) : (
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Animated.View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  opacity: opacityAnim,
+                }}
+              >
                 <TouchableOpacity onPressIn={onFilterButtonPress}>
                   <Text
                     style={{
@@ -267,17 +286,14 @@ const Map = ({ navigation }: any) => {
                     {selectedTag.label}
                   </Text>
                 </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => selectTag(null)} // Clear selection
-                  style={styles.closeButton}
-                >
+                <TouchableOpacity onPress={() => selectTag(null)}>
                   <Ionicons
                     name="close"
                     size={26}
                     color={ThemeColoursPrimary.PrimaryColour}
                   />
                 </TouchableOpacity>
-              </View>
+              </Animated.View>
             )}
           </Animated.View>
           <TouchableOpacity
@@ -471,13 +487,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     margin: 8,
     alignItems: "center",
-  },
-  closeButton: {
-    marginLeft: 10,
-  },
-  closeButtonText: {
-    fontSize: 18,
-    color: "#FFFFFF", // Color for the close button
   },
 });
 
