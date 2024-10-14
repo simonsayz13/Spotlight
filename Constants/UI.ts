@@ -15,18 +15,54 @@ export const guestContentSelectorButtons = [
 ];
 
 export const Tags = [
-  { id: 1, label: "Trending", icon: "🚀", colour: "#FF4C4C", checked: false }, // Bright Orange-Red (like fire)
-  { id: 2, label: "Dating", icon: "❤️", colour: "#FF69B4", checked: false }, // Hot Pink (romantic tone)
-  { id: 3, label: "Event", icon: "📅", colour: "#1E90FF", checked: false }, // Dodger Blue (calendar/event vibe)
-  { id: 4, label: "Discussion", icon: "💬", colour: "#32CD32", checked: false }, // Lime Green (inviting discussion)
-  { id: 5, label: "Deals", icon: "🛍️", colour: "#FFD700", checked: false }, // Gold (value/discounts)
+  {
+    id: 1,
+    label: "Trending",
+    icon: "🚀",
+    colour: "#FF4C4C",
+    checked: false,
+    examples: ["Viral", "Buzz", "Hype"], // One-word examples for Trending
+  },
+  {
+    id: 2,
+    label: "Dating",
+    icon: "❤️",
+    colour: "#FF69B4",
+    checked: false,
+    examples: ["Romance", "Crush", "Connection"], // One-word examples for Dating
+  },
+  {
+    id: 3,
+    label: "Event",
+    icon: "📅",
+    colour: "#1E90FF",
+    checked: false,
+    examples: ["Concert", "Festival", "Party"], // One-word examples for Event
+  },
+  {
+    id: 4,
+    label: "Discussion",
+    icon: "💬",
+    colour: "#32CD32",
+    checked: false,
+    examples: ["Debate", "Talk", "Chat"], // One-word examples for Discussion
+  },
+  {
+    id: 5,
+    label: "Deals",
+    icon: "🛍️",
+    colour: "#FFD700",
+    checked: false,
+    examples: ["Savings", "Discount", "Offer"], // One-word examples for Deals
+  },
   {
     id: 6,
     label: "Recommendations",
     icon: "🏡",
     colour: "#8A2BE2",
     checked: false,
-  }, // Blue Violet (trust/reliability)
+    examples: ["Advice", "Tips", "Suggestions"], // One-word examples for Recommendations
+  },
 ];
 
 export enum HomeStackScreens {

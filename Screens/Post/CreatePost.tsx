@@ -264,10 +264,15 @@ const CreatePost = ({ navigation, route }: any) => {
             handleShowDrawer={handleShowDrawer}
           />
         }
+        heightPercentage={0.34}
       >
         {options}
       </BottomSheet>
-      <BottomDrawer heightPercentage={0.5} ref={bottomDrawerRef}>
+      <BottomDrawer
+        heightPercentage={0.5}
+        ref={bottomDrawerRef}
+        isPannable={true}
+      >
         <TagSelection handleSetTags={handleSetTags} />
       </BottomDrawer>
     </SafeAreaView>

@@ -14,15 +14,16 @@ import {
 } from "react-native";
 import { ThemeColoursPrimary } from "../Constants/UI";
 
-const { width: windowWidth, height: windowHeight } = Dimensions.get("window");
+const { height: windowHeight } = Dimensions.get("window");
 
 type ComponentProps = {
   heightPercentage: number;
+  isPannable: boolean;
   children: ReactNode;
 };
 
 const BottomDrawer = forwardRef(
-  ({ heightPercentage, children }: ComponentProps, ref) => {
+  ({ heightPercentage, isPannable, children }: ComponentProps, ref) => {
     const slideAnim = useRef(new Animated.Value(windowHeight)).current;
 
     const modalPanResponder = useRef(
@@ -81,9 +82,9 @@ const BottomDrawer = forwardRef(
             height: windowHeight * heightPercentage,
           },
         ]}
-        {...modalPanResponder.panHandlers}
+        {...(isPannable ? modalPanResponder.panHandlers : {})}
       >
-        <View style={styles.panIndicator} />
+        {isPannable && <View style={styles.panIndicator} />}
         {children}
       </Animated.View>
     );
@@ -106,6 +107,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: -1 },
     shadowOpacity: 0.2,
     shadowRadius: 2,
+    zIndex: 100,
   },
   panIndicator: {
     alignSelf: "center",

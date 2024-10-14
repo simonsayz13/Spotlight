@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   Alert,
   Dimensions,
+  Text,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MapView, { Marker } from "react-native-maps";
@@ -23,6 +24,10 @@ import {
 } from "../../Firebase/firebaseFireStore";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import MapPostContent from "../../Components/MapPostContent";
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
+import BottomDrawer from "../../Components/BottomDrawer";
+import { Tags } from "../../Constants/UI";
+
 const { width: windowWidth, height: windowHeight } = Dimensions.get("window");
 
 const Map = ({ navigation }: any) => {
@@ -33,6 +38,10 @@ const Map = ({ navigation }: any) => {
   const slideAnim = useRef(new Animated.Value(300)).current;
   const [mapRegion, setMapRegion] = useState<any>(null);
   const mapRef = useRef<MapView>(null);
+  const [heading, setHeading] = useState(0); // Track heading (bearing)
+  const activityFilterDrawerRef = useRef<any>(null);
+  const [selectedTag, setSelectedTag] = useState<any>(null);
+
   const initialise = async () => {
     const permission = await getLocationPermission();
     if (permission !== "OK") {
@@ -111,7 +120,7 @@ const Map = ({ navigation }: any) => {
         {
           center: { latitude, longitude },
           altitude: 1200, // Zoom level for Apple map
-          zoom: 7, // Adjust zoom level as needed for Google map
+          zoom: 12, // Adjust zoom level as needed for Google map
         },
         { duration: 800 }
       );
@@ -127,26 +136,45 @@ const Map = ({ navigation }: any) => {
     }
   };
 
+  const onRegionChangeComplete = async () => {
+    if (mapRef.current) {
+      const camera = await mapRef.current.getCamera();
+      setHeading(camera.heading || 0); // Set the heading (bearing) from the camera object
+    }
+  };
+
+  const rotateHeading = () => {
+    if (mapRef.current) {
+      mapRef.current.animateCamera(
+        {
+          heading: 0, // Reset the map's heading (bearing) to north
+        },
+        { duration: 800 } // Adjust the duration for smoothness
+      );
+      setHeading(0);
+    }
+  };
+
+  const onFilterButtonPress = () => {
+    hideModal();
+    activityFilterDrawerRef.current.showDrawer();
+  };
+
+  const closeFilter = () => {
+    activityFilterDrawerRef.current.hideDrawer();
+  };
+
+  const selectTag = (tag: any) => {
+    setSelectedTag(tag.id === selectedTag?.id ? null : tag); // Deselect if clicked again
+    console.log(selectedTag);
+  };
+
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <KeyboardAvoidingView
         style={styles.container}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        <View style={styles.searchBarContainer}>
-          <View style={styles.searchBar}>
-            <Ionicons
-              name="search"
-              size={32}
-              color={ThemeColoursPrimary.SecondaryColour}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Search..."
-              placeholderTextColor={ThemeColoursPrimary.SecondaryColour}
-            />
-          </View>
-        </View>
         <ActivityLoader indicator={gotLocation} text={"Locating..."} />
         {currentCoordinate && (
           <MapView
@@ -161,9 +189,12 @@ const Map = ({ navigation }: any) => {
             region={mapRegion}
             onRegionChangeComplete={(region) => {
               setMapRegion(region);
+              // setHeading(region.heading || 0);
+              onRegionChangeComplete();
             }}
             showsUserLocation={true}
             showsPointsOfInterest={false}
+            showsMyLocationButton={false}
           >
             {posts.map((post: any) => (
               <Marker
@@ -183,16 +214,123 @@ const Map = ({ navigation }: any) => {
             ))}
           </MapView>
         )}
-        {Platform.OS === "ios" && (
+
+        <View style={styles.actionBarContainer}>
           <TouchableOpacity
-            style={styles.locateButton}
-            onPressIn={() => {
-              centerMapToCurrentLocation();
-            }}
+            style={styles.buttonBase}
+            onPressIn={onFilterButtonPress}
           >
-            <Ionicons name="locate" size={24} color="black" />
+            <FontAwesome5
+              name="search"
+              size={22}
+              color={ThemeColoursPrimary.PrimaryColour}
+            />
           </TouchableOpacity>
-        )}
+          <TouchableOpacity
+            style={styles.buttonBase}
+            onPressIn={centerMapToCurrentLocation}
+          >
+            <FontAwesome5
+              name="location-arrow"
+              size={20}
+              color={ThemeColoursPrimary.PrimaryColour}
+            />
+          </TouchableOpacity>
+
+          {heading !== 0 && (
+            <TouchableOpacity
+              style={styles.buttonBase}
+              onPressIn={rotateHeading}
+            >
+              <FontAwesome5
+                name="compass"
+                size={26}
+                color={ThemeColoursPrimary.PrimaryColour}
+              />
+            </TouchableOpacity>
+          )}
+        </View>
+
+        <BottomDrawer
+          heightPercentage={0.5}
+          ref={activityFilterDrawerRef}
+          isPannable={false}
+        >
+          <View style={styles.bottomDrawerTopContainer}>
+            <Text
+              style={{
+                alignItems: "center",
+                fontWeight: "bold",
+                fontSize: 22,
+                paddingLeft: 8,
+              }}
+            >
+              Filters
+            </Text>
+            <TouchableOpacity
+              onPress={closeFilter}
+              style={{ alignSelf: "flex-end" }}
+            >
+              <Ionicons
+                name="close"
+                size={32}
+                color={ThemeColoursPrimary.SecondaryColour}
+              />
+            </TouchableOpacity>
+          </View>
+          <View>
+            {Tags.map((tag) => (
+              <TouchableOpacity
+                key={tag.id}
+                style={[
+                  styles.tagButton,
+                  {
+                    // backgroundColor: tag.colour,
+                    // opacity: selectedTag?.id === tag.id ? 1 : 0.5, // Highlight only the selected tag
+                  },
+                ]}
+                onPress={() => {
+                  selectTag(tag);
+                  closeFilter();
+                }}
+              >
+                <View
+                  style={{
+                    width: 46,
+                    height: 46,
+                    backgroundColor: tag.colour,
+                    borderRadius: 50,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    shadowColor: "#000",
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.2,
+                    shadowRadius: 2,
+                    elevation: 5,
+                  }}
+                >
+                  <Text style={{ fontSize: 18 }}>{tag.icon}</Text>
+                </View>
+                <View
+                  style={{
+                    marginLeft: 10,
+                    gap: 4,
+                    flex: 1,
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Text style={{ fontSize: 18, fontWeight: "bold" }}>
+                    {tag.label}
+                  </Text>
+                  <Text style={{ marginTop: "auto" }}>
+                    {tag.examples.join(", ")}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </BottomDrawer>
+
         <Animated.View
           style={[
             styles.modalContainer,
@@ -210,7 +348,7 @@ const Map = ({ navigation }: any) => {
           )}
         </Animated.View>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -227,28 +365,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: ThemeColoursPrimary.SecondaryColour,
     marginBottom: 6,
-  },
-  searchBarContainer: {
-    borderBottomWidth: 0.2,
-    borderBottomColor: ThemeColoursPrimary.GreyColour,
-  },
-  searchBar: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: ThemeColoursPrimary.BackgroundColour,
-    borderRadius: 10,
-    borderColor: ThemeColoursPrimary.PrimaryColour,
-    borderWidth: 1.0,
-    marginHorizontal: 12,
-    marginVertical: 8,
-    paddingHorizontal: 8,
-  },
-  input: {
-    height: 36,
-    paddingLeft: 8,
-    color: ThemeColoursPrimary.SecondaryColour,
-    fontSize: 16,
-    width: Platform.OS === "ios" ? windowWidth * 0.76 : windowWidth * 0.74,
   },
   map: {
     width: windowWidth,
@@ -271,15 +387,41 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     height: windowHeight * 0.22,
   },
-  locateButton: {
-    position: "absolute",
-    top: 70,
-    left: 10,
-    // right: 10,
-    backgroundColor: ThemeColoursPrimary.PrimaryColour,
+  buttonBase: {
+    backgroundColor: ThemeColoursPrimary.SecondaryColour,
     borderRadius: 25,
     padding: 2,
     elevation: 5,
+    height: 40,
+    width: 40,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  locateButton: {
+    position: "absolute",
+    top: 64,
+    right: 16,
+  },
+  compassButton: {
+    position: "absolute",
+    top: 80,
+    right: 16,
+  },
+  actionBarContainer: {
+    position: "absolute",
+    top: 64,
+    right: 16,
+    gap: 16,
+  },
+  bottomDrawerTopContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  tagButton: {
+    flexDirection: "row",
+    margin: 8,
+    alignItems: "center",
   },
 });
 
