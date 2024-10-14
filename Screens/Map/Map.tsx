@@ -41,6 +41,7 @@ const Map = ({ navigation }: any) => {
   const [heading, setHeading] = useState(0); // Track heading (bearing)
   const activityFilterDrawerRef = useRef<any>(null);
   const [selectedTag, setSelectedTag] = useState<any>(null);
+  const [animatedWidth] = useState(new Animated.Value(40)); // For animation width
 
   const initialise = async () => {
     const permission = await getLocationPermission();
@@ -165,8 +166,21 @@ const Map = ({ navigation }: any) => {
   };
 
   const selectTag = (tag: any) => {
-    setSelectedTag(tag.id === selectedTag?.id ? null : tag); // Deselect if clicked again
-    console.log(selectedTag);
+    const newTag = tag ? (tag.id === selectedTag?.id ? null : tag) : null;
+    setSelectedTag(newTag); // Deselect if clicked again
+    if (newTag) {
+      Animated.timing(animatedWidth, {
+        toValue: newTag.label.length * 12 + 46, // Dynamically calculate width based on label length
+        duration: 300,
+        useNativeDriver: false,
+      }).start();
+    } else {
+      Animated.timing(animatedWidth, {
+        toValue: 40,
+        duration: 300,
+        useNativeDriver: false,
+      }).start();
+    }
   };
 
   return (
@@ -195,6 +209,7 @@ const Map = ({ navigation }: any) => {
             showsUserLocation={true}
             showsPointsOfInterest={false}
             showsMyLocationButton={false}
+            showsCompass={false}
           >
             {posts.map((post: any) => (
               <Marker
@@ -216,16 +231,55 @@ const Map = ({ navigation }: any) => {
         )}
 
         <View style={styles.actionBarContainer}>
-          <TouchableOpacity
-            style={styles.buttonBase}
-            onPressIn={onFilterButtonPress}
+          <Animated.View
+            style={{
+              flexDirection: "row",
+              width: animatedWidth,
+              flex: 1,
+              backgroundColor: selectedTag ? selectedTag.colour : "black",
+              borderRadius: 50,
+              height: 40,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
           >
-            <FontAwesome5
-              name="search"
-              size={22}
-              color={ThemeColoursPrimary.PrimaryColour}
-            />
-          </TouchableOpacity>
+            {!selectedTag ? (
+              <TouchableOpacity
+                style={styles.buttonBase}
+                onPressIn={onFilterButtonPress}
+              >
+                <FontAwesome5
+                  name="search"
+                  size={22}
+                  color={ThemeColoursPrimary.PrimaryColour}
+                />
+              </TouchableOpacity>
+            ) : (
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <TouchableOpacity onPressIn={onFilterButtonPress}>
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      color: ThemeColoursPrimary.PrimaryColour,
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {selectedTag.label}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => selectTag(null)} // Clear selection
+                  style={styles.closeButton}
+                >
+                  <Ionicons
+                    name="close"
+                    size={26}
+                    color={ThemeColoursPrimary.PrimaryColour}
+                  />
+                </TouchableOpacity>
+              </View>
+            )}
+          </Animated.View>
           <TouchableOpacity
             style={styles.buttonBase}
             onPressIn={centerMapToCurrentLocation}
@@ -282,13 +336,7 @@ const Map = ({ navigation }: any) => {
             {Tags.map((tag) => (
               <TouchableOpacity
                 key={tag.id}
-                style={[
-                  styles.tagButton,
-                  {
-                    // backgroundColor: tag.colour,
-                    // opacity: selectedTag?.id === tag.id ? 1 : 0.5, // Highlight only the selected tag
-                  },
-                ]}
+                style={[styles.tagButton]}
                 onPress={() => {
                   selectTag(tag);
                   closeFilter();
@@ -409,9 +457,10 @@ const styles = StyleSheet.create({
   },
   actionBarContainer: {
     position: "absolute",
-    top: 64,
+    top: 56,
     right: 16,
     gap: 16,
+    alignItems: "flex-end", // Align buttons vertically
   },
   bottomDrawerTopContainer: {
     flexDirection: "row",
@@ -422,6 +471,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     margin: 8,
     alignItems: "center",
+  },
+  closeButton: {
+    marginLeft: 10,
+  },
+  closeButtonText: {
+    fontSize: 18,
+    color: "#FFFFFF", // Color for the close button
   },
 });
 
