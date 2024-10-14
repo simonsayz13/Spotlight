@@ -3,4 +3,5 @@ export type Tag = {
   label: string;
   icon: string;
   checked: boolean;
+  colour: string;
 };

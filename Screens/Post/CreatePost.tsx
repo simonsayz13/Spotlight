@@ -14,9 +14,11 @@ import {
   Platform,
 } from "react-native";
 import {
+  HomeStackScreens,
   MiscStackScreens,
   NavigationTabs,
   PostStackScreens,
+  ProfileStackScreens,
   ThemeColoursPrimary,
 } from "../../Constants/UI";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -47,7 +49,7 @@ const CreatePost = ({ navigation, route }: any) => {
   const [isLocation, setIsLocation] = useState<boolean>(false);
   const [isPrivate, setIsPrivate] = useState<boolean>(false);
   const [photoArray, setPhotoArray] = useState<Array<string>>([]);
-
+  const [tags, setTags] = useState<Array<any>>([]);
   const bottomDrawerRef = useRef<any>(null);
   const goBack = () => {
     resetStates();
@@ -104,10 +106,11 @@ const CreatePost = ({ navigation, route }: any) => {
       isComment,
       isLocation,
       isPrivate,
+      tags: tags.map((tag) => tag.label),
     };
     await createPost(userId, postData);
-    navigation.navigate(NavigationTabs.Me);
     resetStates();
+    navigation.navigate(NavigationTabs.Home);
   };
 
   const togglePrivateSwitch = () =>
@@ -135,7 +138,8 @@ const CreatePost = ({ navigation, route }: any) => {
     }
   };
 
-  const handleSetTags = () => {
+  const handleSetTags = (tags: Array<string>) => {
+    setTags(tags);
     handleHideDrawer();
   };
 
@@ -189,6 +193,7 @@ const CreatePost = ({ navigation, route }: any) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.topBarContainer}>
+        <ActivityLoader indicator={posting} text={"Posting..."} />
         <TouchableOpacity onPressIn={goBack} style={styles.closeButton}>
           <Ionicons
             name="close"
@@ -234,7 +239,23 @@ const CreatePost = ({ navigation, route }: any) => {
           </TextInput>
         </View>
       </TouchableWithoutFeedback>
-      <ActivityLoader indicator={posting} text={"Posting..."} />
+      {tags.length > 0 && (
+        <View style={styles.tagsContainer}>
+          <Text style={styles.tagsLabel}>Tags:</Text>
+          <View style={styles.selectedTags}>
+            {tags.map((tag, index) => (
+              <View
+                key={index}
+                style={[styles.tagChip, { backgroundColor: tag.colour }]}
+              >
+                <Text style={styles.tagText}>
+                  {tag.icon} {tag.label}
+                </Text>
+              </View>
+            ))}
+          </View>
+        </View>
+      )}
       <BottomSheet
         menuBar={
           <PostOptionsMenuBar
@@ -307,10 +328,9 @@ const styles = StyleSheet.create({
   },
   descriptionInputContainer: {
     marginTop: 10,
-    width: width * 0.95,
-    height: height * 0.6,
+    width: width,
     borderRadius: 8,
-    paddingVertical: 10,
+    padding: 10,
   },
   descriptionTextInput: {
     fontSize: 20,
@@ -336,6 +356,38 @@ const styles = StyleSheet.create({
     fontSize: 12,
     opacity: 0.7,
     color: ThemeColoursPrimary.SecondaryColour,
+  },
+  selectedTagsContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginVertical: 10,
+  },
+  tagChip: {
+    borderRadius: 6,
+    paddingVertical: 6,
+    paddingHorizontal: 4,
+    marginRight: 4,
+    marginBottom: 4,
+  },
+  tagText: {
+    color: ThemeColoursPrimary.PrimaryColour,
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+  tagsContainer: {
+    width: width,
+    paddingHorizontal: 10,
+    marginTop: 10,
+  },
+  tagsLabel: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: ThemeColoursPrimary.SecondaryColour,
+  },
+  selectedTags: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginTop: 5,
   },
 });
 

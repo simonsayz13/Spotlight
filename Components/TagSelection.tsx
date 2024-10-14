@@ -21,11 +21,23 @@ const TagSelection = ({ handleSetTags }: any) => {
     );
   };
 
+  const handleConfirmSelection = () => {
+    const selectedTags = tags
+      .filter((tag: Tag) => tag.checked) // Filter tags with checked = true
+      .map((tag: Tag) => ({
+        icon: tag.icon,
+        label: tag.label,
+        colour: tag.colour,
+      })); // Get the icon, label, and color of each selected tag
+
+    handleSetTags(selectedTags); // Pass the array of selected tags
+  };
+
   return (
     <View>
       <View style={styles.tagSelectionTopContainer}>
         <Text style={styles.tagTitle}>Tags</Text>
-        <TouchableOpacity onPressIn={handleSetTags}>
+        <TouchableOpacity onPressIn={handleConfirmSelection}>
           <Feather name="check" size={32} color="black" />
         </TouchableOpacity>
       </View>

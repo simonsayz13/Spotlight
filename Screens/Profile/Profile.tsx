@@ -90,7 +90,7 @@ const Profile = ({ navigation }: any) => {
     setLdgUserDetails(true);
     setLdgSuccUserDetails(false);
     try {
-      return await getUserDetails(userId);
+      return await getUserDetails(userId!);
     } catch (error) {
       setLdgUserDetails(false);
       Alert.alert("Error", `${error}`);

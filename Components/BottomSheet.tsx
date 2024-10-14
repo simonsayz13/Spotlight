@@ -4,7 +4,6 @@ import {
   Dimensions,
   View,
   StyleSheet,
-  Text,
   TouchableOpacity,
 } from "react-native";
 import { ThemeColoursPrimary } from "../Constants/UI";

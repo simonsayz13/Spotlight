@@ -59,7 +59,7 @@ const TabNavigation = ({ navigation }: any) => {
         }}
       >
         <Tab.Screen
-          name={NavigationTabs.Contents}
+          name={NavigationTabs.Home}
           component={HomeStack}
           options={{
             tabBarIcon: ({ focused }) => (
