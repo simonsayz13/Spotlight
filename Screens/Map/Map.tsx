@@ -1,8 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import {
-  SafeAreaView,
   StyleSheet,
-  TextInput,
   View,
   Platform,
   KeyboardAvoidingView,
@@ -26,7 +24,7 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import MapPostContent from "../../Components/MapPostContent";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import BottomDrawer from "../../Components/BottomDrawer";
-import { Tags } from "../../Constants/UI";
+import MapFilters from "../../Components/MapFilters";
 
 const { width: windowWidth, height: windowHeight } = Dimensions.get("window");
 
@@ -326,73 +324,7 @@ const Map = ({ navigation }: any) => {
           ref={activityFilterDrawerRef}
           isPannable={false}
         >
-          <View style={styles.bottomDrawerTopContainer}>
-            <Text
-              style={{
-                alignItems: "center",
-                fontWeight: "bold",
-                fontSize: 22,
-                paddingLeft: 8,
-              }}
-            >
-              Filters
-            </Text>
-            <TouchableOpacity
-              onPress={closeFilter}
-              style={{ alignSelf: "flex-end" }}
-            >
-              <Ionicons
-                name="close"
-                size={32}
-                color={ThemeColoursPrimary.SecondaryColour}
-              />
-            </TouchableOpacity>
-          </View>
-          <View>
-            {Tags.map((tag) => (
-              <TouchableOpacity
-                key={tag.id}
-                style={[styles.tagButton]}
-                onPress={() => {
-                  selectTag(tag);
-                  closeFilter();
-                }}
-              >
-                <View
-                  style={{
-                    width: 46,
-                    height: 46,
-                    backgroundColor: tag.colour,
-                    borderRadius: 50,
-                    justifyContent: "center",
-                    alignItems: "center",
-                    shadowColor: "#000",
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.2,
-                    shadowRadius: 2,
-                    elevation: 5,
-                  }}
-                >
-                  <Text style={{ fontSize: 18 }}>{tag.icon}</Text>
-                </View>
-                <View
-                  style={{
-                    marginLeft: 10,
-                    gap: 4,
-                    flex: 1,
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-                    {tag.label}
-                  </Text>
-                  <Text style={{ marginTop: "auto" }}>
-                    {tag.examples.join(", ")}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </View>
+          <MapFilters selectTag={selectTag} closeFilter={closeFilter} />
         </BottomDrawer>
 
         <Animated.View
@@ -477,16 +409,6 @@ const styles = StyleSheet.create({
     right: 16,
     gap: 16,
     alignItems: "flex-end", // Align buttons vertically
-  },
-  bottomDrawerTopContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  tagButton: {
-    flexDirection: "row",
-    margin: 8,
-    alignItems: "center",
   },
 });
 
