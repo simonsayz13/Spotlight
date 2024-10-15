@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import {
   StyleSheet,
   View,
@@ -7,14 +7,17 @@ import {
   TouchableOpacity,
 } from "react-native";
 // 32 is a good default number
-const Size = 46; // Default size of the speech bubble
-const CollapsedSize = 20; // Collapsed size for the speech bubble
+const Size = 36; // Default size of the speech bubble
+const CollapsedSize = 12; // Collapsed size for the speech bubble
 
-const MapMarker = () => {
-  const [collapsed, setCollapsed] = useState<boolean>(false);
+const MapMarker = ({ tag, collapsed }: any) => {
+  // const [collapsed, setCollapsed] = useState<boolean>(false);
 
   const animatedSize = useRef(new Animated.Value(Size)).current;
   const animatedOpacity = useRef(new Animated.Value(1)).current;
+  const animatedTranslateX = useRef(new Animated.Value(0)).current;
+  const animatedTranslateY = useRef(new Animated.Value(0)).current;
+
   useEffect(() => {
     // Define the animation when 'collapsed' changes
     Animated.parallel([
@@ -28,51 +31,61 @@ const MapMarker = () => {
         duration: 300,
         useNativeDriver: false,
       }),
+      Animated.timing(animatedTranslateX, {
+        // Move right when expanded, left when collapsed
+        toValue: collapsed ? -6 : 12, // 10 units to the right when expanded, -30 units to the left when collapsed
+        duration: 300,
+        useNativeDriver: false,
+      }),
+      Animated.timing(animatedTranslateY, {
+        // Move up when expanded, down when collapsed
+        toValue: collapsed ? 6 : -12, // -10 units up when expanded, 30 units down when collapsed
+        duration: 300,
+        useNativeDriver: false,
+      }),
     ]).start();
   }, [collapsed]);
-
+  // onPress={() => setCollapsed(!collapsed)}>
   return (
     <TouchableOpacity>
-      {/*onPress={() => setCollapsed(!collapsed)}>*/}
       <View style={styles.container}>
-        {/* Animated Icon with dynamic size and border radius */}
         <Animated.View
           style={[
             styles.bubble,
             {
+              backgroundColor: tag.colour,
               width: animatedSize,
               height: animatedSize,
-              borderRadius: animatedSize,
+              borderTopLeftRadius: animatedSize.interpolate({
+                inputRange: [CollapsedSize, Size],
+                outputRange: [CollapsedSize / 2, Size / 2], // Keep round for top-left
+              }),
+              borderTopRightRadius: animatedSize.interpolate({
+                inputRange: [CollapsedSize, Size],
+                outputRange: [CollapsedSize / 2, Size / 2], // Keep round for top-right
+              }),
+              borderBottomRightRadius: animatedSize.interpolate({
+                inputRange: [CollapsedSize, Size],
+                outputRange: [CollapsedSize / 2, Size / 2], // Keep round for bottom-right
+              }),
+              borderBottomLeftRadius: animatedSize.interpolate({
+                inputRange: [CollapsedSize, Size],
+                outputRange: [CollapsedSize / 2, 0],
+              }),
+              transform: [
+                { translateX: animatedTranslateX },
+                { translateY: animatedTranslateY },
+              ],
             },
           ]}
         >
-          {/* <Ionicons name="chatbubble" size={Size} color="#FF4C4C" /> */}
-          {/* <Animated.View
-            style={[
-              styles.bubbleTail,
-              {
-                borderLeftWidth: animatedSize.interpolate({
-                  inputRange: [CollapsedSize, Size],
-                  outputRange: [CollapsedSize * 0.4, Size * 0.4], // Adjust relative to bubble size
-                }),
-                borderRightWidth: animatedSize.interpolate({
-                  inputRange: [CollapsedSize, Size],
-                  outputRange: [CollapsedSize * 0.4, Size * 0.4],
-                }),
-                borderTopWidth: animatedSize.interpolate({
-                  inputRange: [CollapsedSize, Size],
-                  outputRange: [CollapsedSize * 0.8, Size * 0.8],
-                }),
-              },
-            ]}
-          /> */}
           <Animated.Text
             style={[
               styles.iconContent,
               { opacity: animatedOpacity, fontSize: Size / 2 - 4 },
             ]}
           >
-            🔥
+            {tag.icon}
           </Animated.Text>
         </Animated.View>
       </View>
@@ -83,31 +96,15 @@ const MapMarker = () => {
 const styles = StyleSheet.create({
   container: {
     position: "relative",
-    width: 48,
-    height: 48,
+    width: 50,
+    height: 50,
     justifyContent: "center",
     alignItems: "center",
   },
   bubble: {
-    backgroundColor: "#FF4C4C",
     justifyContent: "center",
     alignItems: "center",
     position: "relative",
-  },
-  bubbleTail: {
-    position: "absolute",
-    bottom: -6, // Slightly move up to connect with the bubble
-    right: "50%",
-    transform: [
-      // { translateX: -6 }, // Center the tail horizontally
-      { rotate: "45deg" }, // Rotate the tail to make it diagonal
-    ],
-    width: 0,
-    height: 0,
-    borderStyle: "solid",
-    borderLeftColor: "transparent",
-    borderRightColor: "transparent",
-    borderTopColor: "#FF4C4C", // Same color as the bubble
   },
   iconContent: {
     fontSize: 24, // Size of the text/emoji inside the bubble

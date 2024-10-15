@@ -11,14 +11,13 @@ import {
   Dimensions,
 } from "react-native";
 import MapView, { Marker } from "react-native-maps";
-import { ThemeColoursPrimary } from "../../Constants/UI";
+import { Tags, ThemeColoursPrimary } from "../../Constants/UI";
 import { getLocation, getLocationPermission } from "../../Util/LocationService";
 import ActivityLoader from "../../Components/ActivityLoader";
 import {
   getLocationPosts,
   getUserDetails,
 } from "../../Firebase/firebaseFireStore";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import MapPostContent from "../../Components/MapPostContent";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import BottomDrawer from "../../Components/BottomDrawer";
@@ -193,18 +192,24 @@ const Map = ({ navigation }: any) => {
             showsMyLocationButton={false}
             showsCompass={false}
           >
-            {posts.map((post: any) => (
-              <Marker
-                key={post.id}
-                coordinate={{
-                  latitude: post.coordinates.latitude,
-                  longitude: post.coordinates.longitude,
-                }}
-                onPress={() => handleMarkerPress(post)}
-              >
-                <MapMarker />
-              </Marker>
-            ))}
+            {posts.map((post: any) => {
+              const tag = Tags.find((tag) => tag.label === post.tags[0]);
+              const isCollapsed =
+                selectedTag && selectedTag.label !== post.tags[0];
+
+              return (
+                <Marker
+                  key={post.id}
+                  coordinate={{
+                    latitude: post.coordinates.latitude,
+                    longitude: post.coordinates.longitude,
+                  }}
+                  onPress={() => handleMarkerPress(post)}
+                >
+                  <MapMarker tag={tag} collapsed={isCollapsed} />
+                </Marker>
+              );
+            })}
           </MapView>
         )}
 
