@@ -9,9 +9,7 @@ import {
   TouchableOpacity,
   Alert,
   Dimensions,
-  Text,
 } from "react-native";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import MapView, { Marker } from "react-native-maps";
 import { ThemeColoursPrimary } from "../../Constants/UI";
 import { getLocation, getLocationPermission } from "../../Util/LocationService";
@@ -25,6 +23,7 @@ import MapPostContent from "../../Components/MapPostContent";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import BottomDrawer from "../../Components/BottomDrawer";
 import MapFilters from "../../Components/MapFilters";
+import FilterButton from "../../Components/FilterButton";
 
 const { width: windowWidth, height: windowHeight } = Dimensions.get("window");
 
@@ -39,8 +38,6 @@ const Map = ({ navigation }: any) => {
   const [heading, setHeading] = useState(0); // Track heading (bearing)
   const activityFilterDrawerRef = useRef<any>(null);
   const [selectedTag, setSelectedTag] = useState<any>(null);
-  const animatedWidth = useRef(new Animated.Value(40)).current; // For animation width
-  const opacityAnim = useRef(new Animated.Value(0)).current;
 
   const initialise = async () => {
     const permission = await getLocationPermission();
@@ -165,34 +162,8 @@ const Map = ({ navigation }: any) => {
   };
 
   const selectTag = (tag: any) => {
-    const newTag = tag ? (tag.id === selectedTag?.id ? null : tag) : null;
+    const newTag = tag.id === selectedTag?.id ? null : tag;
     setSelectedTag(newTag); // Deselect if clicked again
-    if (newTag) {
-      Animated.parallel([
-        Animated.timing(opacityAnim, {
-          toValue: 1, // Fully visible
-          duration: 300, // Animation duration
-          useNativeDriver: true,
-        }),
-        Animated.timing(animatedWidth, {
-          toValue: newTag.label.length * 12 + 46, // Dynamically calculate width based on label length
-          duration: 300,
-          useNativeDriver: false,
-        }),
-      ]).start();
-    } else {
-      opacityAnim.setValue(0);
-      Animated.timing(opacityAnim, {
-        toValue: 0, // Fully visible
-        duration: 300, // Animation duration
-        useNativeDriver: true,
-      }).start();
-      Animated.timing(animatedWidth, {
-        toValue: 40,
-        duration: 300,
-        useNativeDriver: false,
-      }).start();
-    }
   };
 
   return (
@@ -242,58 +213,11 @@ const Map = ({ navigation }: any) => {
         )}
 
         <View style={styles.actionBarContainer}>
-          <Animated.View
-            style={{
-              flexDirection: "row",
-              width: animatedWidth,
-              flex: 1,
-              backgroundColor: selectedTag ? selectedTag.colour : "black",
-              borderRadius: 50,
-              height: 40,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            {!selectedTag ? (
-              <TouchableOpacity
-                style={styles.buttonBase}
-                onPressIn={onFilterButtonPress}
-              >
-                <FontAwesome5
-                  name="search"
-                  size={22}
-                  color={ThemeColoursPrimary.PrimaryColour}
-                />
-              </TouchableOpacity>
-            ) : (
-              <Animated.View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  opacity: opacityAnim,
-                }}
-              >
-                <TouchableOpacity onPressIn={onFilterButtonPress}>
-                  <Text
-                    style={{
-                      fontSize: 18,
-                      color: ThemeColoursPrimary.PrimaryColour,
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {selectedTag.label}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => selectTag(null)}>
-                  <Ionicons
-                    name="close"
-                    size={26}
-                    color={ThemeColoursPrimary.PrimaryColour}
-                  />
-                </TouchableOpacity>
-              </Animated.View>
-            )}
-          </Animated.View>
+          <FilterButton
+            selectedTag={selectedTag}
+            setSelectedTag={setSelectedTag}
+            onFilterButtonPress={onFilterButtonPress}
+          />
           <TouchableOpacity
             style={styles.buttonBase}
             onPressIn={centerMapToCurrentLocation}
