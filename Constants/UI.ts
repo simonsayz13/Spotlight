@@ -18,7 +18,7 @@ export const Tags = [
   {
     id: 1,
     label: "Trending",
-    icon: "🚀",
+    icon: "🔥",
     colour: "#FF4C4C",
     checked: false,
     examples: ["Viral", "Buzz", "Hype"], // One-word examples for Trending

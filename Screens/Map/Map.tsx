@@ -24,6 +24,7 @@ import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import BottomDrawer from "../../Components/BottomDrawer";
 import MapFilters from "../../Components/MapFilters";
 import FilterButton from "../../Components/FilterButton";
+import MapMarker from "../../Components/MapMarker";
 
 const { width: windowWidth, height: windowHeight } = Dimensions.get("window");
 
@@ -60,6 +61,7 @@ const Map = ({ navigation }: any) => {
         };
       })
     );
+    //@ts-ignore
     setPosts(postsWithUserDetails);
     setGotLocation(false);
     setMapRegion(currentCoordinate);
@@ -116,8 +118,6 @@ const Map = ({ navigation }: any) => {
       mapRef.current.animateCamera(
         {
           center: { latitude, longitude },
-          altitude: 1200, // Zoom level for Apple map
-          zoom: 12, // Adjust zoom level as needed for Google map
         },
         { duration: 800 }
       );
@@ -188,7 +188,7 @@ const Map = ({ navigation }: any) => {
               setMapRegion(region);
               onRegionChangeComplete();
             }}
-            showsUserLocation={true}
+            // showsUserLocation={true}
             showsPointsOfInterest={false}
             showsMyLocationButton={false}
             showsCompass={false}
@@ -202,11 +202,7 @@ const Map = ({ navigation }: any) => {
                 }}
                 onPress={() => handleMarkerPress(post)}
               >
-                <MaterialCommunityIcons
-                  name="sign-text"
-                  size={32}
-                  color={ThemeColoursPrimary.LogoColour}
-                />
+                <MapMarker />
               </Marker>
             ))}
           </MapView>
