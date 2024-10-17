@@ -10,15 +10,12 @@ import {
   Animated,
   PanResponder,
   KeyboardAvoidingView,
-  ActivityIndicator,
   Alert,
-  Modal,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {
   EditProfileType,
   Gender,
-  MiscStackScreens,
   ThemeColours,
   ThemeColoursPrimary,
 } from "../../Constants/UI";

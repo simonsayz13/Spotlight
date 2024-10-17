@@ -14,6 +14,57 @@ export const guestContentSelectorButtons = [
   { id: 1, label: "Posts", clicked: true },
 ];
 
+export const Tags = [
+  {
+    id: 1,
+    label: "Trending",
+    icon: "🔥",
+    colour: "#FF4C4C",
+    checked: false,
+    examples: ["Viral", "Buzz", "Hype"], // One-word examples for Trending
+  },
+  {
+    id: 2,
+    label: "Dating",
+    icon: "❤️",
+    colour: "#FF69B4",
+    checked: false,
+    examples: ["Romance", "Crush", "Connection"], // One-word examples for Dating
+  },
+  {
+    id: 3,
+    label: "Event",
+    icon: "📅",
+    colour: "#1E90FF",
+    checked: false,
+    examples: ["Concert", "Festival", "Party"], // One-word examples for Event
+  },
+  {
+    id: 4,
+    label: "Discussion",
+    icon: "💬",
+    colour: "#32CD32",
+    checked: false,
+    examples: ["Debate", "Talk", "Chat"], // One-word examples for Discussion
+  },
+  {
+    id: 5,
+    label: "Deals",
+    icon: "🛍️",
+    colour: "#FFD700",
+    checked: false,
+    examples: ["Savings", "Discount", "Offer"], // One-word examples for Deals
+  },
+  {
+    id: 6,
+    label: "Recommendations",
+    icon: "🏡",
+    colour: "#8A2BE2",
+    checked: false,
+    examples: ["Advice", "Tips", "Suggestions"], // One-word examples for Recommendations
+  },
+];
+
 export enum HomeStackScreens {
   Home = "home",
   Post = "post",
@@ -28,10 +79,10 @@ export enum ProfileStackScreens {
   ViewProfile = "viewprofile",
 }
 export enum NavigationTabs {
-  Me = "me",
-  Messages = "messages",
-  Contents = "contents",
-  Map = "map",
+  Me = "Me",
+  Messages = "Messages",
+  Home = "Home",
+  Map = "Map",
 }
 
 export enum MessagingStackScreens {
@@ -59,7 +110,7 @@ export enum ThemeColoursPrimary {
   PrimaryColour = "#ffffff",
   SecondaryColour = "#000000",
   ThirdColour = "red",
-  LogoColour = "#ec5050",
+  LogoColour = "#0a74da", //#ec5050
   GreyColour = "#b9b9b9",
   BackgroundColour = "#f1f1f1",
   GoldColour = "#ffd700",
