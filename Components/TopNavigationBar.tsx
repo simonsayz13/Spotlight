@@ -5,19 +5,18 @@ import {
   StyleSheet,
   Animated,
   TextInput,
-  Keyboard,
+  Dimensions,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useState, useRef, useEffect } from "react";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { ThemeColoursPrimary, TopNavigationHomeButtons } from "../Constants/UI";
+const { width } = Dimensions.get("window");
 
 const TopNavigationBar = (props: any) => {
   const {
-    //* status
     searchText,
     showSearchBar,
-    //* status updator
     handleSearchBarChange,
     setContent,
     handlePressSearchBtn,
@@ -69,69 +68,89 @@ const TopNavigationBar = (props: any) => {
   }, [showSearchBar]);
 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity onPress={handlePressMenuBtn}>
-        <Ionicons
-          name={showSearchBar ? "chevron-back" : "menu"}
-          size={32}
-          color={ThemeColoursPrimary.SecondaryColour}
-        />
-      </TouchableOpacity>
+    <View>
+      <View style={styles.container}>
+        <TouchableOpacity onPress={handlePressMenuBtn}>
+          <Ionicons
+            name={showSearchBar ? "chevron-back" : "menu"}
+            size={32}
+            color={ThemeColoursPrimary.SecondaryColour}
+          />
+        </TouchableOpacity>
 
-      <View style={styles.menuContainer}>
-        <Animated.View
-          style={[
-            styles.searchBar,
-            {
-              opacity: searchBarOpacity,
-              transform: [{ translateX: searchBarTranslateX }],
-            },
-          ]}
-          pointerEvents={showSearchBar ? "auto" : "none"}
-        >
-          <View style={[styles.searchBarWrapper]}>
-            <TextInput
-              ref={inputRef}
-              style={styles.input}
-              placeholder="Search..."
-              value={searchText}
-              onChange={handleSearchBarChange}
-            />
-            {searchText.length > 0 && (
-              <TouchableOpacity
-                onPressIn={() => {
-                  handlePressInClearBtn();
-                }}
-              >
-                <AntDesign name="closecircleo" size={20} color="black" />
-              </TouchableOpacity>
-            )}
-          </View>
-        </Animated.View>
-        {!showSearchBar &&
-          buttonStates.map((button) => (
-            <TouchableOpacity
-              key={button.id}
-              onPress={() => handlePress(button.id)}
-            >
-              {button.clicked ? (
-                <View style={styles.textWrapper}>
-                  <Text style={styles.menuButtonClicked}>{button.label}</Text>
-                  <View style={styles.customUnderline} />
-                </View>
-              ) : (
-                <Text style={styles.menuButton}>{button.label}</Text>
+        <View style={styles.menuContainer}>
+          <Text
+            style={{
+              fontWeight: "bold",
+              fontSize: 28,
+              color: ThemeColoursPrimary.LogoColour,
+            }}
+          >
+            LINKIFY
+          </Text>
+          <Animated.View
+            style={[
+              styles.searchBar,
+              {
+                opacity: searchBarOpacity,
+                transform: [{ translateX: searchBarTranslateX }],
+              },
+            ]}
+            pointerEvents={showSearchBar ? "auto" : "none"}
+          >
+            <View style={[styles.searchBarWrapper]}>
+              <TextInput
+                ref={inputRef}
+                style={styles.input}
+                placeholder="Search..."
+                value={searchText}
+                onChange={handleSearchBarChange}
+              />
+              {searchText.length > 0 && (
+                <TouchableOpacity
+                  onPressIn={() => {
+                    handlePressInClearBtn();
+                  }}
+                >
+                  <AntDesign name="closecircleo" size={20} color="black" />
+                </TouchableOpacity>
               )}
-            </TouchableOpacity>
-          ))}
+            </View>
+          </Animated.View>
+        </View>
+        <TouchableOpacity onPress={handlePressSearchBtn}>
+          <Ionicons
+            name="search"
+            size={32}
+            color={ThemeColoursPrimary.SecondaryColour}
+          />
+        </TouchableOpacity>
       </View>
-      <TouchableOpacity onPress={handlePressSearchBtn}>
-        <Ionicons
-          name="search"
-          size={32}
-          color={ThemeColoursPrimary.SecondaryColour}
-        />
-      </TouchableOpacity>
+      {/* <View
+        style={{
+          paddingVertical: 6,
+          flexDirection: "row",
+        }}
+      >
+        {buttonStates.map((button) => (
+          <TouchableOpacity
+            key={button.id}
+            onPress={() => handlePress(button.id)}
+            style={{ width: width / 3 }}
+          >
+            <View style={styles.textWrapper}>
+              <Text
+                style={
+                  button.clicked ? styles.menuButtonClicked : styles.menuButton
+                }
+              >
+                {button.label}
+              </Text>
+            </View>
+            {button.clicked && <View style={styles.customUnderline} />}
+          </TouchableOpacity>
+        ))}
+      </View> */}
     </View>
   );
 };
@@ -154,13 +173,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 12,
   },
-
   menuButton: {
     fontSize: 20,
-    fontWeight: "normal",
-    color: ThemeColoursPrimary.SecondaryColour,
+    fontWeight: "bold",
+    color: "#808080",
   },
   menuButtonClicked: {
     fontSize: 20,
@@ -168,14 +185,16 @@ const styles = StyleSheet.create({
     color: ThemeColoursPrimary.SecondaryColour,
   },
   textWrapper: {
-    position: "relative",
+    // position: "relative",
     alignItems: "center",
+    justifyContent: "center",
   },
   customUnderline: {
     position: "absolute",
-    bottom: -4, // Adjust this value to control the gap between the text and underline
+    bottom: -5, // Adjust this value to control the gap between the text and underline
     height: 3,
-    width: "70%",
+    width: "100%",
+
     backgroundColor: ThemeColoursPrimary.LogoColour, // Set the underline color
     borderRadius: 18,
   },
@@ -191,7 +210,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     backgroundColor: ThemeColoursPrimary.BackgroundColour,
     borderRadius: 20,
-    // borderColor: ThemeColours.PrimaryColour,
     borderWidth: 2,
   },
   input: {
