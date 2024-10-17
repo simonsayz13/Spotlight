@@ -6,17 +6,20 @@ import {
   Text,
   Platform,
 } from "react-native";
-import Feather from "@expo/vector-icons/Feather";
-import { Tags } from "../Constants/UI";
+import { Tags, ThemeColoursPrimary } from "../Constants/UI";
 import { Tag } from "../type/General";
+import AntDesign from "@expo/vector-icons/AntDesign";
 
 const TagSelection = ({ handleSetTags }: any) => {
   const [tags, setTags] = useState(Tags);
 
   const handleTagToggle = (id: number) => {
     setTags((prevTags) =>
-      prevTags.map((tag) =>
-        tag.id === id ? { ...tag, checked: !tag.checked } : tag
+      prevTags.map(
+        (tag) =>
+          tag.id === id
+            ? { ...tag, checked: !tag.checked } // Toggle the selected tag
+            : { ...tag, checked: false } // Uncheck all other tags
       )
     );
   };
@@ -37,8 +40,11 @@ const TagSelection = ({ handleSetTags }: any) => {
     <View>
       <View style={styles.tagSelectionTopContainer}>
         <Text style={styles.tagTitle}>Tags</Text>
-        <TouchableOpacity onPressIn={handleConfirmSelection}>
-          <Feather name="check" size={32} color="black" />
+        <TouchableOpacity
+          style={styles.confirmButton}
+          onPressIn={handleConfirmSelection}
+        >
+          <Text style={styles.confirmButtonText}>Save</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.tagSelectionBodyContainer}>
@@ -54,11 +60,13 @@ const TagSelection = ({ handleSetTags }: any) => {
               <Text style={styles.tagLabel}>{tag.label}</Text>
             </View>
             <View style={styles.checkBox}>
-              <Feather
-                name={tag.checked ? "check-square" : "square"}
-                size={24}
-                color="black"
-              />
+              {tag.checked && (
+                <AntDesign
+                  name="check"
+                  size={24}
+                  color={ThemeColoursPrimary.LogoColour}
+                />
+              )}
             </View>
           </TouchableOpacity>
         ))}
@@ -102,6 +110,17 @@ const styles = StyleSheet.create({
   },
   checkBox: {
     paddingRight: 10,
+  },
+  confirmButton: {
+    backgroundColor: ThemeColoursPrimary.LogoColour, // Use your theme color
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 16,
+  },
+  confirmButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
 export default TagSelection;

@@ -12,6 +12,7 @@ import {
   Alert,
   Switch,
   Platform,
+  KeyboardAvoidingView,
 } from "react-native";
 import {
   HomeStackScreens,
@@ -33,9 +34,9 @@ import { getLocation, getLocationPermission } from "../../Util/LocationService";
 import ImagePreviewCarousel from "../../Components/ImagePreviewCarousel";
 import { createMediaData } from "../../Util/utility";
 import BottomDrawer from "../../Components/BottomDrawer";
-import AntDesign from "@expo/vector-icons/AntDesign";
 import TagSelection from "../../Components/TagSelection";
 import PostOptionsMenuBar from "../../Components/PostOptionsMenuBar";
+import { ScrollView } from "react-native-gesture-handler";
 
 const { width, height } = Dimensions.get("window");
 
@@ -45,7 +46,7 @@ const CreatePost = ({ navigation, route }: any) => {
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [posting, setPosting] = useState<boolean>(false);
-  const [isComment, setIsComment] = useState<boolean>(false);
+  const [isComment, setIsComment] = useState<boolean>(true);
   const [isLocation, setIsLocation] = useState<boolean>(false);
   const [isPrivate, setIsPrivate] = useState<boolean>(false);
   const [photoArray, setPhotoArray] = useState<Array<string>>([]);
@@ -201,61 +202,79 @@ const CreatePost = ({ navigation, route }: any) => {
             color={ThemeColoursPrimary.SecondaryColour}
           />
         </TouchableOpacity>
-        <Text style={styles.title}>Create a post</Text>
-        <TouchableOpacity style={styles.postButton} onPressIn={post}>
+        <TouchableOpacity
+          style={[
+            styles.postButton,
+            {
+              backgroundColor: title ? ThemeColoursPrimary.LogoColour : "#ccc",
+            },
+          ]}
+          onPressIn={post}
+          disabled={!title}
+        >
           <Text style={styles.buttonText}>Post</Text>
         </TouchableOpacity>
       </View>
-      {photoArray.length > 0 && (
-        <ImagePreviewCarousel
-          photoArray={photoArray}
-          setPhotoArray={setPhotoArray}
-        />
-      )}
-
-      <View style={styles.titleInputContainer}>
-        <TextInput
-          style={styles.titleTextInput}
-          placeholder="Add a title..."
-          onChangeText={(text) => {
-            setTitle(text);
-          }}
-        >
-          {title}
-        </TextInput>
-      </View>
-      <View style={styles.divider}></View>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={styles.descriptionInputContainer}>
-          <TextInput
-            style={styles.descriptionTextInput}
-            placeholder="Add a description..."
-            multiline={true}
-            onChangeText={(text) => {
-              setDescription(text);
-            }}
-          >
-            {description}
-          </TextInput>
-        </View>
-      </TouchableWithoutFeedback>
-      {tags.length > 0 && (
-        <View style={styles.tagsContainer}>
-          <Text style={styles.tagsLabel}>Tags:</Text>
-          <View style={styles.selectedTags}>
-            {tags.map((tag, index) => (
-              <View
-                key={index}
-                style={[styles.tagChip, { backgroundColor: tag.colour }]}
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={{ flex: 1 }}
+        >
+          <ScrollView onScrollEndDrag={Keyboard.dismiss}>
+            {photoArray.length > 0 && (
+              <ImagePreviewCarousel
+                photoArray={photoArray}
+                setPhotoArray={setPhotoArray}
+              />
+            )}
+
+            <View style={styles.titleInputContainer}>
+              <TextInput
+                style={styles.titleTextInput}
+                placeholder="Title"
+                onChangeText={(text) => {
+                  setTitle(text);
+                }}
+                placeholderTextColor="rgba(0, 0, 0, 1)"
               >
-                <Text style={styles.tagText}>
-                  {tag.icon} {tag.label}
-                </Text>
+                {title}
+              </TextInput>
+            </View>
+            <View style={styles.descriptionInputContainer}>
+              <TextInput
+                style={styles.descriptionTextInput}
+                placeholder="body text (optional)"
+                multiline={true}
+                onChangeText={(text) => {
+                  setDescription(text);
+                }}
+                scrollEnabled={false}
+              >
+                {description}
+              </TextInput>
+            </View>
+
+            {tags.length > 0 && (
+              <View style={styles.tagsContainer}>
+                <View style={styles.selectedTags}>
+                  {tags.map((tag, index) => (
+                    <TouchableOpacity
+                      key={index}
+                      style={[styles.tagChip, { backgroundColor: tag.colour }]}
+                      activeOpacity={1}
+                      onPressIn={handleShowDrawer}
+                    >
+                      <Text style={styles.tagText}>
+                        {tag.icon} {tag.label}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
               </View>
-            ))}
-          </View>
-        </View>
-      )}
+            )}
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </TouchableWithoutFeedback>
       <BottomSheet
         menuBar={
           <PostOptionsMenuBar
@@ -287,6 +306,8 @@ const styles = StyleSheet.create({
   },
   topBarContainer: {
     padding: 8,
+    width: width,
+    justifyContent: "space-between",
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: ThemeColoursPrimary.PrimaryColour,
@@ -322,23 +343,21 @@ const styles = StyleSheet.create({
     color: ThemeColoursPrimary.GreyColour,
   },
   titleInputContainer: {
-    width: width * 0.95,
-    gap: 10,
-    borderRadius: 8,
-    paddingVertical: 10,
+    width: width,
+    paddingHorizontal: 10,
+    marginTop: 12,
+    marginBottom: 16,
   },
   titleTextInput: {
-    height: 40,
-    fontSize: 20,
+    fontSize: 26,
+    fontWeight: "700",
   },
   descriptionInputContainer: {
-    marginTop: 10,
     width: width,
-    borderRadius: 8,
-    padding: 10,
+    paddingHorizontal: 10,
   },
   descriptionTextInput: {
-    fontSize: 20,
+    fontSize: 18,
   },
   divider: {
     width: width * 0.95,
@@ -362,10 +381,10 @@ const styles = StyleSheet.create({
     opacity: 0.7,
     color: ThemeColoursPrimary.SecondaryColour,
   },
-  selectedTagsContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    marginVertical: 10,
+  tagsContainer: {
+    width: width,
+    paddingHorizontal: 10,
+    marginTop: 20,
   },
   tagChip: {
     borderRadius: 6,
@@ -379,20 +398,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "bold",
   },
-  tagsContainer: {
-    width: width,
-    paddingHorizontal: 10,
-    marginTop: 10,
-  },
-  tagsLabel: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: ThemeColoursPrimary.SecondaryColour,
-  },
   selectedTags: {
     flexDirection: "row",
     flexWrap: "wrap",
-    marginTop: 5,
   },
 });
 

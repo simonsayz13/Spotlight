@@ -110,7 +110,7 @@ export enum ThemeColoursPrimary {
   PrimaryColour = "#ffffff",
   SecondaryColour = "#000000",
   ThirdColour = "red",
-  LogoColour = "#ec5050",
+  LogoColour = "#0a74da",
   GreyColour = "#b9b9b9",
   BackgroundColour = "#f1f1f1",
   GoldColour = "#ffd700",

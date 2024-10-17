@@ -25,6 +25,7 @@ const ImagePreviewCarousel = memo(({ photoArray, setPhotoArray }: any) => {
               <TouchableOpacity
                 style={styles.deleteButton}
                 onPress={() => handleDelete(photoURI)}
+                activeOpacity={1}
               >
                 <AntDesign name="closecircleo" size={20} color="black" />
               </TouchableOpacity>
