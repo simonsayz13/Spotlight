@@ -11,6 +11,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { useState, useRef, useEffect } from "react";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { ThemeColoursPrimary, TopNavigationHomeButtons } from "../Constants/UI";
+
 const { width } = Dimensions.get("window");
 
 const TopNavigationBar = (props: any) => {
@@ -22,14 +23,22 @@ const TopNavigationBar = (props: any) => {
     handlePressSearchBtn,
     handlePressMenuBtn,
     handlePressInClearBtn,
+    isMenuVisible,
   } = props;
-  const inputRef = useRef<TextInput>(null);
 
+  const inputRef = useRef<TextInput>(null);
   const [buttonStates, setButtonStates] = useState(TopNavigationHomeButtons);
   const [searchBarOpacity] = useState(new Animated.Value(0)); // Start with opacity 0 (invisible)
   const [searchBarTranslateX] = useState(new Animated.Value(10)); // Start with position off-screen
-
-  const handlePress = (id: number) => {
+  const [underlinePosition] = useState(
+    new Animated.Value(
+      width / buttonStates.length +
+        (width / buttonStates.length - width / 4) / 2
+    )
+  );
+  const menuButtonTranslateY = useRef(new Animated.Value(0)).current;
+  // const middleButtonIndex = Math.floor(buttonStates.length / 2);
+  const handlePress = (id: number, index: number) => {
     setButtonStates((prevStates) =>
       prevStates.map((button) =>
         button.id === id
@@ -41,6 +50,15 @@ const TopNavigationBar = (props: any) => {
     );
     const clickedScreen = buttonStates.find((item) => id == item.id)?.label;
     setContent(clickedScreen);
+
+    // Animate underline to the new tab
+    Animated.timing(underlinePosition, {
+      toValue:
+        index * (width / buttonStates.length) +
+        (width / buttonStates.length - width / 4) / 2, // width divided by the number of buttons
+      duration: 200, // Duration of animation
+      useNativeDriver: true, // Use native driver for better performance
+    }).start();
   };
 
   //> Hooks
@@ -67,6 +85,15 @@ const TopNavigationBar = (props: any) => {
     ]).start();
   }, [showSearchBar]);
 
+  useEffect(() => {
+    // Animate the menu button view
+    Animated.timing(menuButtonTranslateY, {
+      toValue: isMenuVisible ? 0 : -50, // Adjust the value to control how much it moves
+      duration: 200,
+      useNativeDriver: true,
+    }).start();
+  }, [isMenuVisible]);
+
   return (
     <View>
       <View style={styles.container}>
@@ -81,12 +108,12 @@ const TopNavigationBar = (props: any) => {
         <View style={styles.menuContainer}>
           <Text
             style={{
-              fontWeight: "bold",
-              fontSize: 28,
+              fontFamily: "Shrikhand_400Regular",
+              fontSize: 40,
               color: ThemeColoursPrimary.LogoColour,
             }}
           >
-            LINKIFY
+            Pulse
           </Text>
           <Animated.View
             style={[
@@ -121,36 +148,58 @@ const TopNavigationBar = (props: any) => {
         <TouchableOpacity onPress={handlePressSearchBtn}>
           <Ionicons
             name="search"
-            size={32}
+            size={26}
             color={ThemeColoursPrimary.SecondaryColour}
           />
         </TouchableOpacity>
       </View>
-      {/* <View
+      <Animated.View
         style={{
-          paddingVertical: 6,
-          flexDirection: "row",
+          zIndex: -10,
+          transform: [{ translateY: menuButtonTranslateY }],
+          height: isMenuVisible ? "auto" : 0, // Adjust height based on visibility
+          opacity: menuButtonTranslateY.interpolate({
+            inputRange: [-50, 0],
+            outputRange: [0, 1],
+            extrapolate: "clamp",
+          }),
         }}
       >
-        {buttonStates.map((button) => (
-          <TouchableOpacity
-            key={button.id}
-            onPress={() => handlePress(button.id)}
-            style={{ width: width / 3 }}
-          >
-            <View style={styles.textWrapper}>
-              <Text
-                style={
-                  button.clicked ? styles.menuButtonClicked : styles.menuButton
-                }
-              >
-                {button.label}
-              </Text>
-            </View>
-            {button.clicked && <View style={styles.customUnderline} />}
-          </TouchableOpacity>
-        ))}
-      </View> */}
+        <View
+          style={{
+            paddingVertical: 6,
+            flexDirection: "row",
+          }}
+        >
+          {buttonStates.map((button, index) => (
+            <TouchableOpacity
+              key={button.id}
+              onPress={() => handlePress(button.id, index)}
+              style={{ width: width / 3 }}
+            >
+              <View style={styles.textWrapper}>
+                <Text
+                  style={
+                    button.clicked
+                      ? styles.menuButtonClicked
+                      : styles.menuButton
+                  }
+                >
+                  {button.label}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </View>
+        <Animated.View
+          style={[
+            styles.customUnderline,
+            {
+              transform: [{ translateX: underlinePosition }], // Move based on animated value
+            },
+          ]}
+        />
+      </Animated.View>
     </View>
   );
 };
@@ -160,7 +209,7 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    padding: 8,
+    paddingHorizontal: 8,
     alignItems: "center",
     flexDirection: "row",
     justifyContent: "space-around",
@@ -185,18 +234,17 @@ const styles = StyleSheet.create({
     color: ThemeColoursPrimary.SecondaryColour,
   },
   textWrapper: {
-    // position: "relative",
     alignItems: "center",
     justifyContent: "center",
   },
   customUnderline: {
     position: "absolute",
-    bottom: -5, // Adjust this value to control the gap between the text and underline
+    bottom: 2, // Adjust this value to control the gap between the text and underline
     height: 3,
-    width: "100%",
-
+    width: width / 4,
     backgroundColor: ThemeColoursPrimary.LogoColour, // Set the underline color
-    borderRadius: 18,
+    borderRadius: 20,
+    justifyContent: "center",
   },
   searchBarWrapper: {
     flexDirection: "row",

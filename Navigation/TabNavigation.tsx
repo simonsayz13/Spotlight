@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import HomeStack from "./Stacks/HomeStack";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
+import FontAwesome6 from "@expo/vector-icons/FontAwesome";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Map } from "../Screens/Map/Map";
 import ProfileStack from "./Stacks/ProfileStack";
@@ -18,6 +18,7 @@ import {
   ThemeColoursPrimary,
 } from "../Constants/UI";
 import MessagingStackScreen from "./Stacks/MessagingStack";
+import Feather from "@expo/vector-icons/Feather";
 
 const Tab = createBottomTabNavigator();
 const { width, height } = Dimensions.get("window");
@@ -31,7 +32,7 @@ const TabNavigation = ({ navigation }: any) => {
     >
       {/* Main Tab Navigator */}
       <Tab.Navigator
-        initialRouteName={NavigationTabs.Contents}
+        initialRouteName={NavigationTabs.Home}
         screenOptions={{
           tabBarHideOnKeyboard: true,
           headerShown: false,
@@ -120,11 +121,17 @@ const TabNavigation = ({ navigation }: any) => {
         onPress={() => navigation.navigate(PostStackScreens.CreatePost)} // Navigate to your Post screen
         activeOpacity={1}
       >
-        <FontAwesome
+        {/* <FontAwesome
           name="plus-square-o"
           size={40}
           color={ThemeColoursPrimary.LogoColour}
-        />
+        /> */}
+        {/* <FontAwesome6
+          name="bolt"
+          size={40}
+          color={ThemeColoursPrimary.LogoColour}
+        /> */}
+        <Feather name="plus" size={44} color={ThemeColoursPrimary.LogoColour} />
       </TouchableOpacity>
     </KeyboardAvoidingView>
   );

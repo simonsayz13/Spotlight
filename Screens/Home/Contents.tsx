@@ -9,7 +9,7 @@ import store, { RootState } from "../../Redux/store";
 import { MasonryFlashList } from "@shopify/flash-list";
 
 const Contents = (props: any) => {
-  const { content, navigation, showSearchBar, searchText } = props;
+  const { content, navigation, showSearchBar, searchText, onScroll } = props;
   const [refreshing, setRefreshing] = useState(false);
   const { posts } = useSelector((state: RootState) => state.posts);
   const [filteredPosts, setFilteredPosts] = useState([]);
@@ -94,6 +94,8 @@ const Contents = (props: any) => {
       numColumns={2} // Setting 2 columns for masonry layout
       showsVerticalScrollIndicator={false}
       contentContainerStyle={styles.flashListContainer}
+      onScroll={onScroll}
+      scrollEventThrottle={16}
       refreshControl={
         <RefreshControl
           refreshing={refreshing}
