@@ -31,6 +31,7 @@ const HomeScreen = ({ navigation }: any) => {
   const [content, setContent] = useState("Explore");
   const [searchText, setSearchText] = useState("");
   const [showSearchBar, setShowSearchBar] = useState(false);
+  const [isMenuVisible, setIsMenuVisible] = useState(true);
 
   const changeContent = useCallback((content: string) => {
     setContent(content);
@@ -61,10 +62,12 @@ const HomeScreen = ({ navigation }: any) => {
 
   const handlePressSearchBtn = () => {
     showSearchBar ? fetchNewItem() : setShowSearchBar((prev: boolean) => !prev);
+    setIsMenuVisible(false);
   };
 
   const handlePressMenuBtn = (cb: any) => {
     showSearchBar ? setShowSearchBar((prev: boolean) => !prev) : cb();
+    setIsMenuVisible(true);
   };
 
   const handlePressInClearBtn = () => {
@@ -77,6 +80,16 @@ const HomeScreen = ({ navigation }: any) => {
       setSearchText("");
     }
   }, [showSearchBar]);
+
+  const handleScroll = (event: any) => {
+    const offsetY = event.nativeEvent.contentOffset.y;
+    // Hide the buttons when scrolling down, show them when scrolling up
+    if (offsetY > 100) {
+      setIsMenuVisible(false);
+    } else {
+      setIsMenuVisible(true);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -91,12 +104,14 @@ const HomeScreen = ({ navigation }: any) => {
               handlePressSearchBtn={handlePressSearchBtn}
               handlePressMenuBtn={() => handlePressMenuBtn(openDrawer)}
               handlePressInClearBtn={handlePressInClearBtn}
+              isMenuVisible={isMenuVisible}
             />
             <Contents
               content={content}
               navigation={navigation}
               searchText={searchText}
               showSearchBar={showSearchBar}
+              onScroll={handleScroll}
             />
           </View>
         )}

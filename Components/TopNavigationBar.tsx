@@ -5,32 +5,40 @@ import {
   StyleSheet,
   Animated,
   TextInput,
-  Keyboard,
+  Dimensions,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useState, useRef, useEffect } from "react";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { ThemeColoursPrimary, TopNavigationHomeButtons } from "../Constants/UI";
 
+const { width } = Dimensions.get("window");
+
 const TopNavigationBar = (props: any) => {
   const {
-    //* status
     searchText,
     showSearchBar,
-    //* status updator
     handleSearchBarChange,
     setContent,
     handlePressSearchBtn,
     handlePressMenuBtn,
     handlePressInClearBtn,
+    isMenuVisible,
   } = props;
-  const inputRef = useRef<TextInput>(null);
 
+  const inputRef = useRef<TextInput>(null);
   const [buttonStates, setButtonStates] = useState(TopNavigationHomeButtons);
   const [searchBarOpacity] = useState(new Animated.Value(0)); // Start with opacity 0 (invisible)
   const [searchBarTranslateX] = useState(new Animated.Value(10)); // Start with position off-screen
-
-  const handlePress = (id: number) => {
+  const [underlinePosition] = useState(
+    new Animated.Value(
+      width / buttonStates.length +
+        (width / buttonStates.length - width / 4) / 2
+    )
+  );
+  const menuButtonTranslateY = useRef(new Animated.Value(0)).current;
+  // const middleButtonIndex = Math.floor(buttonStates.length / 2);
+  const handlePress = (id: number, index: number) => {
     setButtonStates((prevStates) =>
       prevStates.map((button) =>
         button.id === id
@@ -42,6 +50,15 @@ const TopNavigationBar = (props: any) => {
     );
     const clickedScreen = buttonStates.find((item) => id == item.id)?.label;
     setContent(clickedScreen);
+
+    // Animate underline to the new tab
+    Animated.timing(underlinePosition, {
+      toValue:
+        index * (width / buttonStates.length) +
+        (width / buttonStates.length - width / 4) / 2, // width divided by the number of buttons
+      duration: 200, // Duration of animation
+      useNativeDriver: true, // Use native driver for better performance
+    }).start();
   };
 
   //> Hooks
@@ -68,70 +85,117 @@ const TopNavigationBar = (props: any) => {
     ]).start();
   }, [showSearchBar]);
 
-  return (
-    <View style={styles.container}>
-      <TouchableOpacity onPress={handlePressMenuBtn}>
-        <Ionicons
-          name={showSearchBar ? "chevron-back" : "menu"}
-          size={32}
-          color={ThemeColoursPrimary.SecondaryColour}
-        />
-      </TouchableOpacity>
+  useEffect(() => {
+    // Animate the menu button view
+    Animated.timing(menuButtonTranslateY, {
+      toValue: isMenuVisible ? 0 : -50, // Adjust the value to control how much it moves
+      duration: 200,
+      useNativeDriver: true,
+    }).start();
+  }, [isMenuVisible]);
 
-      <View style={styles.menuContainer}>
-        <Animated.View
-          style={[
-            styles.searchBar,
-            {
-              opacity: searchBarOpacity,
-              transform: [{ translateX: searchBarTranslateX }],
-            },
-          ]}
-          pointerEvents={showSearchBar ? "auto" : "none"}
+  return (
+    <View>
+      <View style={styles.container}>
+        <TouchableOpacity onPress={handlePressMenuBtn}>
+          <Ionicons
+            name={showSearchBar ? "chevron-back" : "menu"}
+            size={32}
+            color={ThemeColoursPrimary.SecondaryColour}
+          />
+        </TouchableOpacity>
+
+        <View style={styles.menuContainer}>
+          <Text
+            style={{
+              fontFamily: "Shrikhand_400Regular",
+              fontSize: 40,
+              color: ThemeColoursPrimary.LogoColour,
+            }}
+          >
+            Spotlight
+          </Text>
+          <Animated.View
+            style={[
+              styles.searchBar,
+              {
+                opacity: searchBarOpacity,
+                transform: [{ translateX: searchBarTranslateX }],
+              },
+            ]}
+            pointerEvents={showSearchBar ? "auto" : "none"}
+          >
+            <View style={[styles.searchBarWrapper]}>
+              <TextInput
+                ref={inputRef}
+                style={styles.input}
+                placeholder="Search..."
+                value={searchText}
+                onChange={handleSearchBarChange}
+              />
+              {searchText.length > 0 && (
+                <TouchableOpacity onPressIn={handlePressInClearBtn}>
+                  <AntDesign name="closecircleo" size={20} color="black" />
+                </TouchableOpacity>
+              )}
+            </View>
+          </Animated.View>
+        </View>
+        <TouchableOpacity onPress={handlePressSearchBtn}>
+          <Ionicons
+            name="search"
+            size={26}
+            color={ThemeColoursPrimary.SecondaryColour}
+          />
+        </TouchableOpacity>
+      </View>
+      <Animated.View
+        style={{
+          zIndex: -10,
+          transform: [{ translateY: menuButtonTranslateY }],
+          height: isMenuVisible ? "auto" : 0, // Adjust height based on visibility
+          opacity: menuButtonTranslateY.interpolate({
+            inputRange: [-50, 0],
+            outputRange: [0, 1],
+            extrapolate: "clamp",
+          }),
+        }}
+      >
+        <View
+          style={{
+            paddingVertical: 6,
+            flexDirection: "row",
+          }}
         >
-          <View style={[styles.searchBarWrapper]}>
-            <TextInput
-              ref={inputRef}
-              style={styles.input}
-              placeholder="Search..."
-              value={searchText}
-              onChange={handleSearchBarChange}
-            />
-            {searchText.length > 0 && (
-              <TouchableOpacity
-                onPressIn={() => {
-                  handlePressInClearBtn();
-                }}
-              >
-                <AntDesign name="closecircleo" size={20} color="black" />
-              </TouchableOpacity>
-            )}
-          </View>
-        </Animated.View>
-        {!showSearchBar &&
-          buttonStates.map((button) => (
+          {buttonStates.map((button, index) => (
             <TouchableOpacity
               key={button.id}
-              onPress={() => handlePress(button.id)}
+              onPress={() => handlePress(button.id, index)}
+              style={{ width: width / 3 }}
             >
-              {button.clicked ? (
-                <View style={styles.textWrapper}>
-                  <Text style={styles.menuButtonClicked}>{button.label}</Text>
-                  <View style={styles.customUnderline} />
-                </View>
-              ) : (
-                <Text style={styles.menuButton}>{button.label}</Text>
-              )}
+              <View style={styles.textWrapper}>
+                <Text
+                  style={
+                    button.clicked
+                      ? styles.menuButtonClicked
+                      : styles.menuButton
+                  }
+                >
+                  {button.label}
+                </Text>
+              </View>
             </TouchableOpacity>
           ))}
-      </View>
-      <TouchableOpacity onPress={handlePressSearchBtn}>
-        <Ionicons
-          name="search"
-          size={32}
-          color={ThemeColoursPrimary.SecondaryColour}
+        </View>
+        <Animated.View
+          style={[
+            styles.customUnderline,
+            {
+              transform: [{ translateX: underlinePosition }], // Move based on animated value
+            },
+          ]}
         />
-      </TouchableOpacity>
+      </Animated.View>
     </View>
   );
 };
@@ -141,7 +205,7 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    padding: 8,
+    paddingHorizontal: 8,
     alignItems: "center",
     flexDirection: "row",
     justifyContent: "space-around",
@@ -154,13 +218,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 12,
   },
-
   menuButton: {
     fontSize: 20,
-    fontWeight: "normal",
-    color: ThemeColoursPrimary.SecondaryColour,
+    fontWeight: "bold",
+    color: "#808080",
   },
   menuButtonClicked: {
     fontSize: 20,
@@ -168,16 +230,17 @@ const styles = StyleSheet.create({
     color: ThemeColoursPrimary.SecondaryColour,
   },
   textWrapper: {
-    position: "relative",
     alignItems: "center",
+    justifyContent: "center",
   },
   customUnderline: {
     position: "absolute",
-    bottom: -4, // Adjust this value to control the gap between the text and underline
+    bottom: 2, // Adjust this value to control the gap between the text and underline
     height: 3,
-    width: "70%",
+    width: width / 4,
     backgroundColor: ThemeColoursPrimary.LogoColour, // Set the underline color
-    borderRadius: 18,
+    borderRadius: 20,
+    justifyContent: "center",
   },
   searchBarWrapper: {
     flexDirection: "row",
@@ -191,7 +254,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     backgroundColor: ThemeColoursPrimary.BackgroundColour,
     borderRadius: 20,
-    // borderColor: ThemeColours.PrimaryColour,
     borderWidth: 2,
   },
   input: {
