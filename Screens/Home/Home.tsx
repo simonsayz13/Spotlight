@@ -62,10 +62,12 @@ const HomeScreen = ({ navigation }: any) => {
 
   const handlePressSearchBtn = () => {
     showSearchBar ? fetchNewItem() : setShowSearchBar((prev: boolean) => !prev);
+    setIsMenuVisible(false);
   };
 
   const handlePressMenuBtn = (cb: any) => {
     showSearchBar ? setShowSearchBar((prev: boolean) => !prev) : cb();
+    setIsMenuVisible(true);
   };
 
   const handlePressInClearBtn = () => {

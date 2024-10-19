@@ -113,7 +113,7 @@ const TopNavigationBar = (props: any) => {
               color: ThemeColoursPrimary.LogoColour,
             }}
           >
-            Pulse
+            Spotlight
           </Text>
           <Animated.View
             style={[
@@ -134,11 +134,7 @@ const TopNavigationBar = (props: any) => {
                 onChange={handleSearchBarChange}
               />
               {searchText.length > 0 && (
-                <TouchableOpacity
-                  onPressIn={() => {
-                    handlePressInClearBtn();
-                  }}
-                >
+                <TouchableOpacity onPressIn={handlePressInClearBtn}>
                   <AntDesign name="closecircleo" size={20} color="black" />
                 </TouchableOpacity>
               )}
