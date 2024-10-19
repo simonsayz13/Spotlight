@@ -8,15 +8,18 @@ import { useSelector } from "react-redux";
 import { selectCommentsByPostId } from "../Redux/Selectors/postSelector";
 import ImageCarousel from "./ImageCarousel";
 
-const MainPost = ({ postData, navigation }: any) => {
+const MainPost = ({
+  postData,
+  navigation,
+  openKeyboard,
+  setReplyingTo,
+}: any) => {
   const { title, description, timeStamp, id: postId } = postData;
 
   const comments = useSelector(selectCommentsByPostId(postId));
-
   return (
     <ScrollView
       contentContainerStyle={styles.scrollView}
-      bounces={false}
       overScrollMode="never"
     >
       {postData.media.length > 0 && <ImageCarousel images={postData.media} />}
@@ -37,24 +40,61 @@ const MainPost = ({ postData, navigation }: any) => {
       </View>
 
       {/* Comment Count */}
-      <View style={styles.commentCountContainer}>
-        <Text style={{ color: ThemeColoursPrimary.SecondaryColour }}>
-          {comments.length} Comments
-        </Text>
-      </View>
+      {comments.length > 0 ? (
+        <View>
+          <View style={styles.commentCountContainer}>
+            <Text
+              style={{
+                color: ThemeColoursPrimary.SecondaryColour,
+                fontWeight: "500",
+              }}
+            >
+              Comments
+            </Text>
+          </View>
+          <View>
+            {comments.map((comment: any) => (
+              <View key={comment.commentId + "_view"}>
+                <CommentCard
+                  key={comment.commentId}
+                  commentData={comment}
+                  navigation={navigation}
+                  openKeyboard={openKeyboard}
+                  setReplyingTo={setReplyingTo}
+                  reply={false}
+                />
+                {comment.replies &&
+                  comment.replies.map((reply: any) => (
+                    <CommentCard
+                      key={reply.replyId}
+                      commentData={reply}
+                      navigation={navigation}
+                      openKeyboard={openKeyboard}
+                      setReplyingTo={setReplyingTo}
+                      reply={true}
+                    />
+                  ))}
+                <View style={styles.divider} />
+              </View>
+            ))}
+          </View>
+        </View>
+      ) : (
+        <View style={styles.commentCountContainer}>
+          <Text
+            style={{
+              color: ThemeColoursPrimary.SecondaryColour,
+              fontWeight: "500",
+            }}
+          >
+            No comments
+          </Text>
+        </View>
+      )}
 
-      {/* Comment Section */}
-      <View>
-        {comments.map((comment: any) => (
-          <CommentCard
-            key={comment.commentId}
-            commentData={comment}
-            navigation={navigation}
-          />
-        ))}
-      </View>
-
-      <View style={{ alignItems: "center", paddingTop: 15, paddingBottom: 40 }}>
+      <View
+        style={{ alignItems: "center", paddingTop: 30, paddingBottom: 400 }}
+      >
         <Text style={{ color: ThemeColoursPrimary.SecondaryColour }}>
           - The end -
         </Text>
@@ -76,16 +116,13 @@ const styles = StyleSheet.create({
   },
   postTitleContainer: {
     marginVertical: 8,
-    marginHorizontal: 8,
   },
   postTitleText: {
     fontSize: 20,
     fontWeight: "bold",
     color: ThemeColoursPrimary.SecondaryColour,
   },
-  postDescriptionContainer: {
-    marginHorizontal: 8,
-  },
+  postDescriptionContainer: {},
   postDescriptionText: {
     fontSize: 16,
     fontWeight: "500",
@@ -93,21 +130,24 @@ const styles = StyleSheet.create({
   },
   userMetaDataContainer: {
     marginVertical: 6,
-    marginHorizontal: 8,
+    height: 11,
   },
   userMetaDataText: {
     fontSize: 11,
     opacity: 0.6,
     color: ThemeColoursPrimary.SecondaryColour,
+    position: "absolute",
+    bottom: 0,
+    right: 0,
   },
   postContentContainer: {
     borderBottomWidth: 1,
     borderBottomColor: "#D3D3D3",
-    marginHorizontal: 8,
+    marginHorizontal: 14,
   },
   commentCountContainer: {
     marginTop: 6,
-    marginHorizontal: 16,
+    marginHorizontal: 14,
   },
   searchBar: {
     backgroundColor: "#f1f1f1",
@@ -139,5 +179,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   commentStyle: { flexDirection: "row" },
+
+  divider: {
+    borderBottomWidth: 0.6,
+    borderColor: ThemeColoursPrimary.SecondaryColour + "20",
+    marginHorizontal: 14,
+  },
 });
 export default MainPost;

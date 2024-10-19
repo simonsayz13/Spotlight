@@ -24,7 +24,7 @@ import "react-native-get-random-values";
 import { v4 as uuidv4 } from "uuid";
 import { Alert } from "react-native";
 import store from "../Redux/store";
-import { addComment } from "../Redux/Slices/postsSlices";
+import { addComment, addReply } from "../Redux/Slices/postsSlices";
 import { UserDetails } from "../type/Messenger";
 
 const db = firestoreDB;
@@ -283,6 +283,63 @@ export const addCommentToPost = async (
     store.dispatch(addComment({ postId, comment: newComment }));
   } catch (error) {
     console.error("Error adding comment: ", error);
+  }
+};
+
+export const addReplyToComment = async (
+  postId: string,
+  commentId: string,
+  userId: string,
+  displayName: string,
+  userProfilePhotoURL: string,
+  commentText: string
+) => {
+  try {
+    // Reference to the specific post document in Firestore
+    const postRef = doc(db, FireStoreCollections.Posts, postId);
+
+    // Fetch the current post data
+    const postSnapshot = await getDoc(postRef);
+
+    const newReply = {
+      replyId: Date.now().toString(), // Unique ID for the reply
+      userId: userId,
+      displayName: displayName,
+      text: commentText,
+      profilePhotoUrl: userProfilePhotoURL,
+      timeStamp: new Date().toISOString(),
+    };
+
+    if (postSnapshot.exists()) {
+      const postData = postSnapshot.data();
+
+      // Find the comment to which the reply should be added
+      const comments = postData.comments.map((comment: any) => {
+        if (comment.commentId === commentId) {
+          // If the comment matches, add the reply to its replies array
+
+          // If the comment doesn't have a replies array, initialize it
+          const updatedReplies = comment.replies
+            ? [...comment.replies, newReply]
+            : [newReply];
+
+          return {
+            ...comment,
+            replies: updatedReplies,
+          };
+        }
+        return comment;
+      });
+
+      // Update the post document with the modified comments array
+      await updateDoc(postRef, { comments });
+
+      store.dispatch(addReply({ postId, commentId, reply: newReply }));
+    } else {
+      console.error("Post not found!");
+    }
+  } catch (error) {
+    console.error("Error adding reply: ", error);
   }
 };
 

@@ -51,7 +51,27 @@ export const postsSlice = createSlice({
         // Push the new comment to the comments array
         //@ts-ignore
         post.comments.push(comment);
-        console.log(comment);
+      }
+    },
+    addReply: (state, action) => {
+      const { postId, commentId, reply } = action.payload;
+
+      // Find the post by postId
+      const post = state.posts.find((post: any) => post.id === postId);
+      if (post) {
+        // Find the comment by commentId
+        //@ts-ignore
+        const comment = post.comments.find(
+          (comment: any) => comment.commentId === commentId
+        );
+        if (comment) {
+          // If the comment has replies, push the new reply, otherwise create a new array
+          if (comment.replies) {
+            comment.replies.push(reply);
+          } else {
+            comment.replies = [reply];
+          }
+        }
       }
     },
   },
@@ -64,6 +84,7 @@ export const {
   incrementFavourites,
   decrementFavourites,
   addComment,
+  addReply,
 } = postsSlice.actions;
 
 export default postsSlice.reducer;

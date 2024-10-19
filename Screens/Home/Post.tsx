@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   StyleSheet,
@@ -13,6 +13,18 @@ import { ThemeColoursPrimary } from "../../Constants/UI";
 
 const Post = ({ navigation, route }: any) => {
   const { postData } = route.params;
+  const postInteractionBarRef = useRef(null);
+  const [replyingTo, setReplyingTo] = useState(null);
+
+  const openKeyboard = () => {
+    if (postInteractionBarRef.current) {
+      postInteractionBarRef.current.showKeyboard();
+    }
+  };
+
+  useEffect(() => {
+    console.log(replyingTo);
+  }, [replyingTo]);
   return (
     <SafeAreaView style={styles.container}>
       <TopNavigationBarPost navigation={navigation} postData={postData} />
@@ -20,9 +32,19 @@ const Post = ({ navigation, route }: any) => {
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={styles.container}
       >
-        <MainPost postData={postData} navigation={navigation} />
+        <MainPost
+          postData={postData}
+          navigation={navigation}
+          openKeyboard={openKeyboard}
+          setReplyingTo={setReplyingTo}
+        />
         <View style={styles.bottomView}>
-          <PostInteractionBar postData={postData} />
+          <PostInteractionBar
+            ref={postInteractionBarRef}
+            postData={postData}
+            replyingTo={replyingTo}
+            setReplyingTo={setReplyingTo}
+          />
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -35,7 +57,7 @@ const styles = StyleSheet.create({
     backgroundColor: ThemeColoursPrimary.PrimaryColour,
   },
   bottomView: {
-    height: 60,
+    height: 50,
   },
 });
 export default Post;
