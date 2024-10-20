@@ -13,6 +13,7 @@ import {
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import {
+  MainStacks,
   ProfileStackScreens,
   ThemeColours,
   ThemeColoursPrimary,
@@ -38,7 +39,7 @@ const Login = ({ navigation }: any) => {
     const response = await signInWithEmail(email, password);
     setLoading(false);
     if (response.success) {
-      navigation.replace(ProfileStackScreens.Profile);
+      navigation.replace(MainStacks.MainTab);
     } else {
       const errorCode = response.errorMessage as AuthErrorCode;
       Alert.alert("Error", FireBaseAuthErrorMessages[errorCode]);

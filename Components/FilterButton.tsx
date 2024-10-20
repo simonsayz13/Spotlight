@@ -49,7 +49,7 @@ const FilterButton = ({
           width: animatedWidth,
           backgroundColor: selectedTag
             ? selectedTag.colour
-            : ThemeColoursPrimary.SecondaryColour,
+            : ThemeColoursPrimary.LogoColour,
         },
       ]}
     >
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   buttonBase: {
-    backgroundColor: ThemeColoursPrimary.SecondaryColour,
+    backgroundColor: ThemeColoursPrimary.LogoColour,
     borderRadius: 25,
     padding: 2,
     elevation: 5,

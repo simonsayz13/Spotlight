@@ -14,6 +14,7 @@ import { RootState } from "../../Redux/store";
 import {
   Gender,
   HomeStackScreens,
+  MainStacks,
   ProfileStackScreens,
   ThemeColoursPrimary,
   userContentSelectorButtons,
@@ -133,7 +134,7 @@ const Profile = ({ navigation }: any) => {
 
   const handleLogout = () => {
     logOut();
-    navigation.replace(ProfileStackScreens.LoginSignUp);
+    navigation.replace(MainStacks.Login);
   };
 
   const handleEdit = () => {
