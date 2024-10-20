@@ -35,42 +35,27 @@ export const postsSlice = createSlice({
     },
     decrementFavourites: (state, action) => {
       const { postId } = action.payload;
-      const post = state.posts.find((post: any) => post.id === postId);
+      const post: any = state.posts.find((post: any) => post.id === postId);
       if (post) {
-        //@ts-ignore
         post.favourites -= 1;
       }
     },
     addComment: (state, action) => {
       const { postId, comment } = action.payload;
-
-      // Find the specific post by ID
-      const post = state.posts.find((post: any) => post.id === postId);
-
+      const post: any = state.posts.find((post: any) => post.id === postId);
       if (post) {
-        // Push the new comment to the comments array
-        //@ts-ignore
         post.comments.push(comment);
       }
     },
-    addReply: (state, action) => {
-      const { postId, commentId, reply } = action.payload;
-
-      // Find the post by postId
-      const post = state.posts.find((post: any) => post.id === postId);
+    updateCommentLikes: (state, action) => {
+      const { postId, commentId, likes } = action.payload;
+      const post: any = state.posts.find((post: any) => post.id === postId);
       if (post) {
-        // Find the comment by commentId
-        //@ts-ignore
         const comment = post.comments.find(
           (comment: any) => comment.commentId === commentId
         );
         if (comment) {
-          // If the comment has replies, push the new reply, otherwise create a new array
-          if (comment.replies) {
-            comment.replies.push(reply);
-          } else {
-            comment.replies = [reply];
-          }
+          comment.likes = likes;
         }
       }
     },
@@ -84,7 +69,7 @@ export const {
   incrementFavourites,
   decrementFavourites,
   addComment,
-  addReply,
+  updateCommentLikes,
 } = postsSlice.actions;
 
 export default postsSlice.reducer;

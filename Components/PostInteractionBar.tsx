@@ -29,6 +29,7 @@ import {
   updatePostMetric,
   addCommentToPost,
   addReplyToComment,
+  addCommentOrReply,
 } from "../Firebase/firebaseFireStore";
 import { FireStoreAction, FireStorePostField } from "../Constants/dbReference";
 import { useSelector } from "react-redux";
@@ -177,7 +178,7 @@ const PostInteractionBar = forwardRef(
 
     const handlePostComment = async () => {
       try {
-        await addCommentToPost(
+        await addCommentOrReply(
           postId,
           userId!,
           userDisplayName!,
@@ -195,13 +196,16 @@ const PostInteractionBar = forwardRef(
 
     const handleReply = async () => {
       try {
-        await addReplyToComment(
+        await addCommentOrReply(
           postId,
-          replyingTo.commentId,
           userId!,
           userDisplayName!,
           userProfilePhotoURL!,
-          commentInput
+          commentInput,
+          replyingTo.commentId,
+          replyingTo.parentCommentId
+            ? { userId: replyingTo.userId, displayName: replyingTo.displayName }
+            : null
         );
         if (textInputRef.current) {
           textInputRef.current.clear();

@@ -18,13 +18,11 @@ const Post = ({ navigation, route }: any) => {
 
   const openKeyboard = () => {
     if (postInteractionBarRef.current) {
+      //@ts-ignore
       postInteractionBarRef.current.showKeyboard();
     }
   };
 
-  useEffect(() => {
-    console.log(replyingTo);
-  }, [replyingTo]);
   return (
     <SafeAreaView style={styles.container}>
       <TopNavigationBarPost navigation={navigation} postData={postData} />

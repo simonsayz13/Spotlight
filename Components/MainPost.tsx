@@ -17,6 +17,44 @@ const MainPost = ({
   const { title, description, timeStamp, id: postId } = postData;
 
   const comments = useSelector(selectCommentsByPostId(postId));
+
+  const renderCommentsWithReplies = (
+    comments: any[],
+    navigation: any,
+    openKeyboard: any,
+    setReplyingTo: any
+  ) => {
+    const renderCommentThread = (
+      parentCommentId: string | null,
+      isTopLevel: boolean = false
+    ) => {
+      return comments
+        .filter((comment) => comment.parentCommentId === parentCommentId)
+        .sort(
+          (a, b) =>
+            new Date(a.timeStamp).getTime() - new Date(b.timeStamp).getTime()
+        ) // Sort by timestamp
+        .map((comment, index, array) => (
+          <View key={comment.commentId + "_view"}>
+            {/* Render the comment */}
+            <CommentCard
+              key={comment.commentId}
+              commentData={comment}
+              navigation={navigation}
+              openKeyboard={openKeyboard}
+              setReplyingTo={setReplyingTo}
+              reply={!!parentCommentId} // Pass 'reply' prop to style replies differently
+              postId={postId}
+            />
+            {renderCommentThread(comment.commentId)}
+            {isTopLevel && <View style={styles.divider} />}
+          </View>
+        ));
+    };
+
+    // Start rendering from the top-level comments (where parentCommentId is null)
+    return renderCommentThread(null, true); // Pass 'true' to indicate top-level comments
+  };
   return (
     <ScrollView
       contentContainerStyle={styles.scrollView}
@@ -53,30 +91,12 @@ const MainPost = ({
             </Text>
           </View>
           <View>
-            {comments.map((comment: any) => (
-              <View key={comment.commentId + "_view"}>
-                <CommentCard
-                  key={comment.commentId}
-                  commentData={comment}
-                  navigation={navigation}
-                  openKeyboard={openKeyboard}
-                  setReplyingTo={setReplyingTo}
-                  reply={false}
-                />
-                {comment.replies &&
-                  comment.replies.map((reply: any) => (
-                    <CommentCard
-                      key={reply.replyId}
-                      commentData={reply}
-                      navigation={navigation}
-                      openKeyboard={openKeyboard}
-                      setReplyingTo={setReplyingTo}
-                      reply={true}
-                    />
-                  ))}
-                <View style={styles.divider} />
-              </View>
-            ))}
+            {renderCommentsWithReplies(
+              comments,
+              navigation,
+              openKeyboard,
+              setReplyingTo
+            )}
           </View>
         </View>
       ) : (

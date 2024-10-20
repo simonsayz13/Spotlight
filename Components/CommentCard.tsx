@@ -12,29 +12,40 @@ import { formatRelativeTime } from "../Util/utility";
 import { Image } from "expo-image";
 import { useSelector } from "react-redux";
 import { RootState } from "../Redux/store";
+import { toggleLikeComment } from "../Firebase/firebaseFireStore";
 
 const CommentCard = ({
   commentData,
   navigation,
   openKeyboard,
   setReplyingTo,
-  reply,
+  postId,
 }: any) => {
-  const { profilePhotoUrl, userId: commentUserId } = commentData;
+  const { profilePhotoUrl } = commentData;
   const { userId } = useSelector((state: RootState) => state.user);
 
-  const goToProfile = () => {
+  const goToProfile = (commentUserId: string) => {
     userId === commentUserId
       ? navigation.navigate(NavigationTabs.Me)
       : navigation.navigate(ProfileStackScreens.ViewProfile, {
           userId: commentUserId,
         });
   };
-
+  const isLiked = commentData.likes.includes(userId);
   return (
-    <View style={[styles.container, { marginLeft: reply ? 54 : 14 }]}>
+    <View
+      style={[
+        styles.container,
+        { marginLeft: commentData.parentCommentId ? 54 : 14 },
+      ]}
+    >
       <View style={styles.userContainer}>
-        <TouchableOpacity style={styles.userWrapper} onPressIn={goToProfile}>
+        <TouchableOpacity
+          style={styles.userWrapper}
+          onPressIn={() => {
+            goToProfile(commentData.userId);
+          }}
+        >
           {profilePhotoUrl ? (
             <Image
               source={{ uri: profilePhotoUrl }}
@@ -73,18 +84,52 @@ const CommentCard = ({
         </View>
       </View>
       <View style={styles.commentContainer}>
+        {commentData.replyingTo && (
+          <View style={{ flexDirection: "row" }}>
+            <Text style={{ color: "#666" }}>Reply </Text>
+            <TouchableOpacity
+              onPressIn={() => {
+                goToProfile(commentData.replyingTo.userId);
+              }}
+            >
+              <Text
+                style={{
+                  fontWeight: "bold",
+                  color: ThemeColoursPrimary.LogoColour,
+                  textDecorationLine: "underline",
+                }}
+              >
+                {commentData.replyingTo.displayName}
+              </Text>
+            </TouchableOpacity>
+            <Text>: </Text>
+          </View>
+        )}
         <Text style={styles.commentFont}>{commentData.text}</Text>
         <TouchableOpacity
           style={{
             position: "absolute", // Set the heart icon's position to absolute
             bottom: 0, // Align it to the bottom of the text container
             right: 0, // Align it to the right side}
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 2,
+          }}
+          onPressIn={() => {
+            toggleLikeComment(postId, commentData.commentId, userId!);
           }}
         >
+          {commentData.likes.length > 0 && (
+            <Text>{commentData.likes.length}</Text>
+          )}
           <AntDesign
-            name={"hearto"}
+            name={isLiked ? "heart" : "hearto"}
             size={16}
-            color={ThemeColoursPrimary.SecondaryColour}
+            color={
+              isLiked
+                ? ThemeColoursPrimary.LogoColour
+                : ThemeColoursPrimary.SecondaryColour
+            }
           />
         </TouchableOpacity>
       </View>
