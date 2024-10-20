@@ -42,10 +42,6 @@ const ProfileStackScreen = () => {
         name={ProfileStackScreens.EditProfile}
         component={EditProfile}
       />
-      <ProfileStack.Screen
-        name={ProfileStackScreens.FollowerList}
-        component={FollowerList}
-      />
     </ProfileStack.Navigator>
   );
 };

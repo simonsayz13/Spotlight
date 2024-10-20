@@ -1,6 +1,7 @@
 import React from "react";
 import TabNavigation from "./TabNavigation";
 import {
+  FollowStackScreens,
   HomeStackScreens,
   MessagingStackScreens,
   MiscStackScreens,
@@ -17,6 +18,8 @@ import { ViewPhoto } from "../Screens/Post/ViewPhoto";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { CreatePost } from "../Screens/Post/CreatePost";
 import ViewProfile from "../Screens/Profile/ViewProfile";
+
+import FollowStackScreen from "./Stacks/FollowStack";
 const MainStack = createNativeStackNavigator();
 
 const MainNavigationStack = () => (
@@ -45,7 +48,7 @@ const MainNavigationStack = () => (
       name={MiscStackScreens.ImageCropper}
       component={ImageCropScreen}
     />
-    <MainStack.Screen name={ProfileStackScreens.Profile} component={Profile} />
+    {/* <MainStack.Screen name={ProfileStackScreens.Profile} component={Profile} /> */}
     <MainStack.Screen
       name={PostStackScreens.CreatePost}
       component={CreatePost}
@@ -55,9 +58,14 @@ const MainNavigationStack = () => (
     />
     <MainStack.Screen name={PostStackScreens.Camera} component={Camera} />
     <MainStack.Screen name={PostStackScreens.ViewPhoto} component={ViewPhoto} />
-    <MainStack.Screen
+    {/* <MainStack.Screen
       name={ProfileStackScreens.ViewProfile}
       component={ViewProfile}
+    /> */}
+    <MainStack.Screen
+      name={"FollowStack"}
+      component={FollowStackScreen}
+      options={{ headerShown: false }}
     />
   </MainStack.Navigator>
 );

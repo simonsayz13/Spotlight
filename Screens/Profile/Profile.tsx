@@ -13,6 +13,7 @@ import {
 import { useSelector } from "react-redux";
 import { RootState } from "../../Redux/store";
 import {
+  FollowStackScreens,
   Gender,
   HomeStackScreens,
   ProfileStackScreens,
@@ -156,11 +157,10 @@ const Profile = ({ navigation }: any) => {
     });
   };
 
-  const openFollowerScreen = (postData: any) => {
-    console.log("=========>");
-    navigation.navigate(ProfileStackScreens.FollowerList, {
-      displayName,
-      followers: followers,
+  const openFollowerScreen = () => {
+    navigation.navigate("FollowStack", {
+      screen: FollowStackScreens.FollowerList,
+      params: { displayName, followers: followers, profileId: userId },
     });
   };
 

@@ -22,9 +22,6 @@ const FollowerList = ({ navigation, route }: any) => {
   const [ldgFollowers, setLdgFollowers] = useState(false);
   const [followerList, setFollowerList] = useState([]);
 
-  // console.log("followers", followers);
-  console.log("FollowerList", followerList);
-
   useFocusEffect(
     useCallback(() => {
       const fetchFollowers = async () => {
@@ -40,7 +37,6 @@ const FollowerList = ({ navigation, route }: any) => {
           //   async (follower) => await getUserDetails(follower, false)
           // );
           setLdgFollowers(false);
-          console.log("====> data 1", data);
           return data;
         } catch (error) {
           setLdgFollowers(false);
@@ -54,10 +50,6 @@ const FollowerList = ({ navigation, route }: any) => {
   );
   return (
     <SafeAreaView style={styles.container}>
-      <TopNavigationBarFollows
-        navigation={navigation}
-        displayName={displayName}
-      />
       <ScrollView style={styles.listContainer}>
         {followerList?.map((follower) => (
           <FollowerRow followerObj={follower} />

@@ -62,7 +62,6 @@ export const getUserDetails = async (
   userId: string,
   hasFollowInfo: boolean = true
 ) => {
-  console.log("userId", userId);
   try {
     const userProfileCollection = doc(db, FireStoreCollections.Users, userId);
     const userDoc = await getDoc(userProfileCollection);
