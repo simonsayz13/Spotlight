@@ -24,7 +24,11 @@ import "react-native-get-random-values";
 import { v4 as uuidv4 } from "uuid";
 import { Alert } from "react-native";
 import store from "../Redux/store";
-import { addComment } from "../Redux/Slices/postsSlices";
+import {
+  addComment,
+  addReply,
+  updateCommentLikes,
+} from "../Redux/Slices/postsSlices";
 import { UserDetails } from "../type/Messenger";
 
 const db = firestoreDB;
@@ -254,35 +258,104 @@ export const getPostMetrics = async (
   }
 };
 
-export const addCommentToPost = async (
+export const addCommentOrReply = async (
   postId: string,
   userId: string,
   displayName: string,
   userProfilePhotoURL: string,
-  commentText: string
+  commentText: string,
+  commentId: string | null = null, // null means it's a new comment, not a reply
+  replyingTo?: {} | null // Details of the user being replied to (only for replies)
 ) => {
   try {
     // Reference to the specific post document in Firestore
     const postRef = doc(db, FireStoreCollections.Posts, postId);
 
-    // Construct the comment object to add
-    const newComment = {
-      commentId: Date.now().toString(), // Unique ID for the comment
+    // Fetch the current post data
+    const postSnapshot = await getDoc(postRef);
+
+    if (!postSnapshot.exists()) {
+      console.error("Post not found!");
+      return;
+    }
+
+    const postData = postSnapshot.data();
+
+    const newCommentOrReply = {
+      commentId: Date.now().toString(), // Unique ID for the comment/reply
       userId: userId,
       displayName: displayName,
       text: commentText,
       profilePhotoUrl: userProfilePhotoURL,
       timeStamp: new Date().toISOString(),
+      parentCommentId: commentId ?? null, // If it's a reply, store the original commentId
+      replyingTo: replyingTo ?? null, // If it's a reply, store the user being replied to
+      likes: [],
     };
 
-    // Use the update function with arrayUnion to add the new comment
-    await updateDoc(postRef, {
-      comments: arrayUnion(newComment),
-    });
+    // Add the new comment/reply to the existing comments array
+    const updatedComments = [...(postData.comments || []), newCommentOrReply];
 
-    store.dispatch(addComment({ postId, comment: newComment }));
+    // Update the post document with the modified comments array
+    await updateDoc(postRef, { comments: updatedComments });
+
+    // It's a new comment
+    store.dispatch(
+      addComment({
+        postId,
+        comment: newCommentOrReply,
+      })
+    );
   } catch (error) {
-    console.error("Error adding comment: ", error);
+    console.error("Error adding comment or reply: ", error);
+  }
+};
+export const toggleLikeComment = async (
+  postId: string,
+  commentId: string,
+  userId: string
+) => {
+  try {
+    const postRef = doc(db, FireStoreCollections.Posts, postId);
+
+    // Fetch the current post data
+    const postSnapshot = await getDoc(postRef);
+
+    let likes: Array<any> = [];
+
+    if (postSnapshot.exists()) {
+      const postData = postSnapshot.data();
+
+      // Find the comment to update
+      const comments = postData.comments.map((comment: any) => {
+        if (comment.commentId === commentId) {
+          // Check if the user has already liked the comment
+          const alreadyLiked = comment.likes && comment.likes.includes(userId);
+
+          // Update likes array accordingly
+          const updatedLikes: Array<string> = alreadyLiked
+            ? comment.likes.filter((id: string) => id !== userId) // Remove userId if already liked
+            : [...(comment.likes || []), userId]; // Add userId if not liked
+
+          likes = updatedLikes;
+          return {
+            ...comment,
+            likes: updatedLikes,
+          };
+        }
+        return comment;
+      });
+
+      // Update the post document with the modified comments array
+      await updateDoc(postRef, { comments });
+
+      // Dispatch action to update Redux store (if using Redux)
+      store.dispatch(updateCommentLikes({ postId, commentId, likes }));
+    } else {
+      console.error("Post not found!");
+    }
+  } catch (error) {
+    console.error("Error toggling like on comment: ", error);
   }
 };
 

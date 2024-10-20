@@ -35,23 +35,28 @@ export const postsSlice = createSlice({
     },
     decrementFavourites: (state, action) => {
       const { postId } = action.payload;
-      const post = state.posts.find((post: any) => post.id === postId);
+      const post: any = state.posts.find((post: any) => post.id === postId);
       if (post) {
-        //@ts-ignore
         post.favourites -= 1;
       }
     },
     addComment: (state, action) => {
       const { postId, comment } = action.payload;
-
-      // Find the specific post by ID
-      const post = state.posts.find((post: any) => post.id === postId);
-
+      const post: any = state.posts.find((post: any) => post.id === postId);
       if (post) {
-        // Push the new comment to the comments array
-        //@ts-ignore
         post.comments.push(comment);
-        console.log(comment);
+      }
+    },
+    updateCommentLikes: (state, action) => {
+      const { postId, commentId, likes } = action.payload;
+      const post: any = state.posts.find((post: any) => post.id === postId);
+      if (post) {
+        const comment = post.comments.find(
+          (comment: any) => comment.commentId === commentId
+        );
+        if (comment) {
+          comment.likes = likes;
+        }
       }
     },
   },
@@ -64,6 +69,7 @@ export const {
   incrementFavourites,
   decrementFavourites,
   addComment,
+  updateCommentLikes,
 } = postsSlice.actions;
 
 export default postsSlice.reducer;
