@@ -84,28 +84,34 @@ const CommentCard = ({
         </View>
       </View>
       <View style={styles.commentContainer}>
-        {commentData.replyingTo && (
-          <View style={{ flexDirection: "row" }}>
-            <Text style={{ color: "#666" }}>Reply </Text>
-            <TouchableOpacity
-              onPressIn={() => {
-                goToProfile(commentData.replyingTo.userId);
+        <View style={styles.comment}>
+          {commentData.replyingTo && (
+            <View
+              style={{
+                flexDirection: "row",
               }}
             >
-              <Text
-                style={{
-                  fontWeight: "bold",
-                  color: ThemeColoursPrimary.LogoColour,
-                  textDecorationLine: "underline",
+              <Text style={{ color: "#666" }}>Reply </Text>
+              <TouchableOpacity
+                onPressIn={() => {
+                  goToProfile(commentData.replyingTo.userId);
                 }}
               >
-                {commentData.replyingTo.displayName}
-              </Text>
-            </TouchableOpacity>
-            <Text>: </Text>
-          </View>
-        )}
-        <Text style={styles.commentFont}>{commentData.text}</Text>
+                <Text
+                  style={{
+                    fontWeight: "bold",
+                    color: ThemeColoursPrimary.LogoColour,
+                    textDecorationLine: "underline",
+                  }}
+                >
+                  {commentData.replyingTo.displayName}
+                </Text>
+              </TouchableOpacity>
+              <Text>: </Text>
+            </View>
+          )}
+          <Text style={styles.commentText}>{commentData.text}</Text>
+        </View>
         <TouchableOpacity
           style={{
             position: "absolute", // Set the heart icon's position to absolute
@@ -158,9 +164,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   commentContainer: {
+    // flex: 1,
     marginTop: 2,
     flexDirection: "row",
     alignItems: "center",
+    flexWrap: "wrap",
   },
   separatorDot: {
     height: 3.5,
@@ -168,8 +176,14 @@ const styles = StyleSheet.create({
     backgroundColor: ThemeColoursPrimary.SecondaryColour,
     borderRadius: 50,
   },
-  commentFont: {
-    width: "92%",
+  commentText: {
+    color: ThemeColoursPrimary.SecondaryColour,
+  },
+  comment: {
+    alignItems: "center",
+    flexDirection: "row",
+    flexWrap: "wrap",
+    maxWidth: "91%",
     color: ThemeColoursPrimary.SecondaryColour,
   },
   commentActions: {

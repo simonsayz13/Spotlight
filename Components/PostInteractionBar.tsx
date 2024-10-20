@@ -17,6 +17,7 @@ import {
   TouchableOpacity,
   Alert,
   Keyboard,
+  KeyboardAvoidingView,
 } from "react-native";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
@@ -27,8 +28,6 @@ import { ThemeColoursPrimary } from "../Constants/UI";
 import {
   updateUserPostMetric,
   updatePostMetric,
-  addCommentToPost,
-  addReplyToComment,
   addCommentOrReply,
 } from "../Firebase/firebaseFireStore";
 import { FireStoreAction, FireStorePostField } from "../Constants/dbReference";
@@ -49,7 +48,7 @@ import {
 
 const screenWidth = Dimensions.get("window").width;
 const PostInteractionBar = forwardRef(
-  ({ postData, replyingTo, setReplyingTo }: any, ref) => {
+  ({ postData, replyingTo, setReplyingTo, setBottomHeight }: any, ref) => {
     const {
       userId,
       userLiked,
@@ -67,8 +66,29 @@ const PostInteractionBar = forwardRef(
     const liked = userLiked.includes(postId);
     //@ts-ignore
     const favourited = userFavourites.includes(postId);
-
+    const [inputHeight, setInputHeight] = useState(34);
     const textInputRef = useRef<TextInput>(null);
+    const isFirstRender = useRef(true);
+    useEffect(() => {
+      if (isFirstRender.current) {
+        isFirstRender.current = false; // Set to false after first render
+        return;
+      }
+      if (commentInput) {
+        Animated.timing(inputWidth, {
+          toValue: screenWidth - 76, // Full width when the keyboard is open (adjust based on screen size)
+          duration: 100,
+          useNativeDriver: false,
+        }).start();
+      }
+      if (inputActive && !commentInput) {
+        Animated.timing(inputWidth, {
+          toValue: screenWidth - 16, // Full width when the keyboard is open (adjust based on screen size)
+          duration: 100,
+          useNativeDriver: false,
+        }).start();
+      }
+    }, [commentInput]);
 
     const showKeyboard = () => {
       if (textInputRef.current) {
@@ -95,6 +115,8 @@ const PostInteractionBar = forwardRef(
       }).start();
       setInputActive(false);
       setReplyingTo(null);
+      setBottomHeight(50);
+      setCommentInput("");
     };
 
     const onClickLike = () => {
@@ -189,6 +211,7 @@ const PostInteractionBar = forwardRef(
           textInputRef.current.clear();
           setCommentInput(""); // Also clear the state if you're managing it
         }
+        Keyboard.dismiss();
       } catch (error) {
         Alert.alert("Error", "Error posting comment");
       }
@@ -211,21 +234,25 @@ const PostInteractionBar = forwardRef(
           textInputRef.current.clear();
           setCommentInput(""); // Also clear the state if you're managing it
         }
+        Keyboard.dismiss();
       } catch (error) {
         Alert.alert("Error", "Error posting reply");
       }
     };
 
     return (
-      <View style={styles.container}>
-        <Animated.View style={[styles.commentBar, { width: inputWidth }]}>
+      <View
+        style={[styles.container, { gap: Platform.OS === "android" ? 4 : 0 }]}
+      >
+        <Animated.View
+          style={[
+            styles.commentBar,
+            { width: inputWidth, height: inputHeight },
+          ]}
+        >
           <View style={styles.commentStyle}>
-            <FontAwesome
-              name="pencil-square-o"
-              size={20}
-              color={ThemeColoursPrimary.SecondaryColour}
-            />
             <TextInput
+              multiline={true}
               ref={textInputRef}
               style={styles.input}
               placeholder={
@@ -236,12 +263,29 @@ const PostInteractionBar = forwardRef(
               onFocus={showKeyboard}
               onBlur={handleKeyboardDidHide}
               placeholderTextColor={ThemeColoursPrimary.SecondaryColour}
-              returnKeyType="send"
               onChangeText={(text) => setCommentInput(text)}
-              onSubmitEditing={replyingTo ? handleReply : handlePostComment}
+              onContentSizeChange={(event) => {
+                const { contentSize } = event.nativeEvent; // Correctly accessing the contentSize
+                if (contentSize) {
+                  setInputHeight(Math.min(contentSize.height + 20, 100)); // Add extra padding
+                  if (Math.min(contentSize.height + 20, 100) < 50)
+                    setBottomHeight(50);
+                  if (Math.min(contentSize.height + 20, 100) > 50)
+                    setBottomHeight(Math.min(contentSize.height + 30, 110));
+                }
+              }}
             />
           </View>
         </Animated.View>
+
+        {Boolean(commentInput) && inputActive && (
+          <TouchableOpacity
+            style={styles.button}
+            onPressIn={replyingTo ? handleReply : handlePostComment}
+          >
+            <Text style={styles.buttonText}>Send</Text>
+          </TouchableOpacity>
+        )}
         {!inputActive && (
           <View style={styles.actionsContainer}>
             <View style={styles.actionWrapper}>
@@ -300,14 +344,12 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    gap: Platform.OS === "ios" ? 14 : 8,
     backgroundColor: ThemeColoursPrimary.PrimaryColour,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: -6 },
     shadowOpacity: 0.05,
     shadowRadius: 6,
     elevation: 20,
-    justifyContent: "space-between",
   },
   commentBar: {
     backgroundColor: "#f1f1f1",
@@ -317,14 +359,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingLeft: 10,
-    height: 34,
     marginLeft: 8,
   },
   input: {
-    height: 18,
-    marginLeft: 4,
-    fontSize: 16,
-    width: screenWidth * 0.8,
+    width: "100%", // Full width
+    color: ThemeColoursPrimary.SecondaryColour,
+    fontSize: 16, // Font size
+    paddingVertical: 0, // Reset default padding
+    paddingHorizontal: 4, // Add horizontal padding
   },
   actionsContainer: {
     flex: 1,
@@ -346,6 +388,20 @@ const styles = StyleSheet.create({
     gap: 10,
     justifyContent: "center",
     alignItems: "center",
+  },
+  button: {
+    padding: 8,
+    backgroundColor: ThemeColoursPrimary.LogoColour,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    height: 39,
+    marginLeft: 4,
+  },
+  buttonText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: ThemeColoursPrimary.PrimaryColour,
   },
 });
 

@@ -15,7 +15,7 @@ const Post = ({ navigation, route }: any) => {
   const { postData } = route.params;
   const postInteractionBarRef = useRef(null);
   const [replyingTo, setReplyingTo] = useState(null);
-
+  const [bottomHeight, setBottomHeight] = useState(50); // Default height
   const openKeyboard = () => {
     if (postInteractionBarRef.current) {
       //@ts-ignore
@@ -36,12 +36,13 @@ const Post = ({ navigation, route }: any) => {
           openKeyboard={openKeyboard}
           setReplyingTo={setReplyingTo}
         />
-        <View style={styles.bottomView}>
+        <View style={[styles.bottomView, { height: bottomHeight }]}>
           <PostInteractionBar
             ref={postInteractionBarRef}
             postData={postData}
             replyingTo={replyingTo}
             setReplyingTo={setReplyingTo}
+            setBottomHeight={setBottomHeight}
           />
         </View>
       </KeyboardAvoidingView>
@@ -54,8 +55,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: ThemeColoursPrimary.PrimaryColour,
   },
-  bottomView: {
-    height: 50,
-  },
+  bottomView: {},
 });
 export default Post;
