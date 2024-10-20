@@ -25,8 +25,9 @@ const ImagePreviewCarousel = memo(({ photoArray, setPhotoArray }: any) => {
               <TouchableOpacity
                 style={styles.deleteButton}
                 onPress={() => handleDelete(photoURI)}
+                activeOpacity={1}
               >
-                <AntDesign name="closecircleo" size={24} color="black" />
+                <AntDesign name="closecircleo" size={20} color="black" />
               </TouchableOpacity>
             </TouchableOpacity>
           </View>
@@ -44,8 +45,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   imageView: {
-    width: 140,
-    height: 140,
+    width: 110,
+    height: 110,
     borderRadius: 10,
     marginRight: 6,
   },
@@ -56,8 +57,8 @@ const styles = StyleSheet.create({
   },
   deleteButton: {
     position: "absolute",
-    top: -8,
-    right: -4,
+    top: -6,
+    right: -2,
     backgroundColor: ThemeColoursPrimary.PrimaryColour,
     borderRadius: 12,
     zIndex: 20,

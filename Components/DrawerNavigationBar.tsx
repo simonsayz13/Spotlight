@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   Dimensions,
 } from "react-native";
-import { ThemeColours, ThemeColoursPrimary } from "../Constants/UI";
+import { ThemeColoursPrimary } from "../Constants/UI";
 
 const { width } = Dimensions.get("window");
 

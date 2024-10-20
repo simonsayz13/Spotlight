@@ -4,14 +4,14 @@ import {
   Dimensions,
   View,
   StyleSheet,
-  Text,
   TouchableOpacity,
 } from "react-native";
 import { ThemeColoursPrimary } from "../Constants/UI";
 import AntDesign from "@expo/vector-icons/AntDesign";
-const { width, height } = Dimensions.get("window");
-const sheetHeight = height * 0.34;
-const BottomSheet = ({ children, menuBar }: any) => {
+const { height: windowHeight } = Dimensions.get("window");
+
+const BottomSheet = ({ children, menuBar, heightPercentage }: any) => {
+  const sheetHeight = windowHeight * heightPercentage;
   const slideAnim = useRef(new Animated.Value(sheetHeight)).current;
   const [opened, setOpened] = useState(false);
   const iconRotation = useRef(new Animated.Value(0)).current;
@@ -19,7 +19,7 @@ const BottomSheet = ({ children, menuBar }: any) => {
     setOpened(true);
     Animated.parallel([
       Animated.timing(slideAnim, {
-        toValue: height * 0.1,
+        toValue: windowHeight * 0.1,
         duration: 300,
         useNativeDriver: true,
       }),
@@ -57,7 +57,7 @@ const BottomSheet = ({ children, menuBar }: any) => {
     <Animated.View
       style={[
         styles.modalContainer,
-        { transform: [{ translateY: slideAnim }] },
+        { transform: [{ translateY: slideAnim }], height: sheetHeight },
       ]}
     >
       <View style={styles.menuBar}>
@@ -87,7 +87,7 @@ const BottomSheet = ({ children, menuBar }: any) => {
 const styles = StyleSheet.create({
   modalContainer: {
     position: "absolute",
-    bottom: height * 0.1,
+    bottom: windowHeight * 0.1,
     left: 0,
     right: 0,
     backgroundColor: ThemeColoursPrimary.PrimaryColour,
@@ -97,7 +97,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: -1 },
     shadowOpacity: 0.2,
     shadowRadius: 2,
-    height: sheetHeight,
   },
   modalTitle: {
     fontSize: 18,

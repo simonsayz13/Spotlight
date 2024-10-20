@@ -25,7 +25,6 @@ import { v4 as uuidv4 } from "uuid";
 import { Alert } from "react-native";
 import store from "../Redux/store";
 import { addComment } from "../Redux/Slices/postsSlices";
-import { SetStateAction } from "react";
 import { UserDetails } from "../type/Messenger";
 
 const db = firestoreDB;
@@ -99,11 +98,10 @@ export const getUserDetails = async (
           })
         );
       }
-
       return { ...userDoc.data(), followers, followings };
     }
   } catch (error) {
-    Alert.alert("Error", "Error fetchhing user profile");
+    Alert.alert("Error", "Error fetching user profile");
   }
 };
 
@@ -354,7 +352,7 @@ export const removeFollower = async (
   }
 };
 
-export const getLocationPosts = async (setPosts: SetStateAction<any>) => {
+export const getLocationPosts = async () => {
   const postsRef = collection(db, FireStoreCollections.Posts); // Reference to the 'posts' collection
 
   // Create a query to find all documents where isLocation is true
@@ -370,7 +368,8 @@ export const getLocationPosts = async (setPosts: SetStateAction<any>) => {
       id: doc.id,
       postData: doc.data(),
     })); // Map through docs
-    return setPosts(locationPosts); // Return the array of posts with location enabled
+
+    return locationPosts; // Return the array of posts with location enabled
   } catch (error) {
     console.error("Error fetching location posts: ", error);
     return [];

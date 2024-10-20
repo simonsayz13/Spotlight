@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { StyleSheet, Alert, RefreshControl, View } from "react-native";
 import PostCard from "../../Components/PostCard";
-import { getAllPosts } from "../../Firebase/firebaseFireStore";
+import { getAllPosts, getUserDetails } from "../../Firebase/firebaseFireStore";
 import { HomeStackScreens } from "../../Constants/UI";
 import { setPosts } from "../../Redux/Slices/postsSlices";
 import { useSelector } from "react-redux";
@@ -9,10 +9,29 @@ import store, { RootState } from "../../Redux/store";
 import { MasonryFlashList } from "@shopify/flash-list";
 
 const Contents = (props: any) => {
-  const { content, navigation, showSearchBar, searchText } = props;
+  const { content, navigation, showSearchBar, searchText, onScroll } = props;
   const [refreshing, setRefreshing] = useState(false);
   const { posts } = useSelector((state: RootState) => state.posts);
   const [filteredPosts, setFilteredPosts] = useState([]);
+
+  const fetchPosts = async () => {
+    try {
+      const fetchedPosts = await getAllPosts();
+      const postsWithUserDetails = await Promise.all(
+        fetchedPosts.map(async (post: any) => {
+          const userDetails = await getUserDetails(post.user_id); // Assuming user_id is available in post
+          return {
+            ...post,
+            userDisplayName: userDetails.display_name,
+            userProfilePic: userDetails.profile_picture_url,
+          };
+        })
+      );
+      store.dispatch(setPosts(postsWithUserDetails));
+    } catch (error) {
+      Alert.alert("Error", "Error fetching posts");
+    }
+  };
 
   // Refresh the contents page
   const onRefresh = useCallback(async () => {
@@ -22,15 +41,6 @@ const Contents = (props: any) => {
       setRefreshing(false);
     }, 800); // Simulating a fetch time
   }, []);
-
-  const fetchPosts = async () => {
-    try {
-      const data = await getAllPosts();
-      store.dispatch(setPosts(data));
-    } catch (error) {
-      Alert.alert("Error", "Error fetching posts");
-    }
-  };
 
   const openPost = (postData: any) => {
     navigation.navigate(HomeStackScreens.Post, {
@@ -80,10 +90,12 @@ const Contents = (props: any) => {
       data={filteredPosts}
       keyExtractor={(post) => post.id}
       renderItem={renderItem}
-      estimatedItemSize={200} // Estimated size for optimal performance
+      estimatedItemSize={50} // Estimated size for optimal performance
       numColumns={2} // Setting 2 columns for masonry layout
       showsVerticalScrollIndicator={false}
       contentContainerStyle={styles.flashListContainer}
+      onScroll={onScroll}
+      scrollEventThrottle={16}
       refreshControl={
         <RefreshControl
           refreshing={refreshing}

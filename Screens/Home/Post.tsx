@@ -13,10 +13,9 @@ import { ThemeColoursPrimary } from "../../Constants/UI";
 
 const Post = ({ navigation, route }: any) => {
   const { postData } = route.params;
-  const userId = postData.user_id;
   return (
     <SafeAreaView style={styles.container}>
-      <TopNavigationBarPost navigation={navigation} userId={userId} />
+      <TopNavigationBarPost navigation={navigation} postData={postData} />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={styles.container}

@@ -24,6 +24,11 @@ const ProfileStackScreen = () => {
       screenOptions={{ headerShown: false }}
     >
       <ProfileStack.Screen
+        name={ProfileStackScreens.Profile}
+        component={Profile}
+        options={{ gestureEnabled: false }}
+      />
+      <ProfileStack.Screen
         name={ProfileStackScreens.LoginSignUp}
         component={LoginSignUpScreen}
       />
@@ -32,11 +37,7 @@ const ProfileStackScreen = () => {
         name={ProfileStackScreens.Register}
         component={Register}
       />
-      <ProfileStack.Screen
-        name={ProfileStackScreens.Profile}
-        component={Profile}
-        options={{ gestureEnabled: false }}
-      />
+
       <ProfileStack.Screen
         name={ProfileStackScreens.EditProfile}
         component={EditProfile}
