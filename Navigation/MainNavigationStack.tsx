@@ -20,14 +20,12 @@ import { CreatePost } from "../Screens/Post/CreatePost";
 import ViewProfile from "../Screens/Profile/ViewProfile";
 import { useSelector } from "react-redux";
 import LoginSignInStackScreen from "./Stacks/LoginSignInStack";
+import { RootState } from "../Redux/store";
 const MainStack = createNativeStackNavigator();
 
 const MainNavigationStack = () => {
   const userId = useSelector((state: RootState) => state.user.userId);
-  console.log(userId);
-
   const initialRouteName = userId ? MainStacks.MainTab : MainStacks.Login;
-
   return (
     <MainStack.Navigator
       screenOptions={{ headerShown: false }}

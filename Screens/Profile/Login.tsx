@@ -5,19 +5,12 @@ import {
   StyleSheet,
   SafeAreaView,
   TextInput,
-  Modal,
-  ActivityIndicator,
   TouchableOpacity,
   Alert,
 } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import {
-  MainStacks,
-  ProfileStackScreens,
-  ThemeColours,
-  ThemeColoursPrimary,
-} from "../../Constants/UI";
+import { MainStacks, ThemeColoursPrimary } from "../../Constants/UI";
 import { signInWithEmail } from "../../Firebase/firebaseAuth";
 import {
   AuthErrorCode,
