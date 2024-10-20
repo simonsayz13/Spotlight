@@ -160,7 +160,24 @@ const Profile = ({ navigation }: any) => {
   const openFollowerScreen = () => {
     navigation.navigate("FollowStack", {
       screen: FollowStackScreens.FollowerList,
-      params: { displayName, followers: followers, profileId: userId },
+      params: {
+        displayName,
+        followers,
+        followings,
+        profileId: userId,
+      },
+    });
+  };
+
+  const openFollowingScreen = () => {
+    navigation.navigate("FollowStack", {
+      screen: FollowStackScreens.FollowingList,
+      params: {
+        displayName,
+        followers,
+        followings,
+        profileId: userId,
+      },
     });
   };
 
@@ -240,18 +257,20 @@ const Profile = ({ navigation }: any) => {
           )}
         </View>
         <View style={styles.userStatsContainer}>
-          <Pressable style={styles.statsView} onPress={openFollowerScreen}>
+          <Pressable style={styles.statsView} onPress={openFollowingScreen}>
             <Text style={styles.statsCount}>
               {ldgUserDetails ? "-" : followings?.length}
             </Text>
             <Text style={styles.statsFont}>Following</Text>
           </Pressable>
-          <View style={styles.statsView}>
-            <Text style={styles.statsCount}>
-              {ldgUserDetails ? "-" : followers?.length}
-            </Text>
-            <Text style={styles.statsFont}>Followers</Text>
-          </View>
+          <Pressable style={styles.statsView} onPress={openFollowerScreen}>
+            <View style={styles.statsView}>
+              <Text style={styles.statsCount}>
+                {ldgUserDetails ? "-" : followers?.length}
+              </Text>
+              <Text style={styles.statsFont}>Followers</Text>
+            </View>
+          </Pressable>
           <View style={styles.statsView}>
             <Text style={styles.statsCount}>666</Text>
             <Text style={styles.statsFont}>Likes & Favs</Text>

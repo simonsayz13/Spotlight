@@ -7,7 +7,15 @@ import { ProfileStackScreens, ThemeColoursPrimary } from "../Constants/UI";
 import { getUserDetails } from "../Firebase/firebaseFireStore";
 import { Image } from "expo-image";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-const TopNavigationBarPost = ({ navigation, userId, displayName }: any) => {
+import FollowTabsHeader from "./FollowTabsHeader";
+
+const TopNavigationBarPost = ({
+  navigation,
+  userId,
+  displayName,
+  activeTab,
+  handleTabPress,
+}: any) => {
   const [profilePicUrl, setProfilePicUrl] = useState("");
 
   const goToProfile = () => {
@@ -35,6 +43,9 @@ const TopNavigationBarPost = ({ navigation, userId, displayName }: any) => {
           <Text style={styles.usernameText}>{displayName}</Text>
         </TouchableOpacity>
       </View>
+      <View>
+        <FollowTabsHeader activeTab={activeTab} onTabPress={handleTabPress} />
+      </View>
     </View>
   );
 };
@@ -43,15 +54,16 @@ const styles = StyleSheet.create({
   container: {
     padding: 8,
     alignItems: "center",
-    flexDirection: "row",
     justifyContent: "space-between",
     backgroundColor: ThemeColoursPrimary.PrimaryColour,
     borderBottomWidth: 0.4,
     borderBottomColor: ThemeColoursPrimary.GreyColour,
   },
   leftWrapper: {
+    width: "100%",
     flexDirection: "row", // Align children in a row
     alignItems: "center", // Vertically center the content
+    justifyContent: "flex-start",
   },
   textWrapper: {
     position: "relative",

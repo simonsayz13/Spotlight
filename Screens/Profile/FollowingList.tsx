@@ -28,7 +28,7 @@ const FollowerList = ({ navigation, route }: any) => {
         setLdgFollowers(true);
         try {
           const data = await Promise.all(
-            followers.map(async (follower) => {
+            followings.map(async (follower) => {
               const details = await getUserDetails(follower, false);
               return details;
             })
@@ -46,7 +46,7 @@ const FollowerList = ({ navigation, route }: any) => {
       fetchFollowers().then((data) => {
         setFollowerList(data);
       });
-    }, [followers]) // Include dependencies like userId if they change
+    }, [followings]) // Include dependencies like userId if they change
   );
   return (
     <SafeAreaView style={styles.container}>

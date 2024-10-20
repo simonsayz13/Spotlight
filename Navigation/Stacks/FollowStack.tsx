@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useSelector } from "react-redux";
 import { RootState } from "../../Redux/store";
 import FollowerList from "../../Screens/Profile/FollowerList";
+import FollowingList from "../../Screens/Profile/FollowingList";
 import FollowTabsHeader from "../../Components/FollowTabsHeader";
 import { NavigationContainer } from "@react-navigation/native";
 import { StyleSheet, Text, View } from "react-native";
@@ -15,19 +16,27 @@ const FollowStack = createNativeStackNavigator();
 const FollowStackScreen = (props) => {
   const { navigation, route } = props;
   const {
-    params: { params },
+    params: { params, screen },
   } = route;
-  const { displayName } = params;
+  console.log("params", params);
+  console.log("screen", screen);
+  const { displayName, followings, followers } = params;
 
   const userId = useSelector((state: RootState) => state.user.userId);
-  const [activeTab, setActiveTab] = useState(FollowStackScreens.FollowerList);
+  const [activeTab, setActiveTab] = useState(screen);
 
   const handleTabPress = (tab) => {
     setActiveTab(tab);
     if (tab === FollowStackScreens.FollowerList) {
-      navigation.navigate(FollowStackScreens.FollowerList);
+      navigation.navigate(FollowStackScreens.FollowerList, {
+        followers,
+        profileId: userId,
+      });
     } else {
-      navigation.navigate(FollowStackScreens.FollowingList);
+      navigation.navigate(FollowStackScreens.FollowingList, {
+        followings,
+        profileId: userId,
+      });
     }
   };
 
@@ -40,6 +49,8 @@ const FollowStackScreen = (props) => {
             <TopNavigationBarFollows
               navigation={navigation}
               displayName={displayName}
+              activeTab={activeTab}
+              handleTabPress={handleTabPress}
             />
           </SafeAreaView>
         ),
@@ -51,7 +62,7 @@ const FollowStackScreen = (props) => {
       />
       <FollowStack.Screen
         name={FollowStackScreens.FollowingList}
-        component={FollowerList}
+        component={FollowingList}
       />
     </FollowStack.Navigator>
   );

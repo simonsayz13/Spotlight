@@ -1,40 +1,46 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import TopNavigationBarFollows from "./TopNavigationBarFollows";
+import { FollowStackScreens, ThemeColoursPrimary } from "../Constants/UI";
 
-const FollowTabsHeader = ({
-  activeTab,
-  onTabPress,
-  navigation,
-  displayName,
-}) => {
+const FollowTabsHeader = ({ activeTab, onTabPress }) => {
   return (
     <View style={styles.tabContainer}>
-      <TopNavigationBarFollows
-        navigation={navigation}
-        displayName={displayName}
-      />
       <TouchableOpacity
-        onPress={() => onTabPress("Following")}
-        style={styles.tabButton}
+        onPress={() => onTabPress(FollowStackScreens.FollowingList)}
+        style={[
+          styles.tabButton,
+          activeTab === FollowStackScreens.FollowingList
+            ? styles.activeTab
+            : null,
+        ]}
       >
         <Text
           style={[
             styles.tabText,
-            activeTab === "Following" ? styles.activeTab : null,
+            activeTab === FollowStackScreens.FollowingList
+              ? styles.activeTabText
+              : null,
           ]}
         >
           Following
         </Text>
       </TouchableOpacity>
       <TouchableOpacity
-        onPress={() => onTabPress("Followers")}
-        style={styles.tabButton}
+        onPress={() => onTabPress(FollowStackScreens.FollowerList)}
+        style={[
+          styles.tabButton,
+          activeTab === FollowStackScreens.FollowerList
+            ? styles.activeTab
+            : null,
+        ]}
       >
         <Text
           style={[
             styles.tabText,
-            activeTab === "Followers" ? styles.activeTab : null,
+            activeTab === FollowStackScreens.FollowerList
+              ? styles.activeTabText
+              : null,
           ]}
         >
           Followers
@@ -48,20 +54,26 @@ const styles = StyleSheet.create({
   tabContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
-    backgroundColor: "#f8f8f8",
+    // backgroundColor: "#f8f8f8",
     paddingVertical: 10,
+    width: "50%",
   },
   tabButton: {
-    flex: 1,
     alignItems: "center",
   },
   tabText: {
     fontSize: 16,
     color: "#555",
   },
-  activeTab: {
+  activeTabText: {
     fontWeight: "bold",
     color: "#000",
+  },
+  activeTab: {
+    borderBottomColor: ThemeColoursPrimary.LogoColour,
+    borderBottomWidth: 2,
+    height: 30,
+    paddingBottom: 5,
   },
 });
 
