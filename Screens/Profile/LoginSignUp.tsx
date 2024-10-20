@@ -5,11 +5,7 @@ import {
   View,
   TouchableOpacity,
 } from "react-native";
-import {
-  ProfileStackScreens,
-  ThemeColours,
-  ThemeColoursPrimary,
-} from "../../Constants/UI";
+import { ProfileStackScreens, ThemeColoursPrimary } from "../../Constants/UI";
 
 const LoginSignUpScreen = ({ navigation }: any) => {
   const onClickLogin = () => {
@@ -22,7 +18,7 @@ const LoginSignUpScreen = ({ navigation }: any) => {
     <SafeAreaView style={styles.container}>
       <View style={styles.logoContainer}>
         <View style={styles.textContainer}>
-          <Text style={styles.logoText}>Linkify</Text>
+          <Text style={styles.logoText}>Spotlight</Text>
         </View>
       </View>
       <View style={styles.bottomView}>
@@ -55,9 +51,10 @@ const styles = StyleSheet.create({
   },
   logoText: {
     fontWeight: "bold",
-    fontSize: 66,
+    fontSize: 50,
     color: ThemeColoursPrimary.PrimaryColour, // Same color as background
     padding: 20,
+    fontFamily: "Shrikhand_400Regular",
   },
   bottomView: {
     flex: 1,
@@ -69,14 +66,13 @@ const styles = StyleSheet.create({
     height: 40,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: ThemeColoursPrimary.PrimaryColour,
-    borderWidth: 1.5,
-    borderRadius: 10,
+    backgroundColor: ThemeColoursPrimary.LogoColour,
+    borderRadius: 8,
   },
   buttonText: {
     fontSize: 18,
     fontWeight: "bold",
-    color: ThemeColoursPrimary.SecondaryColour,
+    color: ThemeColoursPrimary.PrimaryColour,
   },
 });
 

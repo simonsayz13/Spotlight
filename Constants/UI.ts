@@ -65,6 +65,10 @@ export const Tags = [
   },
 ];
 
+export enum MainStacks {
+  Login = "LoginStack",
+  MainTab = "MainTabStack",
+}
 export enum HomeStackScreens {
   Home = "home",
   Post = "post",

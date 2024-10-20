@@ -2,6 +2,7 @@ import React from "react";
 import TabNavigation from "./TabNavigation";
 import {
   HomeStackScreens,
+  MainStacks,
   MessagingStackScreens,
   MiscStackScreens,
   PostStackScreens,
@@ -17,49 +18,70 @@ import { ViewPhoto } from "../Screens/Post/ViewPhoto";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { CreatePost } from "../Screens/Post/CreatePost";
 import ViewProfile from "../Screens/Profile/ViewProfile";
+import { useSelector } from "react-redux";
+import LoginSignInStackScreen from "./Stacks/LoginSignInStack";
+import { RootState } from "../Redux/store";
 const MainStack = createNativeStackNavigator();
 
-const MainNavigationStack = () => (
-  <MainStack.Navigator screenOptions={{ headerShown: false }}>
-    <MainStack.Screen name={"MainTab"} component={TabNavigation} />
-    <MainStack.Screen
-      name={HomeStackScreens.Post}
-      component={Post}
-      options={({ route }: any) => ({
-        animation:
-          route.params?.customAnimation === true
-            ? "slide_from_bottom"
-            : "slide_from_right",
-      })}
-    />
-    <MainStack.Screen name={MessagingStackScreens.Chat} component={Chat} />
-    <MainStack.Screen
-      name={MiscStackScreens.PhotoBrowser}
-      component={PhotoBrowser}
-      options={{
-        presentation: "modal", // Equivalent to gestureDirection: 'vertical'
-        animation: "slide_from_bottom",
-      }}
-    />
-    <MainStack.Screen
-      name={MiscStackScreens.ImageCropper}
-      component={ImageCropScreen}
-    />
-    <MainStack.Screen name={ProfileStackScreens.Profile} component={Profile} />
-    <MainStack.Screen
-      name={PostStackScreens.CreatePost}
-      component={CreatePost}
-      options={{
-        animation: "slide_from_bottom",
-      }}
-    />
-    <MainStack.Screen name={PostStackScreens.Camera} component={Camera} />
-    <MainStack.Screen name={PostStackScreens.ViewPhoto} component={ViewPhoto} />
-    <MainStack.Screen
-      name={ProfileStackScreens.ViewProfile}
-      component={ViewProfile}
-    />
-  </MainStack.Navigator>
-);
+const MainNavigationStack = () => {
+  const userId = useSelector((state: RootState) => state.user.userId);
+  const initialRouteName = userId ? MainStacks.MainTab : MainStacks.Login;
+  return (
+    <MainStack.Navigator
+      screenOptions={{ headerShown: false }}
+      initialRouteName={initialRouteName}
+    >
+      <MainStack.Screen
+        name={MainStacks.Login}
+        component={LoginSignInStackScreen}
+      />
+
+      <MainStack.Screen name={MainStacks.MainTab} component={TabNavigation} />
+      <MainStack.Screen
+        name={HomeStackScreens.Post}
+        component={Post}
+        options={({ route }: any) => ({
+          animation:
+            route.params?.customAnimation === true
+              ? "slide_from_bottom"
+              : "slide_from_right",
+        })}
+      />
+      <MainStack.Screen name={MessagingStackScreens.Chat} component={Chat} />
+      <MainStack.Screen
+        name={MiscStackScreens.PhotoBrowser}
+        component={PhotoBrowser}
+        options={{
+          presentation: "modal", // Equivalent to gestureDirection: 'vertical'
+          animation: "slide_from_bottom",
+        }}
+      />
+      <MainStack.Screen
+        name={MiscStackScreens.ImageCropper}
+        component={ImageCropScreen}
+      />
+      <MainStack.Screen
+        name={ProfileStackScreens.Profile}
+        component={Profile}
+      />
+      <MainStack.Screen
+        name={PostStackScreens.CreatePost}
+        component={CreatePost}
+        options={{
+          animation: "slide_from_bottom",
+        }}
+      />
+      <MainStack.Screen name={PostStackScreens.Camera} component={Camera} />
+      <MainStack.Screen
+        name={PostStackScreens.ViewPhoto}
+        component={ViewPhoto}
+      />
+      <MainStack.Screen
+        name={ProfileStackScreens.ViewProfile}
+        component={ViewProfile}
+      />
+    </MainStack.Navigator>
+  );
+};
 
 export default MainNavigationStack;
