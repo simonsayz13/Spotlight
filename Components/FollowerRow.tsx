@@ -3,7 +3,7 @@ import { Image } from "expo-image";
 import React from "react";
 import FollowButton from "./FollowButton";
 
-const FollowerRow = ({ followerObj }) => {
+const FollowerRow = ({ followerObj, buttonTitle, buttonDisabled }) => {
   const { display_name, profile_picture_url } = followerObj;
   return (
     <View style={styles.container}>
@@ -14,7 +14,9 @@ const FollowerRow = ({ followerObj }) => {
       )}
       <Text style={styles.displayName}>{display_name}</Text>
       <View style={{ flexGrow: 1 }} />
-      <FollowButton title="Follow" handlePress={() => {}} />
+      {!buttonDisabled && (
+        <FollowButton title={buttonTitle} handlePress={() => {}} />
+      )}
     </View>
   );
 };

@@ -20,7 +20,15 @@ const FollowStackScreen = (props) => {
   } = route;
   console.log("params", params);
   console.log("screen", screen);
-  const { displayName, followings, followers, tabIndex } = params;
+  const {
+    displayName,
+    followings,
+    followers,
+    tabIndex,
+    type,
+    appUserId,
+    appUserFollowings,
+  } = params;
 
   const userId = useSelector((state: RootState) => state.user.userId);
   const [activeTab, setActiveTab] = useState(screen);
@@ -32,6 +40,10 @@ const FollowStackScreen = (props) => {
         followers,
         profileId: userId,
         followings,
+        tabIndex,
+        type,
+        appUserId,
+        appUserFollowings,
       });
     } else {
       navigation.navigate(FollowStackScreens.FollowingList, {

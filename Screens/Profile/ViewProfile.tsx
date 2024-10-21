@@ -33,9 +33,11 @@ import { Image } from "expo-image";
 import { MasonryFlashList } from "@shopify/flash-list";
 import AntDesign from "@expo/vector-icons/AntDesign";
 const ViewProfile = ({ navigation, route }: any) => {
-  const { userId: appUserID } = useSelector((state: RootState) => {
-    return state.user;
-  });
+  const { userId: appUserId, userFollowings: appUserFollowings } = useSelector(
+    (state: RootState) => {
+      return state.user;
+    }
+  );
   const [buttonStates, setButtonStates] = useState(guestContentSelectorButtons);
   const userId = route?.params?.userId;
   const [profileUserId, setProfileUserId] = useState(null);
@@ -121,7 +123,7 @@ const ViewProfile = ({ navigation, route }: any) => {
       setFollowers(followers);
       setfollowings(followings);
       setProfileUserId(user_id);
-      followers?.find((follower) => follower.user_id === appUserID) &&
+      followers?.find((follower) => follower.user_id === appUserId) &&
         setIsFollowed(true);
       setLdgUserDetails(false);
       setLdgSuccUserDetails(true);
@@ -156,9 +158,9 @@ const ViewProfile = ({ navigation, route }: any) => {
 
   const handlePressFollowBtn = async () => {
     try {
-      await addFollower(profileUserId, appUserID);
+      await addFollower(profileUserId, appUserId);
       setIsFollowed(true);
-      setFollowers([...followers, appUserID]);
+      setFollowers([...followers, appUserId]);
     } catch (error) {
       Alert.alert("Error", `${error}`);
     }
@@ -166,11 +168,11 @@ const ViewProfile = ({ navigation, route }: any) => {
 
   const handlePressUnfollowBtn = async () => {
     try {
-      await removeFollower(profileUserId, appUserID);
+      await removeFollower(profileUserId, appUserId);
       setIsFollowed(false);
 
       const arr = followers?.filter(
-        (followerUserId) => followerUserId !== appUserID
+        (followerUserId) => followerUserId !== appUserId
       );
       setFollowers(arr);
     } catch (error) {
@@ -181,7 +183,7 @@ const ViewProfile = ({ navigation, route }: any) => {
     navigation.goBack();
   };
 
-  const openFollowerScreen = () => {
+  const openFollowerScreen = (tabIndex) => {
     navigation.navigate("FollowStack", {
       screen: FollowStackScreens.FollowerList,
       params: {
@@ -189,20 +191,10 @@ const ViewProfile = ({ navigation, route }: any) => {
         followers,
         followings,
         profileId: userId,
-        tabIndex: 1,
-      },
-    });
-  };
-
-  const openFollowingScreen = () => {
-    navigation.navigate("FollowStack", {
-      screen: FollowStackScreens.FollowerList,
-      params: {
-        displayName,
-        followers,
-        followings,
-        profileId: userId,
-        tabIndex: 0,
+        appUserId,
+        tabIndex: tabIndex,
+        appUserFollowings,
+        type: "profileUser",
       },
     });
   };
@@ -270,13 +262,19 @@ const ViewProfile = ({ navigation, route }: any) => {
           )}
         </View>
         <View style={styles.userStatsContainer}>
-          <Pressable style={styles.statsView} onPress={openFollowingScreen}>
+          <Pressable
+            style={styles.statsView}
+            onPress={() => openFollowerScreen(0)}
+          >
             <Text style={styles.statsCount}>
               {ldgUserDetails ? "-" : followings?.length}
             </Text>
             <Text style={styles.statsFont}>Following</Text>
           </Pressable>
-          <Pressable style={styles.statsView} onPress={openFollowerScreen}>
+          <Pressable
+            style={styles.statsView}
+            onPress={() => openFollowerScreen(1)}
+          >
             <Text style={styles.statsCount}>
               {ldgUserDetails ? "-" : followers?.length}
             </Text>

@@ -157,7 +157,7 @@ const Profile = ({ navigation }: any) => {
     });
   };
 
-  const openFollowerScreen = () => {
+  const openFollowerScreen = (tabIndex) => {
     navigation.navigate("FollowStack", {
       screen: FollowStackScreens.FollowerList,
       params: {
@@ -165,20 +165,10 @@ const Profile = ({ navigation }: any) => {
         followers,
         followings,
         profileId: userId,
-        tabIndex: 1,
-      },
-    });
-  };
-
-  const openFollowingScreen = () => {
-    navigation.navigate("FollowStack", {
-      screen: FollowStackScreens.FollowerList,
-      params: {
-        displayName,
-        followers,
-        followings,
-        profileId: userId,
-        tabIndex: 0,
+        appUserId: userId,
+        appUserFollowings: followings,
+        tabIndex: tabIndex,
+        type: "appUser",
       },
     });
   };
@@ -259,13 +249,19 @@ const Profile = ({ navigation }: any) => {
           )}
         </View>
         <View style={styles.userStatsContainer}>
-          <Pressable style={styles.statsView} onPress={openFollowingScreen}>
+          <Pressable
+            style={styles.statsView}
+            onPress={() => openFollowerScreen(0)}
+          >
             <Text style={styles.statsCount}>
               {ldgUserDetails ? "-" : followings?.length}
             </Text>
             <Text style={styles.statsFont}>Following</Text>
           </Pressable>
-          <Pressable style={styles.statsView} onPress={openFollowerScreen}>
+          <Pressable
+            style={styles.statsView}
+            onPress={() => openFollowerScreen(1)}
+          >
             <View style={styles.statsView}>
               <Text style={styles.statsCount}>
                 {ldgUserDetails ? "-" : followers?.length}

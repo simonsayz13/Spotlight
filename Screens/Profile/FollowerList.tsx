@@ -18,33 +18,57 @@ import { useFocusEffect } from "@react-navigation/native";
 import { getUserDetails } from "../../Firebase/firebaseFireStore";
 import FollowerRow from "../../Components/FollowerRow";
 
-const FollowersScreen = (props) => {
-  const { followerList, profileId } = props;
+const FollowingScreen = (props) => {
+  const { followingList, profileId, type, appUserId, appUserFollowings } =
+    props;
   return (
     <View style={styles.container}>
       <ScrollView style={styles.listContainer}>
-        {followerList?.map((profile) => (
-          <FollowerRow
-            key={`followerScreen_followRow_${profileId}_${profile.user_id}`}
-            followerObj={profile}
-          />
-        ))}
+        {followingList?.map((profile) => {
+          const isFollowed = Boolean(
+            appUserFollowings.find((el) => el === profile.user_id)
+          );
+          return (
+            <FollowerRow
+              key={`followingScreen_followRow_${profileId}_${profile.user_id}`}
+              followerObj={profile}
+              buttonTitle={isFollowed ? "Unfollow" : "Follow"}
+              buttonDisabled={profile.user_id === appUserId}
+            />
+          );
+        })}
       </ScrollView>
     </View>
   );
 };
 
-const FollowingScreen = (props) => {
-  const { followingList, profileId } = props;
+const FollowersScreen = (props) => {
+  const {
+    followerList,
+    profileId,
+    type,
+    followings,
+    appUserId,
+    appUserFollowings,
+  } = props;
   return (
     <View style={styles.container}>
       <ScrollView style={styles.listContainer}>
-        {followingList?.map((profile) => (
-          <FollowerRow
-            key={`followingScreen_followRow_${profileId}_${profile.user_id}`}
-            followerObj={profile}
-          />
-        ))}
+        {followerList?.map((profile) => {
+          const isFollowed = Boolean(
+            appUserFollowings.find((el) => el === profile.user_id)
+          );
+
+          console.log("isFollowed", isFollowed);
+          return (
+            <FollowerRow
+              key={`followerScreen_followRow_${profileId}_${profile.user_id}`}
+              followerObj={profile}
+              buttonTitle={isFollowed ? "Unfollow" : "Follow"}
+              buttonDisabled={profile.user_id === appUserId}
+            />
+          );
+        })}
       </ScrollView>
     </View>
   );
@@ -53,8 +77,16 @@ const FollowingScreen = (props) => {
 const initialLayout = { width: Dimensions.get("window").width };
 
 const FollowerList = ({ navigation, route }: any) => {
-  const { followers, followings, displayName, profileId, tabIndex } =
-    route.params;
+  const {
+    followings,
+    followers,
+    displayName,
+    profileId,
+    tabIndex,
+    type,
+    appUserId,
+    appUserFollowings,
+  } = route.params;
 
   const [index, setIndex] = React.useState(tabIndex);
   const [ldgFollowers, setLdgFollowers] = useState(false);
@@ -103,13 +135,23 @@ const FollowerList = ({ navigation, route }: any) => {
     switch (route.key) {
       case "followers":
         return (
-          <FollowersScreen followerList={followerList} profileId={profileId} />
+          <FollowersScreen
+            followerList={followerList}
+            profileId={profileId}
+            type={type}
+            followings={followings}
+            appUserId={appUserId}
+            appUserFollowings={appUserFollowings}
+          />
         );
       case "following":
         return (
           <FollowingScreen
             followingList={followingList}
             profileId={profileId}
+            type={type}
+            appUserId={appUserId}
+            appUserFollowings={appUserFollowings}
           />
         );
       default:
