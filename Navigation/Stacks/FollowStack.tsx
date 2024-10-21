@@ -31,6 +31,7 @@ const FollowStackScreen = (props) => {
       navigation.navigate(FollowStackScreens.FollowerList, {
         followers,
         profileId: userId,
+        followings,
       });
     } else {
       navigation.navigate(FollowStackScreens.FollowingList, {
@@ -45,7 +46,7 @@ const FollowStackScreen = (props) => {
       // initialRouteName={FollowStackScreens.FollowerList}
       screenOptions={{
         header: () => (
-          <SafeAreaView style={styles.container}>
+          <SafeAreaView style={styles.container} edges={["top"]}>
             <TopNavigationBarFollows
               navigation={navigation}
               displayName={displayName}

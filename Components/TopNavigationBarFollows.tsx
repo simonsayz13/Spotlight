@@ -43,9 +43,9 @@ const TopNavigationBarPost = ({
           <Text style={styles.usernameText}>{displayName}</Text>
         </TouchableOpacity>
       </View>
-      <View>
+      {/* <View>
         <FollowTabsHeader activeTab={activeTab} onTabPress={handleTabPress} />
-      </View>
+      </View> */}
     </View>
   );
 };
@@ -56,14 +56,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     backgroundColor: ThemeColoursPrimary.PrimaryColour,
-    borderBottomWidth: 0.4,
-    borderBottomColor: ThemeColoursPrimary.GreyColour,
   },
   leftWrapper: {
     width: "100%",
     flexDirection: "row", // Align children in a row
     alignItems: "center", // Vertically center the content
     justifyContent: "flex-start",
+    backgroundColor: ThemeColoursPrimary.PrimaryColour,
   },
   textWrapper: {
     position: "relative",

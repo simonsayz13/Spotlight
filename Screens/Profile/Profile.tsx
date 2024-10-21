@@ -257,7 +257,7 @@ const Profile = ({ navigation }: any) => {
           )}
         </View>
         <View style={styles.userStatsContainer}>
-          <Pressable style={styles.statsView} onPress={openFollowingScreen}>
+          <Pressable style={styles.statsView} onPress={openFollowerScreen}>
             <Text style={styles.statsCount}>
               {ldgUserDetails ? "-" : followings?.length}
             </Text>

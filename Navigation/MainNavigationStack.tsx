@@ -58,10 +58,10 @@ const MainNavigationStack = () => (
     />
     <MainStack.Screen name={PostStackScreens.Camera} component={Camera} />
     <MainStack.Screen name={PostStackScreens.ViewPhoto} component={ViewPhoto} />
-    {/* <MainStack.Screen
+    <MainStack.Screen
       name={ProfileStackScreens.ViewProfile}
       component={ViewProfile}
-    /> */}
+    />
     <MainStack.Screen
       name={"FollowStack"}
       component={FollowStackScreen}
