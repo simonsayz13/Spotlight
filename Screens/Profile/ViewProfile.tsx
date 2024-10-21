@@ -8,10 +8,12 @@ import {
   SafeAreaView,
   Alert,
   Animated,
+  Pressable,
 } from "react-native";
 import { useSelector } from "react-redux";
 import { RootState } from "../../Redux/store";
 import {
+  FollowStackScreens,
   Gender,
   guestContentSelectorButtons,
   HomeStackScreens,
@@ -179,6 +181,32 @@ const ViewProfile = ({ navigation, route }: any) => {
     navigation.goBack();
   };
 
+  const openFollowerScreen = () => {
+    navigation.navigate("FollowStack", {
+      screen: FollowStackScreens.FollowerList,
+      params: {
+        displayName,
+        followers,
+        followings,
+        profileId: userId,
+        tabIndex: 1,
+      },
+    });
+  };
+
+  const openFollowingScreen = () => {
+    navigation.navigate("FollowStack", {
+      screen: FollowStackScreens.FollowerList,
+      params: {
+        displayName,
+        followers,
+        followings,
+        profileId: userId,
+        tabIndex: 0,
+      },
+    });
+  };
+
   const renderItem = ({ item }: any) => (
     <View style={styles.cardContainer}>
       <PostCard postData={item} openPost={openPost} navigation={navigation} />
@@ -242,18 +270,18 @@ const ViewProfile = ({ navigation, route }: any) => {
           )}
         </View>
         <View style={styles.userStatsContainer}>
-          <View style={styles.statsView}>
+          <Pressable style={styles.statsView} onPress={openFollowingScreen}>
             <Text style={styles.statsCount}>
               {ldgUserDetails ? "-" : followings?.length}
             </Text>
             <Text style={styles.statsFont}>Following</Text>
-          </View>
-          <View style={styles.statsView}>
+          </Pressable>
+          <Pressable style={styles.statsView} onPress={openFollowerScreen}>
             <Text style={styles.statsCount}>
               {ldgUserDetails ? "-" : followers?.length}
             </Text>
             <Text style={styles.statsFont}>Followers</Text>
-          </View>
+          </Pressable>
           <View style={styles.statsView}>
             <Text style={styles.statsCount}>666</Text>
             <Text style={styles.statsFont}>Likes & Favs</Text>

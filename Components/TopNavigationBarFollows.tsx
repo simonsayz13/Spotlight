@@ -39,7 +39,10 @@ const TopNavigationBarPost = ({
             color={ThemeColoursPrimary.SecondaryColour}
           />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.userWrapper} onPressIn={goToProfile}>
+        <TouchableOpacity
+          style={styles.userWrapper}
+          onPressIn={() => navigation.goBack()}
+        >
           <Text style={styles.usernameText}>{displayName}</Text>
         </TouchableOpacity>
       </View>

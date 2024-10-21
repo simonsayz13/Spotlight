@@ -53,10 +53,10 @@ const FollowingScreen = (props) => {
 const initialLayout = { width: Dimensions.get("window").width };
 
 const FollowerList = ({ navigation, route }: any) => {
-  const { followers, followings, displayName, profileId } = route.params;
+  const { followers, followings, displayName, profileId, tabIndex } =
+    route.params;
 
-  console.log("route", route);
-  const [index, setIndex] = React.useState(0);
+  const [index, setIndex] = React.useState(tabIndex);
   const [ldgFollowers, setLdgFollowers] = useState(false);
   const [ldgFollowings, setLdgFollowings] = useState(false);
   const [followerList, setFollowerList] = useState([]);
@@ -83,20 +83,20 @@ const FollowerList = ({ navigation, route }: any) => {
       };
 
       if (index === 0) {
-        fetchFollowProfiles(followers, setLdgFollowers).then((data) => {
-          setFollowerList(data);
-        });
-      } else if (index === 1) {
         fetchFollowProfiles(followings, setLdgFollowings).then((data) => {
           setFollowingList(data);
+        });
+      } else if (index === 1) {
+        fetchFollowProfiles(followers, setLdgFollowers).then((data) => {
+          setFollowerList(data);
         });
       }
     }, [index]) // Include dependencies like userId if they change
   );
 
   const [routes] = React.useState([
-    { key: "followers", title: "Followers" },
     { key: "following", title: "Following" },
+    { key: "followers", title: "Followers" },
   ]);
 
   const renderScene = ({ route }) => {
