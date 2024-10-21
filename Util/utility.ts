@@ -1,5 +1,6 @@
 import { Image } from "react-native";
 import * as MediaLibrary from "expo-media-library";
+import { format, isToday, isSameMinute } from "date-fns";
 
 export const formatRelativeTime = (timeStamp: string) => {
   const givenDate = new Date(timeStamp);
@@ -81,4 +82,38 @@ export const convertPhUriToFileUri = async (phUri: string) => {
   const assetId = phUri.slice(5);
   let returnedAssetInfo = await MediaLibrary.getAssetInfoAsync(assetId);
   return returnedAssetInfo?.localUri;
+};
+
+export const clusterMessages = (messages: any) => {
+  const clusteredMessages: Array<any> = [];
+  let lastTimeStamp: any = null;
+
+  messages.forEach((message: any) => {
+    const currentTimeStamp: any = new Date(message.timestamp);
+
+    // For messages within the last 24 hours
+    if (isToday(currentTimeStamp)) {
+      // Display time if the current message is greater than the last by one minute
+      if (!lastTimeStamp || currentTimeStamp - lastTimeStamp >= 60 * 1000) {
+        clusteredMessages.push({
+          type: "time",
+          text: format(currentTimeStamp, "HH:mm"), // Format the time
+        });
+      }
+    } else {
+      // Add a new cluster for messages older than 24 hours
+      if (!lastTimeStamp || !isSameMinute(lastTimeStamp, currentTimeStamp)) {
+        clusteredMessages.push({
+          type: "header",
+          text: format(currentTimeStamp, "MMMM d, HH:mm"), // Format the date
+        });
+      }
+    }
+
+    // Add the message itself
+    clusteredMessages.push(message);
+    lastTimeStamp = currentTimeStamp; // Update the last timestamp
+  });
+
+  return clusteredMessages;
 };
