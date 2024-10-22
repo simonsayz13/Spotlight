@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import TopNavigationBar from "../../Components/TopNavigationBar";
 import Contents from "./Contents";
-import { useCallback, useState, useEffect } from "react";
+import { useCallback, useState, useEffect, useRef } from "react";
 import DrawerNavigationBar from "../../Components/DrawerNavigationBar";
 import { ThemeColoursPrimary } from "../../Constants/UI";
 import { getPostsBySearch } from "../../Firebase/firebaseFireStore";
@@ -32,7 +32,7 @@ const HomeScreen = ({ navigation }: any) => {
   const [searchText, setSearchText] = useState("");
   const [showSearchBar, setShowSearchBar] = useState(false);
   const [isMenuVisible, setIsMenuVisible] = useState(true);
-
+  const lastScrollY = useRef(0);
   const changeContent = useCallback((content: string) => {
     setContent(content);
   }, []);
@@ -83,12 +83,12 @@ const HomeScreen = ({ navigation }: any) => {
 
   const handleScroll = (event: any) => {
     const offsetY = event.nativeEvent.contentOffset.y;
-    // Hide the buttons when scrolling down, show them when scrolling up
-    if (offsetY > 100) {
+    if (offsetY - lastScrollY.current > 20) {
       setIsMenuVisible(false);
-    } else {
+    } else if (lastScrollY.current - offsetY > 20) {
       setIsMenuVisible(true);
     }
+    lastScrollY.current = offsetY;
   };
 
   return (

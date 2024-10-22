@@ -37,7 +37,7 @@ const TopNavigationBar = (props: any) => {
     )
   );
   const menuButtonTranslateY = useRef(new Animated.Value(0)).current;
-  // const middleButtonIndex = Math.floor(buttonStates.length / 2);
+
   const handlePress = (id: number, index: number) => {
     setButtonStates((prevStates) =>
       prevStates.map((button) =>
@@ -95,7 +95,7 @@ const TopNavigationBar = (props: any) => {
   }, [isMenuVisible]);
 
   return (
-    <View>
+    <View style={{ marginBottom: 2 }}>
       <View style={styles.container}>
         <TouchableOpacity onPress={handlePressMenuBtn}>
           <Ionicons
@@ -109,7 +109,7 @@ const TopNavigationBar = (props: any) => {
           <Text
             style={{
               fontFamily: "Shrikhand_400Regular",
-              fontSize: 40,
+              fontSize: 30,
               color: ThemeColoursPrimary.LogoColour,
             }}
           >
@@ -163,7 +163,8 @@ const TopNavigationBar = (props: any) => {
       >
         <View
           style={{
-            paddingVertical: 6,
+            paddingTop: 4,
+            paddingBottom: 6,
             flexDirection: "row",
           }}
         >
@@ -220,12 +221,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   menuButton: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: "bold",
     color: "#808080",
   },
   menuButtonClicked: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: "bold",
     color: ThemeColoursPrimary.SecondaryColour,
   },
