@@ -5,18 +5,12 @@ import {
   StyleSheet,
   SafeAreaView,
   TextInput,
-  Modal,
-  ActivityIndicator,
   TouchableOpacity,
   Alert,
 } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import {
-  ProfileStackScreens,
-  ThemeColours,
-  ThemeColoursPrimary,
-} from "../../Constants/UI";
+import { MainStacks, ThemeColoursPrimary } from "../../Constants/UI";
 import { signInWithEmail } from "../../Firebase/firebaseAuth";
 import {
   AuthErrorCode,
@@ -38,7 +32,7 @@ const Login = ({ navigation }: any) => {
     const response = await signInWithEmail(email, password);
     setLoading(false);
     if (response.success) {
-      navigation.replace(ProfileStackScreens.Profile);
+      navigation.replace(MainStacks.MainTab);
     } else {
       const errorCode = response.errorMessage as AuthErrorCode;
       Alert.alert("Error", FireBaseAuthErrorMessages[errorCode]);

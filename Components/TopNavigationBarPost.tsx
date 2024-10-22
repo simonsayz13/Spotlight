@@ -1,8 +1,6 @@
 import React from "react";
 import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import {
   NavigationTabs,
   ProfileStackScreens,
@@ -52,19 +50,15 @@ const TopNavigationBarPost = ({ navigation, postData }: any) => {
         </TouchableOpacity>
       </View>
       <View style={styles.followShareWrapper}>
-        <TouchableOpacity>
-          <SimpleLineIcons
-            name="user-follow"
-            size={28}
-            color={ThemeColoursPrimary.SecondaryColour}
-          />
+        <TouchableOpacity style={styles.button}>
+          <Text style={styles.buttonText}>Follow</Text>
         </TouchableOpacity>
 
         <TouchableOpacity>
-          <FontAwesome
-            name="share-square-o"
-            size={28}
-            color={ThemeColoursPrimary.SecondaryColour}
+          <FontAwesome6
+            name="arrow-up-right-from-square"
+            size={24}
+            color="black"
           />
         </TouchableOpacity>
       </View>
@@ -74,7 +68,8 @@ const TopNavigationBarPost = ({ navigation, postData }: any) => {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 8,
+    paddingHorizontal: 6,
+    paddingVertical: 4,
     alignItems: "center",
     flexDirection: "row",
     justifyContent: "space-between",
@@ -98,18 +93,32 @@ const styles = StyleSheet.create({
   usernameText: {
     color: ThemeColoursPrimary.SecondaryColour,
     fontSize: 18,
-    marginLeft: 10,
+    fontWeight: "500",
+    marginLeft: 8,
   },
   followShareWrapper: {
     alignItems: "center",
     flexDirection: "row",
-    gap: 14,
+    gap: 10,
     marginRight: 10,
   },
   profileImage: {
     width: 40, // Width and height should be the same
     height: 42,
     borderRadius: 50, // Half of the width or height for a perfect circle
+  },
+  button: {
+    padding: 8,
+    backgroundColor: ThemeColoursPrimary.LogoColour,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    height: 36,
+  },
+  buttonText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: ThemeColoursPrimary.PrimaryColour,
   },
 });
 

@@ -16,6 +16,7 @@ import {
   FollowStackScreens,
   Gender,
   HomeStackScreens,
+  MainStacks,
   ProfileStackScreens,
   ThemeColoursPrimary,
   userContentSelectorButtons,
@@ -43,6 +44,7 @@ const Profile = ({ navigation }: any) => {
   } = useSelector((state: RootState) => {
     return state.user;
   });
+
   const [postsData, setPostsData] = useState<Array<any>>([]);
   const [displayName, setDisplayName] = useState("");
   const [profilePicUrl, setProfilePicUrl] = useState("");
@@ -142,7 +144,7 @@ const Profile = ({ navigation }: any) => {
 
   const handleLogout = () => {
     logOut();
-    navigation.replace(ProfileStackScreens.LoginSignUp);
+    navigation.replace(MainStacks.Login);
   };
 
   const handleEdit = () => {
