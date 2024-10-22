@@ -26,6 +26,10 @@ import { Alert } from "react-native";
 import store from "../Redux/store";
 import { addComment } from "../Redux/Slices/postsSlices";
 import { UserDetails } from "../type/Messenger";
+import {
+  addToFollowings,
+  removeFromFollowings,
+} from "../Redux/Slices/userSlice";
 
 const db = firestoreDB;
 
@@ -324,6 +328,8 @@ export const addFollower = async (userId: string, followerUserId: string) => {
       followings: arrayUnion(userRef), // Add reference to followings array
     });
 
+    store.dispatch(addToFollowings(userId));
+
     console.log("Followed successfully");
   } catch (error) {
     console.error("Error adding follower:", error);
@@ -344,6 +350,8 @@ export const removeFollower = async (
     await updateDoc(followerUserRef, {
       followings: arrayRemove(userRef), // Add reference to followings array
     });
+
+    store.dispatch(removeFromFollowings(userId));
 
     console.log("Unfollowed successfully");
   } catch (error) {
