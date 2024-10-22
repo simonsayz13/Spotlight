@@ -82,6 +82,11 @@ export enum ProfileStackScreens {
   EditProfile = "editprofile",
   ViewProfile = "viewprofile",
 }
+
+export enum FollowStackScreens {
+  FollowerList = "followerList",
+  FollowingList = "followingList",
+}
 export enum NavigationTabs {
   Me = "Me",
   Messages = "Messages",

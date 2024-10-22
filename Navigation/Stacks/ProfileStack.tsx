@@ -3,6 +3,7 @@ import { ProfileStackScreens } from "../../Constants/UI";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Profile from "../../Screens/Profile/Profile";
 import EditProfile from "../../Screens/Profile/EditProfile";
+import FollowerList from "../../Screens/Profile/FollowerList";
 
 const ProfileStack = createNativeStackNavigator();
 

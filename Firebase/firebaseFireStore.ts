@@ -30,6 +30,10 @@ import {
   updateCommentLikes,
 } from "../Redux/Slices/postsSlices";
 import { UserDetails } from "../type/Messenger";
+import {
+  addToFollowings,
+  removeFromFollowings,
+} from "../Redux/Slices/userSlice";
 
 const db = firestoreDB;
 
@@ -62,13 +66,18 @@ export const updateProfileField = async (
   }
 };
 
-export const getUserDetails = async (userId: string) => {
+export const getUserDetails = async (
+  userId: string,
+  hasFollowInfo: boolean = true
+) => {
   try {
     const userProfileCollection = doc(db, FireStoreCollections.Users, userId);
     const userDoc = await getDoc(userProfileCollection);
     // if (userDoc.exists()) return userDoc.data();
-
     if (userDoc.exists()) {
+      if (!hasFollowInfo) {
+        return { ...userDoc.data(), followers: [], followings: [] };
+      }
       const { followers: followersRef, followings: followingsRef } =
         userDoc.data();
 
@@ -391,6 +400,8 @@ export const addFollower = async (userId: string, followerUserId: string) => {
       followings: arrayUnion(userRef), // Add reference to followings array
     });
 
+    store.dispatch(addToFollowings(userId));
+
     console.log("Followed successfully");
   } catch (error) {
     console.error("Error adding follower:", error);
@@ -411,6 +422,8 @@ export const removeFollower = async (
     await updateDoc(followerUserRef, {
       followings: arrayRemove(userRef), // Add reference to followings array
     });
+
+    store.dispatch(removeFromFollowings(userId));
 
     console.log("Unfollowed successfully");
   } catch (error) {

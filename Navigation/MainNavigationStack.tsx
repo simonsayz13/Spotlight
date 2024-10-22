@@ -1,6 +1,7 @@
 import React from "react";
 import TabNavigation from "./TabNavigation";
 import {
+  FollowStackScreens,
   HomeStackScreens,
   MainStacks,
   MessagingStackScreens,
@@ -21,6 +22,7 @@ import ViewProfile from "../Screens/Profile/ViewProfile";
 import { useSelector } from "react-redux";
 import LoginSignInStackScreen from "./Stacks/LoginSignInStack";
 import { RootState } from "../Redux/store";
+import FollowStackScreen from "./Stacks/FollowStack";
 const MainStack = createNativeStackNavigator();
 
 const MainNavigationStack = () => {
@@ -79,6 +81,11 @@ const MainNavigationStack = () => {
       <MainStack.Screen
         name={ProfileStackScreens.ViewProfile}
         component={ViewProfile}
+      />
+      <MainStack.Screen
+        name={"FollowStack"}
+        component={FollowStackScreen}
+        options={{ headerShown: false }}
       />
     </MainStack.Navigator>
   );

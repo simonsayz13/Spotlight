@@ -8,10 +8,12 @@ import {
   SafeAreaView,
   Alert,
   Animated,
+  Pressable,
 } from "react-native";
 import { useSelector } from "react-redux";
 import { RootState } from "../../Redux/store";
 import {
+  FollowStackScreens,
   Gender,
   HomeStackScreens,
   MainStacks,
@@ -29,20 +31,27 @@ import {
 } from "../../Firebase/firebaseFireStore";
 import { Image } from "expo-image";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import ProfileStackScreen from "../../Navigation/Stacks/ProfileStack";
 import { MasonryFlashList } from "@shopify/flash-list";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 const Profile = ({ navigation }: any) => {
   const [buttonStates, setButtonStates] = useState(userContentSelectorButtons);
-  const { userId, userBio } = useSelector((state: RootState) => {
+
+  const {
+    userId,
+    userBio,
+    userFollowings: followings,
+  } = useSelector((state: RootState) => {
     return state.user;
   });
+
   const [postsData, setPostsData] = useState<Array<any>>([]);
   const [displayName, setDisplayName] = useState("");
   const [profilePicUrl, setProfilePicUrl] = useState("");
   const [bio, setBio] = useState(userBio);
   const [gender, setGender] = useState("");
   const [followers, setFollowers] = useState([]);
-  const [followings, setfollowings] = useState([]);
+  // const [followings, setfollowings] = useState([]);
   const [ldgUserDetails, setLdgUserDetails] = useState(false);
   const [ldgSuccUserDetails, setLdgSuccUserDetails] = useState(false);
 
@@ -109,12 +118,13 @@ const Profile = ({ navigation }: any) => {
         followers,
         followings,
       } = data;
+
       setDisplayName(display_name);
       setProfilePicUrl(profile_picture_url);
       setBio(biography);
       setGender(gender);
       setFollowers(followers);
-      setfollowings(followings);
+      // setfollowings(followings);
       setLdgUserDetails(false);
       setLdgSuccUserDetails(true);
     });
@@ -145,6 +155,54 @@ const Profile = ({ navigation }: any) => {
     navigation.navigate(HomeStackScreens.Post, {
       postData: postData,
     });
+  };
+
+  const openChat = () => {
+    navigation.navigate(MessagingStackScreens.Chat, {
+      userId: opId,
+      userName: displayName,
+      profilePicUrl,
+    });
+  };
+
+  const openFollowerScreen = (tabIndex) => {
+    navigation.navigate("FollowStack", {
+      screen: FollowStackScreens.FollowerList,
+      params: {
+        displayName,
+        followers,
+        followings,
+        profileId: userId,
+        appUserId: userId,
+        appUserFollowings: followings,
+        tabIndex: tabIndex,
+        type: "appUser",
+      },
+    });
+  };
+
+  const handlePressFollowBtn = async () => {
+    try {
+      await addFollower(profileUserId, appUserID);
+      setIsFollowed(true);
+      setFollowers([...followers, appUserID]);
+    } catch (error) {
+      Alert.alert("Error", `${error}`);
+    }
+  };
+
+  const handlePressUnfollowBtn = async () => {
+    try {
+      await removeFollower(profileUserId, appUserID);
+      setIsFollowed(false);
+
+      const arr = followers?.filter(
+        (followerUserId) => followerUserId !== appUserID
+      );
+      setFollowers(arr);
+    } catch (error) {
+      Alert.alert("Error", `${error}`);
+    }
   };
 
   const renderItem = ({ item }: any) => (
@@ -199,18 +257,26 @@ const Profile = ({ navigation }: any) => {
           )}
         </View>
         <View style={styles.userStatsContainer}>
-          <View style={styles.statsView}>
+          <Pressable
+            style={styles.statsView}
+            onPress={() => openFollowerScreen(0)}
+          >
             <Text style={styles.statsCount}>
               {ldgUserDetails ? "-" : followings?.length}
             </Text>
             <Text style={styles.statsFont}>Following</Text>
-          </View>
-          <View style={styles.statsView}>
-            <Text style={styles.statsCount}>
-              {ldgUserDetails ? "-" : followers?.length}
-            </Text>
-            <Text style={styles.statsFont}>Followers</Text>
-          </View>
+          </Pressable>
+          <Pressable
+            style={styles.statsView}
+            onPress={() => openFollowerScreen(1)}
+          >
+            <View style={styles.statsView}>
+              <Text style={styles.statsCount}>
+                {ldgUserDetails ? "-" : followers?.length}
+              </Text>
+              <Text style={styles.statsFont}>Followers</Text>
+            </View>
+          </Pressable>
           <View style={styles.statsView}>
             <Text style={styles.statsCount}>666</Text>
             <Text style={styles.statsFont}>Likes & Favs</Text>

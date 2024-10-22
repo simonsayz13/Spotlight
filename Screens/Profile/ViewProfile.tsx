@@ -8,10 +8,12 @@ import {
   SafeAreaView,
   Alert,
   Animated,
+  Pressable,
 } from "react-native";
 import { useSelector } from "react-redux";
 import { RootState } from "../../Redux/store";
 import {
+  FollowStackScreens,
   Gender,
   guestContentSelectorButtons,
   HomeStackScreens,
@@ -31,9 +33,11 @@ import { Image } from "expo-image";
 import { MasonryFlashList } from "@shopify/flash-list";
 import AntDesign from "@expo/vector-icons/AntDesign";
 const ViewProfile = ({ navigation, route }: any) => {
-  const { userId: appUserID } = useSelector((state: RootState) => {
-    return state.user;
-  });
+  const { userId: appUserId, userFollowings: appUserFollowings } = useSelector(
+    (state: RootState) => {
+      return state.user;
+    }
+  );
   const [buttonStates, setButtonStates] = useState(guestContentSelectorButtons);
   const userId = route?.params?.userId;
   const [profileUserId, setProfileUserId] = useState(null);
@@ -119,12 +123,12 @@ const ViewProfile = ({ navigation, route }: any) => {
       setFollowers(followers);
       setfollowings(followings);
       setProfileUserId(user_id);
-      followers?.find((follower) => follower.user_id === appUserID) &&
-        setIsFollowed(true);
       setLdgUserDetails(false);
       setLdgSuccUserDetails(true);
+      followers?.find((followerId) => followerId === appUserId) &&
+        setIsFollowed(true);
     });
-  }, []);
+  }, [userId]);
 
   const handlePress = (id: number) => {
     setButtonStates((prevStates) =>
@@ -154,9 +158,9 @@ const ViewProfile = ({ navigation, route }: any) => {
 
   const handlePressFollowBtn = async () => {
     try {
-      await addFollower(profileUserId, appUserID);
+      await addFollower(profileUserId, appUserId);
       setIsFollowed(true);
-      setFollowers([...followers, appUserID]);
+      setFollowers([...followers, appUserId]);
     } catch (error) {
       Alert.alert("Error", `${error}`);
     }
@@ -164,11 +168,11 @@ const ViewProfile = ({ navigation, route }: any) => {
 
   const handlePressUnfollowBtn = async () => {
     try {
-      await removeFollower(profileUserId, appUserID);
+      await removeFollower(profileUserId, appUserId);
       setIsFollowed(false);
 
       const arr = followers?.filter(
-        (followerUserId) => followerUserId !== appUserID
+        (followerUserId) => followerUserId !== appUserId
       );
       setFollowers(arr);
     } catch (error) {
@@ -177,6 +181,22 @@ const ViewProfile = ({ navigation, route }: any) => {
   };
   const handleBackButtonPress = () => {
     navigation.goBack();
+  };
+
+  const openFollowerScreen = (tabIndex) => {
+    navigation.navigate("FollowStack", {
+      screen: FollowStackScreens.FollowerList,
+      params: {
+        displayName,
+        followers,
+        followings,
+        profileId: userId,
+        appUserId,
+        tabIndex: tabIndex,
+        appUserFollowings,
+        type: "profileUser",
+      },
+    });
   };
 
   const renderItem = ({ item }: any) => (
@@ -242,38 +262,40 @@ const ViewProfile = ({ navigation, route }: any) => {
           )}
         </View>
         <View style={styles.userStatsContainer}>
-          <View style={styles.statsView}>
+          <Pressable
+            style={styles.statsView}
+            onPress={() => openFollowerScreen(0)}
+          >
             <Text style={styles.statsCount}>
               {ldgUserDetails ? "-" : followings?.length}
             </Text>
             <Text style={styles.statsFont}>Following</Text>
-          </View>
-          <View style={styles.statsView}>
+          </Pressable>
+          <Pressable
+            style={styles.statsView}
+            onPress={() => openFollowerScreen(1)}
+          >
             <Text style={styles.statsCount}>
               {ldgUserDetails ? "-" : followers?.length}
             </Text>
             <Text style={styles.statsFont}>Followers</Text>
-          </View>
+          </Pressable>
           <View style={styles.statsView}>
             <Text style={styles.statsCount}>666</Text>
             <Text style={styles.statsFont}>Likes & Favs</Text>
           </View>
           <View style={styles.interactionContainer}>
-            {isFollowed ? (
-              <TouchableOpacity
-                style={styles.button}
-                onPress={handlePressUnfollowBtn}
-              >
-                <Text style={styles.buttonText}>Unfollow</Text>
-              </TouchableOpacity>
-            ) : (
-              <TouchableOpacity
-                style={styles.button}
-                onPress={handlePressFollowBtn}
-              >
-                <Text style={styles.buttonText}>Follow</Text>
-              </TouchableOpacity>
-            )}
+            <TouchableOpacity
+              style={[styles.button, styles.followButton]}
+              onPress={
+                isFollowed ? handlePressUnfollowBtn : handlePressFollowBtn
+              }
+            >
+              <Text style={styles.buttonText}>
+                {isFollowed ? "Unfollow" : "Follow"}
+              </Text>
+            </TouchableOpacity>
+
             <TouchableOpacity onPressIn={openChat} style={styles.button}>
               <AntDesign
                 name="message1"
@@ -375,6 +397,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     height: 36,
+  },
+  followButton: {
+    width: 90,
   },
   buttonText: {
     fontSize: 16,

@@ -51,6 +51,14 @@ export const userSlice = createSlice({
     updateAge: (state, action) => {
       state.userAge = action.payload;
     },
+    addToFollowings: (state, action) => {
+      state.userFollowings = [...state.userFollowings, action.payload];
+    },
+    removeFromFollowings: (state, action) => {
+      state.userFollowings = state.userFollowings.filter(
+        (el) => el !== action.payload
+      );
+    },
     updateUser: (state, action) => {
       const {
         user_id,
@@ -124,6 +132,8 @@ export const {
   updateGender,
   updateLocation,
   updateAge,
+  addToFollowings,
+  removeFromFollowings,
   updateUser,
   setUserLiked,
   removeUserLiked,
