@@ -54,8 +54,6 @@ const ViewProfile = ({ navigation, route }: any) => {
 
   let heightAnim = useRef(new Animated.Value(200)).current;
 
-  console.log("appUserFollowings", appUserFollowings);
-
   useEffect(() => {
     if (ldgSuccUserDetails) {
       Animated.timing(heightAnim, {
@@ -127,8 +125,6 @@ const ViewProfile = ({ navigation, route }: any) => {
       setProfileUserId(user_id);
       setLdgUserDetails(false);
       setLdgSuccUserDetails(true);
-      console.log("followers", followers);
-      console.log("appUserId", appUserId);
       followers?.find((followerId) => followerId === appUserId) &&
         setIsFollowed(true);
     });

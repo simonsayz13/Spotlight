@@ -1,26 +1,42 @@
 import React, { useCallback, useState } from "react";
-import {
-  View,
-  StyleSheet,
-  SafeAreaView,
-  KeyboardAvoidingView,
-  Platform,
-  Text,
-  Alert,
-  FlatList,
-  ScrollView,
-  Dimensions,
-} from "react-native";
+import { View, StyleSheet, Alert, ScrollView, Dimensions } from "react-native";
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 
 import { ThemeColoursPrimary } from "../../Constants/UI";
 import { useFocusEffect } from "@react-navigation/native";
-import { getUserDetails } from "../../Firebase/firebaseFireStore";
+import {
+  addFollower,
+  getUserDetails,
+  removeFollower,
+} from "../../Firebase/firebaseFireStore";
 import FollowerRow from "../../Components/FollowerRow";
+import { useSelector } from "react-redux";
+import { RootState } from "../../Redux/store";
 
+const handlePressFollowBtn = async (profileId, appUserId) => {
+  try {
+    await addFollower(profileId, appUserId);
+  } catch (error) {
+    Alert.alert("Error", `${error}`);
+  }
+};
+
+const handlePressUnfollowBtn = async (profileId, appUserId) => {
+  try {
+    await removeFollower(profileId, appUserId);
+  } catch (error) {
+    Alert.alert("Error", `${error}`);
+  }
+};
 const FollowingScreen = (props) => {
-  const { followingList, profileId, type, appUserId, appUserFollowings } =
-    props;
+  const { followingList, profileId, type, appUserId } = props;
+
+  const { userFollowings: appUserFollowings } = useSelector(
+    (state: RootState) => {
+      return state.user;
+    }
+  );
+
   return (
     <View style={styles.container}>
       <ScrollView style={styles.listContainer}>
@@ -34,6 +50,11 @@ const FollowingScreen = (props) => {
               followerObj={profile}
               buttonTitle={isFollowed ? "Unfollow" : "Follow"}
               buttonDisabled={profile.user_id === appUserId}
+              handlePressButton={
+                isFollowed
+                  ? () => handlePressUnfollowBtn(profile.user_id, appUserId)
+                  : () => handlePressFollowBtn(profile.user_id, appUserId)
+              }
             />
           );
         })}
@@ -43,14 +64,14 @@ const FollowingScreen = (props) => {
 };
 
 const FollowersScreen = (props) => {
-  const {
-    followerList,
-    profileId,
-    type,
-    followings,
-    appUserId,
-    appUserFollowings,
-  } = props;
+  const { followerList, profileId, type, followings, appUserId } = props;
+
+  const { userFollowings: appUserFollowings } = useSelector(
+    (state: RootState) => {
+      return state.user;
+    }
+  );
+
   return (
     <View style={styles.container}>
       <ScrollView style={styles.listContainer}>
@@ -59,13 +80,17 @@ const FollowersScreen = (props) => {
             appUserFollowings.find((el) => el === profile.user_id)
           );
 
-          console.log("isFollowed", isFollowed);
           return (
             <FollowerRow
               key={`followerScreen_followRow_${profileId}_${profile.user_id}`}
               followerObj={profile}
               buttonTitle={isFollowed ? "Unfollow" : "Follow"}
               buttonDisabled={profile.user_id === appUserId}
+              handlePressButton={
+                isFollowed
+                  ? () => handlePressUnfollowBtn(profile.user_id, appUserId)
+                  : () => handlePressFollowBtn(profile.user_id, appUserId)
+              }
             />
           );
         })}
@@ -77,16 +102,8 @@ const FollowersScreen = (props) => {
 const initialLayout = { width: Dimensions.get("window").width };
 
 const FollowerList = ({ navigation, route }: any) => {
-  const {
-    followings,
-    followers,
-    displayName,
-    profileId,
-    tabIndex,
-    type,
-    appUserId,
-    appUserFollowings,
-  } = route.params;
+  const { followings, followers, profileId, tabIndex, type, appUserId } =
+    route.params;
 
   const [index, setIndex] = React.useState(tabIndex);
   const [ldgFollowers, setLdgFollowers] = useState(false);
@@ -141,7 +158,6 @@ const FollowerList = ({ navigation, route }: any) => {
             type={type}
             followings={followings}
             appUserId={appUserId}
-            appUserFollowings={appUserFollowings}
           />
         );
       case "following":
@@ -151,7 +167,6 @@ const FollowerList = ({ navigation, route }: any) => {
             profileId={profileId}
             type={type}
             appUserId={appUserId}
-            appUserFollowings={appUserFollowings}
           />
         );
       default:

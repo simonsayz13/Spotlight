@@ -35,7 +35,12 @@ import { MasonryFlashList } from "@shopify/flash-list";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 const Profile = ({ navigation }: any) => {
   const [buttonStates, setButtonStates] = useState(userContentSelectorButtons);
-  const { userId, userBio } = useSelector((state: RootState) => {
+
+  const {
+    userId,
+    userBio,
+    userFollowings: followings,
+  } = useSelector((state: RootState) => {
     return state.user;
   });
   const [postsData, setPostsData] = useState<Array<any>>([]);
@@ -44,7 +49,7 @@ const Profile = ({ navigation }: any) => {
   const [bio, setBio] = useState(userBio);
   const [gender, setGender] = useState("");
   const [followers, setFollowers] = useState([]);
-  const [followings, setfollowings] = useState([]);
+  // const [followings, setfollowings] = useState([]);
   const [ldgUserDetails, setLdgUserDetails] = useState(false);
   const [ldgSuccUserDetails, setLdgSuccUserDetails] = useState(false);
 
@@ -111,12 +116,13 @@ const Profile = ({ navigation }: any) => {
         followers,
         followings,
       } = data;
+
       setDisplayName(display_name);
       setProfilePicUrl(profile_picture_url);
       setBio(biography);
       setGender(gender);
       setFollowers(followers);
-      setfollowings(followings);
+      // setfollowings(followings);
       setLdgUserDetails(false);
       setLdgSuccUserDetails(true);
     });
