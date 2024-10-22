@@ -7,7 +7,7 @@ import { RootState } from "../Redux/store";
 
 const { width: windowWidth } = Dimensions.get("window");
 
-const Message = React.memo(({ message, profilePicUrl, onLayout }: any) => {
+const Message = React.memo(({ message, profilePicUrl }: any) => {
   const { userId: currentUserId, userProfilePhotoURL } = useSelector(
     (state: RootState) => state.user
   );
@@ -35,7 +35,6 @@ const Message = React.memo(({ message, profilePicUrl, onLayout }: any) => {
               : "flex-start",
         },
       ]}
-      onLayout={onLayout}
     >
       {isHeader && <Text style={styles.timeStampText}>{message.text}</Text>}
       {isTime && <Text style={styles.timeStampText}>{message.text}</Text>}
