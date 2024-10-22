@@ -42,6 +42,7 @@ const Chat = ({ route, navigation }: any) => {
   const goBack = () => {
     navigation.goBack();
   };
+
   useEffect(() => {
     if (!isFocused) return;
 
@@ -74,13 +75,13 @@ const Chat = ({ route, navigation }: any) => {
     }
   };
 
-  const scrollToBottom = () => {
-    FlatListRef.current?.scrollToEnd({ animated: true });
+  const scrollToTop = () => {
+    FlatListRef.current?.scrollToOffset({ animated: true, offset: 0 });
   };
 
   const handleContentSizeChange = (event: any) => {
     const { height } = event.nativeEvent.contentSize;
-    setInputHeight(Math.min(Math.max(40, height + 20), 120)); // Min height 40, Max height 120
+    setInputHeight(Math.min(Math.max(40, height), 120)); // Min height 40, Max height 120
   };
 
   const goToProfile = () => {
@@ -126,15 +127,14 @@ const Chat = ({ route, navigation }: any) => {
 
         <FlashList
           ref={FlatListRef}
-          data={clusterMessages(messages)}
+          data={clusterMessages(messages).reverse()}
           renderItem={({ item: message }) => (
             <Message message={message} profilePicUrl={profilePicUrl} />
           )}
           contentContainerStyle={styles.messagesList}
-          // onContentSizeChange={scrollToBottom}
-          onLayout={scrollToBottom}
-          estimatedItemSize={100}
-          initialScrollIndex={clusterMessages(messages).length - 1}
+          onLayout={scrollToTop}
+          estimatedItemSize={50}
+          inverted={true}
         />
 
         <View style={styles.messageBarContainer}>
@@ -148,7 +148,6 @@ const Chat = ({ route, navigation }: any) => {
               value={message}
               multiline
               onContentSizeChange={handleContentSizeChange}
-              textAlignVertical="center"
             />
           </View>
           <TouchableOpacity onPressIn={handleSendMessage}>
