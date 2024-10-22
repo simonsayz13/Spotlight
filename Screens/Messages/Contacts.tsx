@@ -21,6 +21,7 @@ import { formatRelativeTime } from "../../Util/utility";
 import { Image } from "expo-image";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { UserDetails } from "../../type/Messenger";
+import ActivityLoader from "../../Components/ActivityLoader";
 
 const { width: windowWidth, height: windowHeight } = Dimensions.get("window");
 
@@ -36,6 +37,7 @@ const Contacts = ({ navigation }: any) => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [filteredUsers, setFilteredUsers] = useState<Array<any>>([]);
   const [isDropdownVisible, setIsDropdownVisible] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true); // Add loading state
   const textInputRef = useRef<TextInput>(null);
   useEffect(() => {
     const unsubscribe = conversationListener(currentUserId!, setConversations);
@@ -81,6 +83,7 @@ const Contacts = ({ navigation }: any) => {
         })
       );
       setUserDetails((prevDetails) => ({ ...prevDetails, ...newDetails }));
+      setLoading(false);
     };
     fetchUserDetails();
   }, [conversations]);
@@ -177,7 +180,6 @@ const Contacts = ({ navigation }: any) => {
                       style={styles.profileImage}
                     />
                   )}
-
                   <Text style={styles.usernameText}>{user.display_name}</Text>
                 </View>
               </TouchableOpacity>
@@ -185,59 +187,68 @@ const Contacts = ({ navigation }: any) => {
           })}
         </ScrollView>
       )}
-      {searchQuery.length === 0 && (
-        <ScrollView bounces={false}>
-          {conversations.map((conversation) => {
-            const userId = conversation.participants.find(
-              (userId: string) => userId != currentUserId
-            );
-            const { display_name: displayName, profile_picture_url } =
-              userDetails[userId || ""] || {};
-            return (
-              <TouchableOpacity
-                key={`key_${userId}`}
-                onPress={() => {
-                  goToChat(
-                    userId,
-                    displayName!,
-                    profile_picture_url!,
-                    conversation.id
-                  );
-                }}
-              >
-                <View style={styles.messageCardContainer}>
-                  {profile_picture_url ? (
-                    <Image
-                      source={{ uri: profile_picture_url }}
-                      style={styles.profileImage}
-                    />
-                  ) : (
-                    <Image
-                      source={require("../../assets/test_image/mock_profile_picture.png")}
-                      style={styles.profileImage}
-                    />
-                  )}
 
-                  <View>
-                    <View style={styles.usernameTimeStampContainer}>
-                      <Text style={styles.usernameText}>{displayName}</Text>
-                      <Text style={styles.timeStamp}>
-                        {formatRelativeTime(conversation.lastMessage.timestamp)}
+      {loading ? (
+        <ActivityLoader indicator={loading} text={"Loading..."} />
+      ) : (
+        searchQuery.length === 0 && (
+          <ScrollView bounces={false}>
+            {conversations.map((conversation) => {
+              const userId = conversation.participants.find(
+                (userId: string) => userId != currentUserId
+              );
+              const { display_name: displayName, profile_picture_url } =
+                userDetails[userId || ""] || {};
+              return (
+                <TouchableOpacity
+                  key={`key_${userId}`}
+                  onPress={() => {
+                    goToChat(
+                      userId,
+                      displayName!,
+                      profile_picture_url!,
+                      conversation.id
+                    );
+                  }}
+                >
+                  <View style={styles.messageCardContainer}>
+                    {profile_picture_url ? (
+                      <Image
+                        source={{ uri: profile_picture_url }}
+                        style={styles.profileImage}
+                      />
+                    ) : (
+                      <Image
+                        source={require("../../assets/test_image/mock_profile_picture.png")}
+                        style={styles.profileImage}
+                      />
+                    )}
+
+                    <View>
+                      <View style={styles.usernameTimeStampContainer}>
+                        <Text style={styles.usernameText}>{displayName}</Text>
+                        <Text style={styles.timeStamp}>
+                          {formatRelativeTime(
+                            conversation.lastMessage.timestamp
+                          )}
+                        </Text>
+                      </View>
+                      <Text
+                        style={styles.lastMessageText}
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                      >
+                        {conversation.lastMessage.text}
                       </Text>
                     </View>
-                    <Text
-                      style={styles.lastMessageText}
-                      numberOfLines={1}
-                      ellipsizeMode="tail"
-                    >
-                      {conversation.lastMessage.text}
-                    </Text>
                   </View>
-                </View>
-              </TouchableOpacity>
-            );
-          })}
-        </ScrollView>
+
+                  <View style={styles.divider} />
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+        )
       )}
     </SafeAreaView>
   );
@@ -316,6 +327,14 @@ const styles = StyleSheet.create({
     padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: "#f1f1f1",
+  },
+
+  divider: {
+    borderBottomWidth: 0.6,
+    borderColor: ThemeColoursPrimary.SecondaryColour + "20",
+    marginLeft: 76,
+    width: "100%",
+    height: 0.8,
   },
 });
 
