@@ -51,6 +51,9 @@ export const userSlice = createSlice({
     updateAge: (state, action) => {
       state.userAge = action.payload;
     },
+    updateFollowings: (state, action) => {
+      state.userFollowings = action.payload;
+    },
     updateUser: (state, action) => {
       const {
         user_id,

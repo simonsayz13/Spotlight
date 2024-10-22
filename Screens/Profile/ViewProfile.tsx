@@ -54,6 +54,8 @@ const ViewProfile = ({ navigation, route }: any) => {
 
   let heightAnim = useRef(new Animated.Value(200)).current;
 
+  console.log("appUserFollowings", appUserFollowings);
+
   useEffect(() => {
     if (ldgSuccUserDetails) {
       Animated.timing(heightAnim, {
@@ -123,10 +125,12 @@ const ViewProfile = ({ navigation, route }: any) => {
       setFollowers(followers);
       setfollowings(followings);
       setProfileUserId(user_id);
-      followers?.find((follower) => follower.user_id === appUserId) &&
-        setIsFollowed(true);
       setLdgUserDetails(false);
       setLdgSuccUserDetails(true);
+      console.log("followers", followers);
+      console.log("appUserId", appUserId);
+      followers?.find((followerId) => followerId === appUserId) &&
+        setIsFollowed(true);
     });
   }, []);
 
@@ -285,21 +289,17 @@ const ViewProfile = ({ navigation, route }: any) => {
             <Text style={styles.statsFont}>Likes & Favs</Text>
           </View>
           <View style={styles.interactionContainer}>
-            {isFollowed ? (
-              <TouchableOpacity
-                style={styles.button}
-                onPress={handlePressUnfollowBtn}
-              >
-                <Text style={styles.buttonText}>Unfollow</Text>
-              </TouchableOpacity>
-            ) : (
-              <TouchableOpacity
-                style={styles.button}
-                onPress={handlePressFollowBtn}
-              >
-                <Text style={styles.buttonText}>Follow</Text>
-              </TouchableOpacity>
-            )}
+            <TouchableOpacity
+              style={[styles.button, styles.followButton]}
+              onPress={
+                isFollowed ? handlePressUnfollowBtn : handlePressFollowBtn
+              }
+            >
+              <Text style={styles.buttonText}>
+                {isFollowed ? "Unfollow" : "Follow"}
+              </Text>
+            </TouchableOpacity>
+
             <TouchableOpacity onPressIn={openChat} style={styles.button}>
               <AntDesign
                 name="message1"
@@ -401,6 +401,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     height: 36,
+  },
+  followButton: {
+    width: 90,
   },
   buttonText: {
     fontSize: 16,
