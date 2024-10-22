@@ -2,7 +2,11 @@ import React, { useCallback, useState } from "react";
 import { View, StyleSheet, Alert, ScrollView, Dimensions } from "react-native";
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 
-import { ThemeColoursPrimary } from "../../Constants/UI";
+import {
+  NavigationTabs,
+  ProfileStackScreens,
+  ThemeColoursPrimary,
+} from "../../Constants/UI";
 import { useFocusEffect } from "@react-navigation/native";
 import {
   addFollower,
@@ -29,7 +33,8 @@ const handlePressUnfollowBtn = async (profileId, appUserId) => {
   }
 };
 const FollowingScreen = (props) => {
-  const { followingList, profileId, type, appUserId } = props;
+  const { followingList, profileId, type, appUserId, handlePressProfile } =
+    props;
 
   const { userFollowings: appUserFollowings } = useSelector(
     (state: RootState) => {
@@ -50,6 +55,7 @@ const FollowingScreen = (props) => {
               followerObj={profile}
               buttonTitle={isFollowed ? "Unfollow" : "Follow"}
               buttonDisabled={profile.user_id === appUserId}
+              handlePressProfile={() => handlePressProfile(profile.user_id)}
               handlePressButton={
                 isFollowed
                   ? () => handlePressUnfollowBtn(profile.user_id, appUserId)
@@ -64,7 +70,14 @@ const FollowingScreen = (props) => {
 };
 
 const FollowersScreen = (props) => {
-  const { followerList, profileId, type, followings, appUserId } = props;
+  const {
+    followerList,
+    profileId,
+    type,
+    followings,
+    appUserId,
+    handlePressProfile,
+  } = props;
 
   const { userFollowings: appUserFollowings } = useSelector(
     (state: RootState) => {
@@ -86,6 +99,7 @@ const FollowersScreen = (props) => {
               followerObj={profile}
               buttonTitle={isFollowed ? "Unfollow" : "Follow"}
               buttonDisabled={profile.user_id === appUserId}
+              handlePressProfile={() => handlePressProfile(profile.user_id)}
               handlePressButton={
                 isFollowed
                   ? () => handlePressUnfollowBtn(profile.user_id, appUserId)
@@ -110,6 +124,14 @@ const FollowerList = ({ navigation, route }: any) => {
   const [ldgFollowings, setLdgFollowings] = useState(false);
   const [followerList, setFollowerList] = useState([]);
   const [followingList, setFollowingList] = useState([]);
+
+  const handlePressProfile = (profileId) => {
+    profileId === appUserId
+      ? navigation.navigate(NavigationTabs.Me)
+      : navigation.navigate(ProfileStackScreens.ViewProfile, {
+          userId: profileId,
+        });
+  };
 
   useFocusEffect(
     useCallback(() => {
@@ -158,6 +180,7 @@ const FollowerList = ({ navigation, route }: any) => {
             type={type}
             followings={followings}
             appUserId={appUserId}
+            handlePressProfile={handlePressProfile}
           />
         );
       case "following":
@@ -167,6 +190,7 @@ const FollowerList = ({ navigation, route }: any) => {
             profileId={profileId}
             type={type}
             appUserId={appUserId}
+            handlePressProfile={handlePressProfile}
           />
         );
       default:

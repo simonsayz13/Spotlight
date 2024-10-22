@@ -128,7 +128,7 @@ const ViewProfile = ({ navigation, route }: any) => {
       followers?.find((followerId) => followerId === appUserId) &&
         setIsFollowed(true);
     });
-  }, []);
+  }, [userId]);
 
   const handlePress = (id: number) => {
     setButtonStates((prevStates) =>

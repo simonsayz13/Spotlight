@@ -1,4 +1,10 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { Image } from "expo-image";
 import React from "react";
 import FollowButton from "./FollowButton";
@@ -8,16 +14,20 @@ const FollowerRow = ({
   buttonTitle,
   buttonDisabled,
   handlePressButton,
+  handlePressProfile,
 }) => {
-  const { display_name, profile_picture_url } = followerObj;
+  const { display_name, profile_picture_url, user_id } = followerObj;
+
   return (
     <View style={styles.container}>
-      {profile_picture_url ? (
-        <Image source={{ uri: profile_picture_url }} style={styles.image} />
-      ) : (
-        <View style={styles.defaultImage} />
-      )}
-      <Text style={styles.displayName}>{display_name}</Text>
+      <Pressable style={styles.profileContainer} onPress={handlePressProfile}>
+        {profile_picture_url ? (
+          <Image source={{ uri: profile_picture_url }} style={styles.image} />
+        ) : (
+          <View style={styles.defaultImage} />
+        )}
+        <Text style={styles.displayName}>{display_name}</Text>
+      </Pressable>
       <View style={{ flexGrow: 1 }} />
       {!buttonDisabled && (
         <FollowButton title={buttonTitle} handlePress={handlePressButton} />
@@ -33,6 +43,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     paddingVertical: 5, // Adds 10 units of padding to the top and bottom
     paddingHorizontal: 10,
+    alignItems: "center",
+  },
+  profileContainer: {
+    flexDirection: "row",
     alignItems: "center",
   },
   image: {
