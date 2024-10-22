@@ -3,14 +3,11 @@ import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   TextInput,
   SafeAreaView,
   KeyboardAvoidingView,
   TouchableOpacity,
   Platform,
-  Dimensions,
-  FlatList,
 } from "react-native";
 import { Image } from "expo-image";
 import { ProfileStackScreens, ThemeColoursPrimary } from "../../Constants/UI";
@@ -26,13 +23,15 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useIsFocused } from "@react-navigation/native"; // Hook for detecting focus
 import { selectMessagesByChatRoomId } from "../../Redux/Selectors/messagesSelector";
 import Message from "../../Components/Message";
+import { clusterMessages } from "../../Util/utility";
+import { FlashList } from "@shopify/flash-list";
 
 const Chat = ({ route, navigation }: any) => {
   const { userId: currentUserId } = useSelector(
     (state: RootState) => state.user
   );
   const { userId, userName, profilePicUrl, conversationId } = route.params;
-  const FlatListRef = useRef<FlatList>(null);
+  const FlatListRef = useRef<any>(null);
   const [chatRoomId, setChatRoomId] = useState(conversationId);
   const [message, setMessage] = useState<string>("");
   const [inputHeight, setInputHeight] = useState(40);
@@ -40,7 +39,6 @@ const Chat = ({ route, navigation }: any) => {
   const isFocused = useIsFocused();
   const messages = useSelector(selectMessagesByChatRoomId(chatRoomId));
   const dispatch = useDispatch();
-
   const goBack = () => {
     navigation.goBack();
   };
@@ -77,13 +75,13 @@ const Chat = ({ route, navigation }: any) => {
     }
   };
 
-  const scrollToBottom = (animated: boolean) => {
-    FlatListRef.current?.scrollToEnd({ animated });
+  const scrollToTop = () => {
+    FlatListRef.current?.scrollToOffset({ animated: true, offset: 0 });
   };
 
   const handleContentSizeChange = (event: any) => {
     const { height } = event.nativeEvent.contentSize;
-    setInputHeight(Math.min(Math.max(40, height + 20), 120)); // Min height 40, Max height 120
+    setInputHeight(Math.min(Math.max(40, height), 120)); // Min height 40, Max height 120
   };
 
   const goToProfile = () => {
@@ -97,7 +95,7 @@ const Chat = ({ route, navigation }: any) => {
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
         style={styles.KeyboardAvoidingView}
-        behavior="padding"
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         <View style={styles.topBarContainer}>
           <TouchableOpacity onPress={goBack}>
@@ -127,22 +125,16 @@ const Chat = ({ route, navigation }: any) => {
           </TouchableOpacity>
         </View>
 
-        <FlatList
+        <FlashList
           ref={FlatListRef}
-          data={messages}
-          keyExtractor={(message) => message.id}
+          data={clusterMessages(messages).reverse()}
           renderItem={({ item: message }) => (
             <Message message={message} profilePicUrl={profilePicUrl} />
           )}
-          style={styles.messagesList}
-          onContentSizeChange={() => scrollToBottom(true)}
-          initialScrollIndex={messages.length > 0 ? messages.length - 1 : 0}
-          getItemLayout={(_, index) => ({
-            length: 100,
-            offset: 100 * index,
-            index,
-          })}
-          onLayout={() => scrollToBottom(true)}
+          contentContainerStyle={styles.messagesList}
+          onLayout={scrollToTop}
+          estimatedItemSize={50}
+          inverted={true}
         />
 
         <View style={styles.messageBarContainer}>
@@ -156,24 +148,28 @@ const Chat = ({ route, navigation }: any) => {
               value={message}
               multiline
               onContentSizeChange={handleContentSizeChange}
-              textAlignVertical="center"
             />
           </View>
           <TouchableOpacity onPressIn={handleSendMessage}>
-            <FontAwesome name="send" size={28} color="black" />
+            <FontAwesome
+              name="send"
+              size={28}
+              color={ThemeColoursPrimary.LogoColour}
+            />
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: ThemeColoursPrimary.PrimaryColour,
   },
   messagesList: {
-    flex: 1,
+    // flexGrow: 1,
     paddingHorizontal: 8,
   },
   topBarContainer: {
