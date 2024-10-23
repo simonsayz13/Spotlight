@@ -24,6 +24,7 @@ import BottomDrawer from "../../Components/BottomDrawer";
 import MapFilters from "../../Components/MapFilters";
 import FilterButton from "../../Components/FilterButton";
 import MapMarker from "../../Components/MapMarker";
+import Feather from "@expo/vector-icons/Feather";
 
 const { width: windowWidth, height: windowHeight } = Dimensions.get("window");
 
@@ -38,16 +39,12 @@ const Map = ({ navigation }: any) => {
   const [heading, setHeading] = useState(0); // Track heading (bearing)
   const activityFilterDrawerRef = useRef<any>(null);
   const [selectedTag, setSelectedTag] = useState<any>(null);
+  const [isRefreshing, setIsRefreshing] = useState<booean>(false);
 
-  const initialise = async () => {
-    const permission = await getLocationPermission();
-    if (permission !== "OK") {
-      return Alert.alert("Error", permission);
-    }
-    setGotLocation(true);
-    await getLocation(setCurrentCoordinate);
+  const getPostData = async () => {
+    setIsRefreshing(true);
     const fetchedPosts = await getLocationPosts(); // Assuming this returns an array of posts
-    const postsWithUserDetails = await Promise.all(
+    const postsWithUserDetails: any = await Promise.all(
       fetchedPosts.map(async (post: any) => {
         const userDetails = await getUserDetails(post.postData.user_id); // Assuming user_id is available in post
         return {
@@ -60,9 +57,19 @@ const Map = ({ navigation }: any) => {
         };
       })
     );
-    //@ts-ignore
     setPosts(postsWithUserDetails);
+    setIsRefreshing(false);
+  };
+
+  const initialise = async () => {
+    const permission = await getLocationPermission();
+    if (permission !== "OK") {
+      return Alert.alert("Error", permission);
+    }
+    setGotLocation(true);
+    await getLocation(setCurrentCoordinate);
     setGotLocation(false);
+    getPostData();
     setMapRegion(currentCoordinate);
   };
 
@@ -171,6 +178,7 @@ const Map = ({ navigation }: any) => {
         style={styles.container}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
+        <ActivityLoader indicator={isRefreshing} text={"Refreshing..."} />
         <ActivityLoader indicator={gotLocation} text={"Locating..."} />
         {currentCoordinate && (
           <MapView
@@ -187,7 +195,7 @@ const Map = ({ navigation }: any) => {
               setMapRegion(region);
               onRegionChangeComplete();
             }}
-            // showsUserLocation={true}
+            showsUserLocation={true}
             showsPointsOfInterest={false}
             showsMyLocationButton={false}
             showsCompass={false}
@@ -226,6 +234,13 @@ const Map = ({ navigation }: any) => {
             <FontAwesome5
               name="location-arrow"
               size={20}
+              color={ThemeColoursPrimary.PrimaryColour}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.buttonBase} onPressIn={getPostData}>
+            <Feather
+              name="refresh-ccw"
+              size={24}
               color={ThemeColoursPrimary.PrimaryColour}
             />
           </TouchableOpacity>

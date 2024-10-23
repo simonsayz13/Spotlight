@@ -33,7 +33,8 @@ const styles = StyleSheet.create({
   },
   activityIndicatorWrapper: {
     backgroundColor: "#FFFFFF",
-    padding: 20,
+    paddingVertical: 14,
+    paddingHorizontal: 20,
     borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",

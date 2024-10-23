@@ -50,7 +50,7 @@ export const Tags = [
   {
     id: 5,
     label: "Deals",
-    icon: "🛍️",
+    icon: "💸",
     colour: "#FFD700",
     checked: false,
     examples: ["Savings", "Discount", "Offer"], // One-word examples for Deals
@@ -58,7 +58,7 @@ export const Tags = [
   {
     id: 6,
     label: "Recommendations",
-    icon: "🏡",
+    icon: "👍",
     colour: "#8A2BE2",
     checked: false,
     examples: ["Advice", "Tips", "Suggestions"], // One-word examples for Recommendations

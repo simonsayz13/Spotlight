@@ -90,7 +90,7 @@ const Contents = (props: any) => {
       data={filteredPosts}
       keyExtractor={(post) => post.id}
       renderItem={renderItem}
-      estimatedItemSize={50} // Estimated size for optimal performance
+      estimatedItemSize={1} // Estimated size for optimal performance
       numColumns={2} // Setting 2 columns for masonry layout
       showsVerticalScrollIndicator={false}
       contentContainerStyle={styles.flashListContainer}
