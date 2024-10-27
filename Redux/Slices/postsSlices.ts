@@ -4,6 +4,7 @@ export const postsSlice = createSlice({
   name: "user",
   initialState: {
     posts: [],
+    isAppInitilized: false,
   },
   reducers: {
     setPosts: (state, action) => {
@@ -59,6 +60,9 @@ export const postsSlice = createSlice({
         }
       }
     },
+    updateIsAppInitilized: (state, action) => {
+      state.isAppInitilized = action.payload;
+    },
   },
 });
 
@@ -70,6 +74,7 @@ export const {
   decrementFavourites,
   addComment,
   updateCommentLikes,
+  updateIsAppInitilized,
 } = postsSlice.actions;
 
 export default postsSlice.reducer;

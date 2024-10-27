@@ -3,20 +3,22 @@ import { View, StyleSheet, Image, StatusBar, Animated } from "react-native";
 import { ThemeColoursPrimary } from "../../Constants/UI";
 import { images } from "../../Constants";
 
-const SplashScreen = () => {
+const SplashScreen = ({ fadeOutEffect = false }) => {
   const fadeAnim = useRef(new Animated.Value(1)).current; // Initial opacity is 1
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      // Start the fade out animation after 1000ms
-      Animated.timing(fadeAnim, {
-        toValue: 0,
-        duration: 2000,
-        useNativeDriver: true,
-      }).start();
-    }, 1000);
+    if (fadeOutEffect) {
+      const timeout = setTimeout(() => {
+        // Start the fade out animation after 1000ms
+        Animated.timing(fadeAnim, {
+          toValue: 0,
+          duration: 1500,
+          useNativeDriver: true,
+        }).start();
+      }, 1500);
 
-    return () => clearTimeout(timeout);
+      return () => clearTimeout(timeout);
+    }
   }, [fadeAnim]);
 
   return (

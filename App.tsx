@@ -29,9 +29,8 @@ export default function App() {
     Shrikhand_400Regular,
   });
 
-  // return <SplashScreen />;
   if (!fontsLoaded || isLoading) {
-    return <SplashScreen />;
+    return <SplashScreen fadeOutEffect />;
   }
 
   return (
