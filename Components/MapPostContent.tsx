@@ -1,8 +1,8 @@
 import React, { useMemo } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import { Image } from "expo-image";
 import {
   HomeStackScreens,
+  ImageType,
   NavigationTabs,
   ProfileStackScreens,
   ThemeColoursPrimary,
@@ -13,6 +13,7 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useSelector } from "react-redux";
+import ProfilePicture from "./ProfilePicture";
 const MapPostContent = ({ postData, navigation, hideModal }: any) => {
   const { userId: appUserId } = useSelector((state: RootState) => {
     return state.user;
@@ -56,7 +57,11 @@ const MapPostContent = ({ postData, navigation, hideModal }: any) => {
           activeOpacity={1}
           onPressIn={handleUserProfilePress}
         >
-          <Image source={{ uri: userProfilePic }} style={styles.profileImage} />
+          <ProfilePicture
+            uri={userProfilePic}
+            userDisplayName={userDisplayName}
+            type={ImageType.MapPost}
+          />
           <Text style={styles.userNameText}>{userDisplayName}</Text>
         </TouchableOpacity>
         <View style={styles.separatorDot} />
@@ -134,15 +139,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
-  profileImage: {
-    width: 34, // Width and height should be the same
-    height: 34,
-    borderRadius: 50, // Half of the width or height for a perfect circle
-    marginRight: 4,
-  },
   userNameText: {
     fontSize: 16,
     fontWeight: "bold",
+    marginLeft: 4,
   },
   separatorDot: {
     height: 3.5,

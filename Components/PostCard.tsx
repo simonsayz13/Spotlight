@@ -8,12 +8,13 @@ import {
 } from "react-native";
 
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { ThemeColoursPrimary } from "../Constants/UI";
+import { ImageType, ThemeColoursPrimary } from "../Constants/UI";
 import { Image } from "expo-image";
 import { getUserDetails } from "../Firebase/firebaseFireStore";
 import { useSelector } from "react-redux";
 import { RootState } from "../Redux/store";
 import NoPhotoPlaceHolder from "./NoPhotoPlaceHolder";
+import ProfilePicture from "./ProfilePicture";
 
 const PostCard = React.memo(({ postData, openPost, self }: any) => {
   const [displayName, setDisplayName] = useState("");
@@ -77,11 +78,10 @@ const PostCard = React.memo(({ postData, openPost, self }: any) => {
       <View style={styles.content}>
         {imageUrl && <Text style={styles.title}>{title}</Text>}
         <View style={styles.cardDetails}>
-          <Image
-            source={{
-              uri: userProfilePic,
-            }}
-            style={styles.profilePicture}
+          <ProfilePicture
+            uri={userProfilePic}
+            userDisplayName={self ? userDisplayName : displayName}
+            type={ImageType.PostCard}
           />
           <Text style={styles.userFont}>
             {self ? userDisplayName : displayName}
@@ -139,6 +139,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: ThemeColoursPrimary.SecondaryColour,
     opacity: 0.7,
+    marginLeft: 4,
   },
   cardDetails: {
     flex: 1,
@@ -151,12 +152,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 1.6,
     opacity: 0.7,
-  },
-  profilePicture: {
-    width: 18,
-    height: 18,
-    borderRadius: 20,
-    marginRight: 4,
   },
 });
 

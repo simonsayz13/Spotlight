@@ -117,3 +117,10 @@ export const clusterMessages = (messages: any) => {
 
   return clusteredMessages;
 };
+
+export const getInitials = (name: string) => {
+  if (!name) return "";
+  const namesArray = name.trim().split(" ");
+  const initials = namesArray.map((n) => n.charAt(0)).join("");
+  return initials.slice(0, 2).toUpperCase(); // Limit to 2 characters
+};

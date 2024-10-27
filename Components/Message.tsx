@@ -1,89 +1,87 @@
 import React from "react";
 import { View, Text, StyleSheet, Dimensions } from "react-native";
-import { Image } from "expo-image";
-import { ThemeColoursPrimary } from "../Constants/UI";
+import { ImageType, ThemeColoursPrimary } from "../Constants/UI";
 import { useSelector } from "react-redux";
 import { RootState } from "../Redux/store";
+import ProfilePicture from "./ProfilePicture";
 
 const { width: windowWidth } = Dimensions.get("window");
 
-const Message = React.memo(({ message, profilePicUrl }: any) => {
-  const { userId: currentUserId, userProfilePhotoURL } = useSelector(
-    (state: RootState) => state.user
-  );
+const Message = React.memo(
+  ({ message, profilePicUrl, userDisplayName }: any) => {
+    const {
+      userId: currentUserId,
+      userProfilePhotoURL,
+      userDisplayName: appUserDisplayName,
+    } = useSelector((state: RootState) => state.user);
 
-  const isHeader = message.type === "header";
-  const isTime = message.type === "time";
+    const isHeader = message.type === "header";
+    const isTime = message.type === "time";
 
-  return (
-    <View
-      key={message.id + message.timestamp}
-      style={[
-        styles.messageContainer,
-        {
-          flexDirection:
-            isHeader || isTime
-              ? "column"
-              : message.senderId === currentUserId
-              ? "row-reverse"
-              : "row",
-          alignSelf:
-            isHeader || isTime
-              ? "center"
-              : message.senderId === currentUserId
-              ? "flex-end"
-              : "flex-start",
-        },
-      ]}
-    >
-      {isHeader && <Text style={styles.timeStampText}>{message.text}</Text>}
-      {isTime && <Text style={styles.timeStampText}>{message.text}</Text>}
-      {!isHeader && !isTime && (
-        <>
-          {!userProfilePhotoURL && !profilePicUrl ? (
-            <Image
-              source={require("../assets/test_image/mock_profile_picture.png")}
-              style={styles.chatProfileImage}
-            />
-          ) : (
-            <Image
-              source={
+    return (
+      <View
+        key={message.id + message.timestamp}
+        style={[
+          styles.messageContainer,
+          {
+            flexDirection:
+              isHeader || isTime
+                ? "column"
+                : message.senderId === currentUserId
+                ? "row-reverse"
+                : "row",
+            alignSelf:
+              isHeader || isTime
+                ? "center"
+                : message.senderId === currentUserId
+                ? "flex-end"
+                : "flex-start",
+          },
+        ]}
+      >
+        {isHeader && <Text style={styles.timeStampText}>{message.text}</Text>}
+        {isTime && <Text style={styles.timeStampText}>{message.text}</Text>}
+        {!isHeader && !isTime && (
+          <>
+            <ProfilePicture
+              uri={
                 message.senderId === currentUserId
-                  ? {
-                      uri: userProfilePhotoURL!,
-                    }
+                  ? userProfilePhotoURL!
                   : profilePicUrl
-                  ? { uri: profilePicUrl }
-                  : require("../assets/test_image/mock_profile_picture.png")
               }
-              style={styles.chatProfileImage}
+              userDisplayName={
+                message.senderId === currentUserId
+                  ? appUserDisplayName
+                  : userDisplayName
+              }
+              type={ImageType.Post}
             />
-          )}
 
-          <Text
-            style={[
-              styles.messageText,
-              {
-                backgroundColor:
-                  message.senderId === currentUserId
-                    ? ThemeColoursPrimary.LogoColour
-                    : "#e5e5ea",
-                color:
-                  message.senderId === currentUserId
-                    ? ThemeColoursPrimary.PrimaryColour
-                    : ThemeColoursPrimary.SecondaryColour,
-                marginLeft: message.senderId === currentUserId ? 0 : 4,
-                marginRight: message.senderId === currentUserId ? 4 : 0,
-              },
-            ]}
-          >
-            {message.text}
-          </Text>
-        </>
-      )}
-    </View>
-  );
-});
+            <Text
+              style={[
+                styles.messageText,
+                {
+                  backgroundColor:
+                    message.senderId === currentUserId
+                      ? ThemeColoursPrimary.LogoColour
+                      : "#e5e5ea",
+                  color:
+                    message.senderId === currentUserId
+                      ? ThemeColoursPrimary.PrimaryColour
+                      : ThemeColoursPrimary.SecondaryColour,
+                  marginLeft: message.senderId === currentUserId ? 0 : 4,
+                  marginRight: message.senderId === currentUserId ? 4 : 0,
+                },
+              ]}
+            >
+              {message.text}
+            </Text>
+          </>
+        )}
+      </View>
+    );
+  }
+);
 
 const styles = StyleSheet.create({
   messageContainer: {

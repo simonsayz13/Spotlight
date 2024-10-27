@@ -10,7 +10,11 @@ import {
   Platform,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { MessagingStackScreens, ThemeColoursPrimary } from "../../Constants/UI";
+import {
+  ImageType,
+  MessagingStackScreens,
+  ThemeColoursPrimary,
+} from "../../Constants/UI";
 import { ScrollView } from "react-native-gesture-handler";
 import { useSelector } from "react-redux";
 import { RootState } from "../../Redux/store";
@@ -18,10 +22,10 @@ import { useEffect, useRef, useState } from "react";
 import { getUserDetails, searchUsers } from "../../Firebase/firebaseFireStore";
 import { conversationListener } from "../../Firebase/FirebaseChat";
 import { formatRelativeTime } from "../../Util/utility";
-import { Image } from "expo-image";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { UserDetails } from "../../type/Messenger";
 import ActivityLoader from "../../Components/ActivityLoader";
+import ProfilePicture from "../../Components/ProfilePicture";
 
 const { width: windowWidth, height: windowHeight } = Dimensions.get("window");
 
@@ -169,17 +173,11 @@ const Contacts = ({ navigation }: any) => {
                 }}
               >
                 <View style={styles.dropdownItem}>
-                  {user.profile_picture_url ? (
-                    <Image
-                      source={{ uri: user.profile_picture_url }}
-                      style={styles.profileImage}
-                    />
-                  ) : (
-                    <Image
-                      source={require("../../assets/test_image/mock_profile_picture.png")}
-                      style={styles.profileImage}
-                    />
-                  )}
+                  <ProfilePicture
+                    uri={user.profile_picture_url}
+                    userDisplayName={user.display_name}
+                    type={ImageType.Contacts}
+                  />
                   <Text style={styles.usernameText}>{user.display_name}</Text>
                 </View>
               </TouchableOpacity>
@@ -212,19 +210,12 @@ const Contacts = ({ navigation }: any) => {
                   }}
                 >
                   <View style={styles.messageCardContainer}>
-                    {profile_picture_url ? (
-                      <Image
-                        source={{ uri: profile_picture_url }}
-                        style={styles.profileImage}
-                      />
-                    ) : (
-                      <Image
-                        source={require("../../assets/test_image/mock_profile_picture.png")}
-                        style={styles.profileImage}
-                      />
-                    )}
-
-                    <View>
+                    <ProfilePicture
+                      uri={profile_picture_url}
+                      userDisplayName={displayName}
+                      type={ImageType.Contacts}
+                    />
+                    <View style={{ marginLeft: 6, gap: 6 }}>
                       <View style={styles.usernameTimeStampContainer}>
                         <Text style={styles.usernameText}>{displayName}</Text>
                         <Text style={styles.timeStamp}>
@@ -309,12 +300,6 @@ const styles = StyleSheet.create({
     opacity: 0.7,
     fontSize: 12,
   },
-  profileImage: {
-    width: 60, // Width and height should be the same
-    height: 60,
-    borderRadius: 50, // Half of the width or height for a perfect circle
-    marginRight: 6,
-  },
   dropdownContainer: {
     height: windowHeight, // Limit height of dropdown list
     width: windowWidth,
@@ -327,6 +312,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: "#f1f1f1",
+    gap: 6,
   },
 
   divider: {

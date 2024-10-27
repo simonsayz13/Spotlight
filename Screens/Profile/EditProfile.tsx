@@ -16,6 +16,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import {
   EditProfileType,
   Gender,
+  ImageType,
   ThemeColours,
   ThemeColoursPrimary,
 } from "../../Constants/UI";
@@ -34,9 +35,9 @@ import {
 } from "../../Redux/Slices/userSlice";
 import store, { RootState } from "../../Redux/store";
 import * as ImagePicker from "expo-image-picker";
-import { Image } from "expo-image";
 import { uploadProfilePicture } from "../../Firebase/firebaseStorage";
 import ActivityLoader from "../../Components/ActivityLoader";
+import ProfilePicture from "../../Components/ProfilePicture";
 
 const EditProfile = ({ navigation }: any) => {
   const {
@@ -357,13 +358,10 @@ const EditProfile = ({ navigation }: any) => {
           <View style={styles.detailsView}>
             <View style={styles.imageSection}>
               <View style={styles.imageContainer}>
-                <Image
-                  source={
-                    userProfilePhotoURL
-                      ? { uri: userProfilePhotoURL }
-                      : require("../../assets/test_image/mock_profile_picture.png")
-                  }
-                  style={styles.image}
+                <ProfilePicture
+                  uri={userProfilePhotoURL}
+                  userDisplayName={userDisplayName}
+                  type={ImageType.Profile}
                 />
                 <TouchableOpacity
                   style={styles.iconContainer}
@@ -561,11 +559,6 @@ const styles = StyleSheet.create({
   imageSection: {
     alignItems: "center",
     paddingVertical: 8,
-  },
-  image: {
-    width: 100, // Width and height should be the same
-    height: 100,
-    borderRadius: 50, // Half of the width or height for a perfect circle
   },
   imageContainer: {
     position: "relative", // To position the icon inside

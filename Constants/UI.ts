@@ -145,3 +145,19 @@ export enum Gender {
   Female = "Female",
   Other = "Other",
 }
+
+export enum ImageType {
+  Profile = "profile",
+  Contacts = "contacts",
+  Post = "post",
+  PostCard = "postcard",
+  MapPost = "mappost",
+}
+
+export const ProfilePictureSize: Record<ImageType, number> = {
+  [ImageType.Profile]: 100,
+  [ImageType.Contacts]: 60,
+  [ImageType.Post]: 42,
+  [ImageType.PostCard]: 18,
+  [ImageType.MapPost]: 34,
+};

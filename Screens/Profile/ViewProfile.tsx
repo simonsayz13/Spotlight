@@ -17,6 +17,7 @@ import {
   Gender,
   guestContentSelectorButtons,
   HomeStackScreens,
+  ImageType,
   MessagingStackScreens,
   ThemeColoursPrimary,
 } from "../../Constants/UI";
@@ -28,10 +29,9 @@ import {
   addFollower,
   removeFollower,
 } from "../../Firebase/firebaseFireStore";
-import { useFocusEffect } from "@react-navigation/native";
-import { Image } from "expo-image";
 import { MasonryFlashList } from "@shopify/flash-list";
 import AntDesign from "@expo/vector-icons/AntDesign";
+import ProfilePicture from "../../Components/ProfilePicture";
 const ViewProfile = ({ navigation, route }: any) => {
   const { userId: appUserId, userFollowings: appUserFollowings } = useSelector(
     (state: RootState) => {
@@ -219,12 +219,11 @@ const ViewProfile = ({ navigation, route }: any) => {
       </TouchableOpacity>
       <Animated.View style={(styles.profileContainer, { height: heightAnim })}>
         <View style={styles.profileDetails}>
-          {!ldgUserDetails && profilePicUrl ? (
-            <Image source={{ uri: profilePicUrl }} style={styles.image} />
-          ) : (
-            <View style={styles.image} />
-            // <FontAwesome6 name="circle-user" size={70} color="black" />
-          )}
+          <ProfilePicture
+            uri={profilePicUrl}
+            userDisplayName={displayName}
+            type={ImageType.Profile}
+          />
           <View
             style={{
               flexDirection: "row",
@@ -449,11 +448,6 @@ const styles = StyleSheet.create({
     width: "70%",
     backgroundColor: ThemeColoursPrimary.LogoColour, // Set the underline color
     borderRadius: 18,
-  },
-  image: {
-    width: 100, // Width and height should be the same
-    height: 100,
-    borderRadius: 50, // Half of the width or height for a perfect circle
   },
   flashListContainer: {
     paddingHorizontal: 2, // Padding on the sides

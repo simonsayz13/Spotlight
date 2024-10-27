@@ -9,8 +9,11 @@ import {
   TouchableOpacity,
   Platform,
 } from "react-native";
-import { Image } from "expo-image";
-import { ProfileStackScreens, ThemeColoursPrimary } from "../../Constants/UI";
+import {
+  ImageType,
+  ProfileStackScreens,
+  ThemeColoursPrimary,
+} from "../../Constants/UI";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../Redux/store";
@@ -25,6 +28,7 @@ import { selectMessagesByChatRoomId } from "../../Redux/Selectors/messagesSelect
 import Message from "../../Components/Message";
 import { clusterMessages } from "../../Util/utility";
 import { FlashList } from "@shopify/flash-list";
+import ProfilePicture from "../../Components/ProfilePicture";
 
 const Chat = ({ route, navigation }: any) => {
   const { userId: currentUserId } = useSelector(
@@ -110,13 +114,10 @@ const Chat = ({ route, navigation }: any) => {
             activeOpacity={1}
             style={styles.profileContainer}
           >
-            <Image
-              source={
-                profilePicUrl
-                  ? { uri: profilePicUrl }
-                  : require("../../assets/test_image/mock_profile_picture.png")
-              }
-              style={styles.profileImage}
+            <ProfilePicture
+              uri={profilePicUrl}
+              userDisplayName={userName}
+              type={ImageType.Contacts}
             />
             <View style={styles.usernameActivityContainer}>
               <Text style={styles.userNameText}>{userName}</Text>
@@ -129,12 +130,17 @@ const Chat = ({ route, navigation }: any) => {
           ref={FlatListRef}
           data={clusterMessages(messages).reverse()}
           renderItem={({ item: message }) => (
-            <Message message={message} profilePicUrl={profilePicUrl} />
+            <Message
+              message={message}
+              profilePicUrl={profilePicUrl}
+              userDisplayName={userName}
+            />
           )}
           contentContainerStyle={styles.messagesList}
           onLayout={scrollToTop}
           estimatedItemSize={50}
           inverted={true}
+          bounces={false}
         />
 
         <View style={styles.messageBarContainer}>
@@ -191,7 +197,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   usernameActivityContainer: {
-    marginLeft: 2,
+    marginLeft: 6,
   },
   KeyboardAvoidingView: {
     flex: 1,
@@ -223,12 +229,6 @@ const styles = StyleSheet.create({
     color: ThemeColoursPrimary.SecondaryColour,
     paddingVertical: Platform.OS === "ios" ? 10 : 0,
     height: "100%",
-  },
-  profileImage: {
-    width: 50, // Width and height should be the same
-    height: 50,
-    borderRadius: 50, // Half of the width or height for a perfect circle
-    marginRight: 4,
   },
   profileContainer: {
     flexDirection: "row",
