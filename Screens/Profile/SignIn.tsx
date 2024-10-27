@@ -57,41 +57,43 @@ const SignIn = ({ navigation }: any) => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
-        <Image
-          source={images.trademark}
-          resizeMode="cover"
-          style={styles.logo}
-        />
-        <Text style={styles.titleText}>Log in to Spotlight</Text>
-        <FormField
-          title="Email"
-          value={form.email}
-          handleChangeText={(e) => setForm({ ...form, email: e })}
-          otherStyles={styles.formFieldMargin}
-          keyboardType="email-address"
-        />
-        <FormField
-          title="Password"
-          value={form.password}
-          handleChangeText={(e) => setForm({ ...form, password: e })}
-          otherStyles={styles.formFieldMargin}
-          autoComplete="off"
-        />
-        <CustomButton
-          title="Sign In"
-          handlePress={handleLogin}
-          containerStyles={styles.buttonMargin}
-          isLoading={isSubmitting}
-        />
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>Don't have an account?</Text>
-          <Pressable onPress={handlePressSignup}>
-            <Text style={styles.signUpLink}>Sign Up</Text>
-          </Pressable>
+      <ScrollView>
+        <View style={styles.container}>
+          <Image
+            source={images.trademark}
+            resizeMode="cover"
+            style={styles.logo}
+          />
+          <Text style={styles.titleText}>Log in to Spotlight</Text>
+          <FormField
+            title="Email"
+            value={form.email}
+            handleChangeText={(e) => setForm({ ...form, email: e })}
+            otherStyles={styles.formFieldMargin}
+            keyboardType="email-address"
+          />
+          <FormField
+            title="Password"
+            value={form.password}
+            handleChangeText={(e) => setForm({ ...form, password: e })}
+            otherStyles={styles.formFieldMargin}
+            autoComplete="off"
+          />
+          <CustomButton
+            title="Sign In"
+            handlePress={handleLogin}
+            containerStyles={styles.buttonMargin}
+            isLoading={isSubmitting}
+          />
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>Don't have an account?</Text>
+            <Pressable onPress={handlePressSignup}>
+              <Text style={styles.signUpLink}>Sign Up</Text>
+            </Pressable>
+          </View>
         </View>
-      </View>
-      <ActivityLoader indicator={isSubmitting} text={"Logging in"} />
+        <ActivityLoader indicator={isSubmitting} text={"Logging in"} />
+      </ScrollView>
     </SafeAreaView>
   );
 };
