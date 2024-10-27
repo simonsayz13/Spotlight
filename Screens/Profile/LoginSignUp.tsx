@@ -9,7 +9,7 @@ import { ProfileStackScreens, ThemeColoursPrimary } from "../../Constants/UI";
 
 const LoginSignUpScreen = ({ navigation }: any) => {
   const onClickLogin = () => {
-    navigation.navigate(ProfileStackScreens.Login);
+    navigation.navigate(ProfileStackScreens.SignIn);
   };
   const onClickRegister = () => {
     navigation.navigate(ProfileStackScreens.Register);
