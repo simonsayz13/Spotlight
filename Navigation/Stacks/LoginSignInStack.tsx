@@ -3,6 +3,7 @@ import { ProfileStackScreens } from "../../Constants/UI";
 import { LoginSignUpScreen } from "../../Screens/Profile/LoginSignUp";
 import Login from "../../Screens/Profile/Login";
 import Register from "../../Screens/Profile/Register";
+import SignIn from "../../Screens/Profile/SignIn";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 const ProfileStack = createNativeStackNavigator();
@@ -18,6 +19,10 @@ const LoginSignInStackScreen = () => {
       <ProfileStack.Screen
         name={ProfileStackScreens.Register}
         component={Register}
+      />
+      <ProfileStack.Screen
+        name={ProfileStackScreens.SignIn}
+        component={SignIn}
       />
     </ProfileStack.Navigator>
   );
