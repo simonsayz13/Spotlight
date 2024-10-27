@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-// import { images } from "../../constants";
+import { images } from "../../Constants";
 import FormField from "../../Components/FormField";
 import CustomButton from "../../Components/CustomButton";
 import { ProfileStackScreens, ThemeColoursPrimary } from "../../Constants/UI";
@@ -67,11 +67,11 @@ const SignUp = ({ navigation }: any) => {
     <SafeAreaView style={styles.safeArea}>
       <ScrollView>
         <View style={styles.container}>
-          {/* <Image
-            source={images.logo}
-            resizeMode="contain"
+          <Image
+            source={images.trademark}
+            resizeMode="cover"
             style={styles.logo}
-          /> */}
+          />
           <Text style={styles.titleText}>Sign up to Spotlight</Text>
           <FormField
             title="Username"
@@ -125,8 +125,9 @@ const styles = StyleSheet.create({
     marginVertical: 24,
   },
   logo: {
-    width: 115,
-    height: 35,
+    width: 180,
+    height: 70,
+    marginLeft: -10,
   },
   titleText: {
     fontSize: 24, // 'text-2xl'
