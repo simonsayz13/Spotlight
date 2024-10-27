@@ -204,17 +204,8 @@ const Profile = ({ navigation }: any) => {
           <Text style={styles.metaDataFont}>IP Address: United Kingdom</Text>
         </View>
         <View style={styles.description}>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <Text style={styles.descriptionTitle}>Bio</Text>
-          </View>
           {!ldgUserDetails && (
-            <Text style={styles.descriptionText}>
+            <Text style={styles.descriptionText} numberOfLines={2}>
               {bio ?? "Add a bio in edit profile"}
             </Text>
           )}
@@ -331,6 +322,9 @@ const styles = StyleSheet.create({
   },
   descriptionText: {
     color: ThemeColoursPrimary.SecondaryColour,
+    fontSize: 16,
+    lineHeight: 24, // Typically 1.5 times the fontSize
+    minHeight: 48,
   },
   userStatsContainer: {
     flexDirection: "row",

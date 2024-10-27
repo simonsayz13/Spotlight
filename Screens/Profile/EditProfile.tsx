@@ -38,7 +38,7 @@ import * as ImagePicker from "expo-image-picker";
 import { uploadProfilePicture } from "../../Firebase/firebaseStorage";
 import ActivityLoader from "../../Components/ActivityLoader";
 import ProfilePicture from "../../Components/ProfilePicture";
-
+import EditProfileItem from "../../Components/EditProfileItem";
 const EditProfile = ({ navigation }: any) => {
   const {
     userId,
@@ -375,132 +375,46 @@ const EditProfile = ({ navigation }: any) => {
                 </TouchableOpacity>
               </View>
             </View>
-            <View style={styles.detailSection}>
-              <Text style={styles.detailSectionTitle}>
-                {EditProfileType.Name}
-              </Text>
-              <View style={styles.detailSectionTextView}>
-                <Text style={styles.detailSectionText}>{userDisplayName}</Text>
-                <TouchableOpacity
-                  onPressIn={() => {
-                    handleEditPress(EditProfileType.Name);
-                  }}
-                >
-                  <AntDesign
-                    name="edit"
-                    size={20}
-                    color={ThemeColoursPrimary.SecondaryColour}
-                  />
-                </TouchableOpacity>
-              </View>
-            </View>
+            <EditProfileItem
+              itemTitle={EditProfileType.Name}
+              itemData={userDisplayName}
+              onClickItem={() => {
+                handleEditPress(EditProfileType.Name);
+              }}
+            />
             <View style={styles.divider} />
-            <View style={styles.detailSection}>
-              <Text style={styles.detailSectionTitle}>
-                {EditProfileType.Bio}
-              </Text>
-              <View style={styles.detailSectionTextView}>
-                <Text
-                  style={[
-                    styles.detailSectionText,
-                    { width: 260, textAlign: "right" },
-                  ]}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                >
-                  {userBio}
-                </Text>
-                <TouchableOpacity
-                  onPressIn={() => {
-                    handleEditPress(EditProfileType.Bio);
-                  }}
-                >
-                  <AntDesign
-                    name="edit"
-                    size={20}
-                    color={ThemeColoursPrimary.SecondaryColour}
-                  />
-                </TouchableOpacity>
-              </View>
-            </View>
+            <EditProfileItem
+              itemTitle={EditProfileType.Bio}
+              itemData={userBio}
+              onClickItem={() => {
+                handleEditPress(EditProfileType.Bio);
+              }}
+            />
             <View style={styles.divider} />
-            <View style={styles.detailSection}>
-              <Text style={styles.detailSectionTitle}>
-                {EditProfileType.Gender}
-              </Text>
-              <View style={styles.detailSectionTextView}>
-                <Text
-                  style={styles.detailSectionText}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                >
-                  {selectedGender}
-                </Text>
-                <TouchableOpacity
-                  onPressIn={() => {
-                    handleEditPress(EditProfileType.Gender);
-                  }}
-                >
-                  <AntDesign
-                    name="edit"
-                    size={20}
-                    color={ThemeColoursPrimary.SecondaryColour}
-                  />
-                </TouchableOpacity>
-              </View>
-            </View>
+            <EditProfileItem
+              itemTitle={EditProfileType.Gender}
+              itemData={selectedGender}
+              onClickItem={() => {
+                handleEditPress(EditProfileType.Gender);
+              }}
+            />
             <View style={styles.divider} />
-            <View style={styles.detailSection}>
-              <Text style={styles.detailSectionTitle}>
-                {EditProfileType.Age}
-              </Text>
-              <View style={styles.detailSectionTextView}>
-                <Text
-                  style={styles.detailSectionText}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                >
-                  {userAge}
-                </Text>
-                <TouchableOpacity
-                  onPressIn={() => {
-                    handleEditPress(EditProfileType.Age);
-                  }}
-                >
-                  <AntDesign
-                    name="edit"
-                    size={20}
-                    color={ThemeColoursPrimary.SecondaryColour}
-                  />
-                </TouchableOpacity>
-              </View>
-            </View>
+            <EditProfileItem
+              itemTitle={EditProfileType.Age}
+              itemData={userAge}
+              onClickItem={() => {
+                handleEditPress(EditProfileType.Age);
+              }}
+            />
             <View style={styles.divider} />
-            <View style={styles.detailSection}>
-              <Text style={styles.detailSectionTitle}>
-                {EditProfileType.Location}
-              </Text>
-              <View style={styles.detailSectionTextView}>
-                <Text
-                  style={styles.detailSectionText}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                >
-                  {userLocation}
-                </Text>
-                <TouchableOpacity
-                  onPressIn={() => {
-                    handleEditPress(EditProfileType.Location);
-                  }}
-                >
-                  <AntDesign
-                    name="edit"
-                    size={20}
-                    color={ThemeColoursPrimary.SecondaryColour}
-                  />
-                </TouchableOpacity>
-              </View>
-            </View>
+            <EditProfileItem
+              itemTitle={EditProfileType.Location}
+              itemData={userLocation}
+              onClickItem={() => {
+                handleEditPress(EditProfileType.Location);
+              }}
+            />
+            <View style={styles.divider} />
           </View>
         </ScrollView>
 
@@ -576,8 +490,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    borderBottomWidth: 1,
-    borderBottomColor: "rgba(255, 255, 255, 0.2)",
     paddingVertical: 12,
   },
   detailSectionTitle: {
