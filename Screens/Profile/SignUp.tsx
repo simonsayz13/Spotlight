@@ -12,46 +12,54 @@ import { SafeAreaView } from "react-native-safe-area-context";
 // import { images } from "../../constants";
 import FormField from "../../Components/FormField";
 import CustomButton from "../../Components/CustomButton";
-import {
-  MainStacks,
-  ProfileStackScreens,
-  ThemeColoursPrimary,
-} from "../../Constants/UI";
+import { ProfileStackScreens, ThemeColoursPrimary } from "../../Constants/UI";
 import ActivityLoader from "../../Components/ActivityLoader";
-import { signInWithEmail } from "../../Firebase/firebaseAuth";
+import { signUpWithEmail } from "../../Firebase/firebaseAuth";
 import {
   AuthErrorCode,
   FireBaseAuthErrorMessages,
 } from "../../Constants/errorMessages";
-// import { Link } from "expo-router";
+import { createUserProfile } from "../../Firebase/firebaseFireStore";
 
-const SignIn = ({ navigation }: any) => {
+const SignUp = ({ navigation }: any) => {
   const [form, setForm] = useState({
+    username: "",
     email: "",
     password: "",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleLogin = async () => {
+  const handleSignUp = async () => {
     setIsSubmitting(true);
-    const response = await signInWithEmail(form.email, form.password);
+    const response = await signUpWithEmail(
+      form.email,
+      form.username,
+      form.password
+    );
     setIsSubmitting(false);
+
     if (response.success) {
-      navigation.replace(MainStacks.MainTab);
+      navigation.replace(ProfileStackScreens.Profile);
+      //@ts-ignore
+      await createUserProfile(response.userId, form.username);
     } else {
       const errorCode = response.errorMessage as AuthErrorCode;
       Alert.alert("Error", FireBaseAuthErrorMessages[errorCode]);
     }
   };
-  const handlePressSignup = async () => {
+
+  const handlePressSignin = async () => {
+    // navigation.replace(ProfileStackScreens.SignIn);
+
     setForm({
       email: "",
       password: "",
+      username: "",
     });
 
     requestAnimationFrame(() => {
-      navigation.navigate(ProfileStackScreens.SignUp);
+      navigation.navigate(ProfileStackScreens.SignIn);
     });
   };
 
@@ -64,7 +72,13 @@ const SignIn = ({ navigation }: any) => {
             resizeMode="contain"
             style={styles.logo}
           /> */}
-          <Text style={styles.titleText}>Log in to Spotlight</Text>
+          <Text style={styles.titleText}>Sign up to Spotlight</Text>
+          <FormField
+            title="Username"
+            value={form.username}
+            handleChangeText={(e) => setForm({ ...form, username: e })}
+            otherStyles={styles.formFieldMargin}
+          />
           <FormField
             title="Email"
             value={form.email}
@@ -80,15 +94,15 @@ const SignIn = ({ navigation }: any) => {
             autoComplete="off"
           />
           <CustomButton
-            title="Sign In"
-            handlePress={handleLogin}
+            title="Sign Up"
+            handlePress={handleSignUp}
             containerStyles={styles.buttonMargin}
             isLoading={isSubmitting}
           />
           <View style={styles.footer}>
-            <Text style={styles.footerText}>Don't have an account?</Text>
-            <Pressable onPress={handlePressSignup}>
-              <Text style={styles.signUpLink}>Sign Up</Text>
+            <Text style={styles.footerText}>Have an account already??</Text>
+            <Pressable onPress={handlePressSignin}>
+              <Text style={styles.signUpLink}>Sign In</Text>
             </Pressable>
           </View>
         </View>
@@ -146,4 +160,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SignIn;
+export default SignUp;
