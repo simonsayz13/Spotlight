@@ -30,7 +30,7 @@ export default function App() {
   });
 
   if (!fontsLoaded || isLoading) {
-    return <SplashScreen fadeOutEffect />;
+    return <SplashScreen />;
   }
 
   return (
