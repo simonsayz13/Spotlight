@@ -81,6 +81,8 @@ export enum ProfileStackScreens {
   LoginSignUp = "loginsignup",
   EditProfile = "editprofile",
   ViewProfile = "viewprofile",
+  SignIn = "signin",
+  SignUp = "signup",
 }
 
 export enum FollowStackScreens {

@@ -106,13 +106,15 @@ const HomeScreen = ({ navigation }: any) => {
               handlePressInClearBtn={handlePressInClearBtn}
               isMenuVisible={isMenuVisible}
             />
-            <Contents
-              content={content}
-              navigation={navigation}
-              searchText={searchText}
-              showSearchBar={showSearchBar}
-              onScroll={handleScroll}
-            />
+            <View style={styles.contentWrapper}>
+              <Contents
+                content={content}
+                navigation={navigation}
+                searchText={searchText}
+                showSearchBar={showSearchBar}
+                onScroll={handleScroll}
+              />
+            </View>
           </View>
         )}
       </DrawerNavigationBar>
@@ -124,6 +126,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: ThemeColoursPrimary.PrimaryColour,
+  },
+  contentWrapper: {
+    flex: 1,
   },
   content: {
     flex: 1,

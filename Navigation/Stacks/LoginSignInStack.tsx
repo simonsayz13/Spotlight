@@ -3,6 +3,8 @@ import { ProfileStackScreens } from "../../Constants/UI";
 import { LoginSignUpScreen } from "../../Screens/Profile/LoginSignUp";
 import Login from "../../Screens/Profile/Login";
 import Register from "../../Screens/Profile/Register";
+import SignIn from "../../Screens/Profile/SignIn";
+import SignUp from "../../Screens/Profile/SignUp";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 const ProfileStack = createNativeStackNavigator();
@@ -10,7 +12,7 @@ const ProfileStack = createNativeStackNavigator();
 const LoginSignInStackScreen = () => {
   return (
     <ProfileStack.Navigator screenOptions={{ headerShown: false }}>
-      <ProfileStack.Screen
+      {/* <ProfileStack.Screen
         name={ProfileStackScreens.LoginSignUp}
         component={LoginSignUpScreen}
       />
@@ -18,6 +20,14 @@ const LoginSignInStackScreen = () => {
       <ProfileStack.Screen
         name={ProfileStackScreens.Register}
         component={Register}
+      /> */}
+      <ProfileStack.Screen
+        name={ProfileStackScreens.SignIn}
+        component={SignIn}
+      />
+      <ProfileStack.Screen
+        name={ProfileStackScreens.SignUp}
+        component={SignUp}
       />
     </ProfileStack.Navigator>
   );

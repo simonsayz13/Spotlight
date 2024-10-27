@@ -1,18 +1,21 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { StyleSheet, Alert, RefreshControl, View } from "react-native";
+import { StyleSheet, Alert, RefreshControl, View, Text } from "react-native";
 import PostCard from "../../Components/PostCard";
 import { getAllPosts, getUserDetails } from "../../Firebase/firebaseFireStore";
-import { HomeStackScreens } from "../../Constants/UI";
+import { HomeStackScreens, ThemeColoursPrimary } from "../../Constants/UI";
 import { setPosts } from "../../Redux/Slices/postsSlices";
 import { useSelector } from "react-redux";
 import store, { RootState } from "../../Redux/store";
 import { MasonryFlashList } from "@shopify/flash-list";
+import FadeInWrapper from "../../Components/FadeInWrapper";
+import Loader from "../../Components/Loader";
 
 const Contents = (props: any) => {
   const { content, navigation, showSearchBar, searchText, onScroll } = props;
   const [refreshing, setRefreshing] = useState(false);
   const { posts } = useSelector((state: RootState) => state.posts);
   const [filteredPosts, setFilteredPosts] = useState([]);
+  const [displayList, setDisplayList] = useState(false);
 
   const fetchPosts = async () => {
     try {
@@ -28,6 +31,9 @@ const Contents = (props: any) => {
         })
       );
       store.dispatch(setPosts(postsWithUserDetails));
+      setTimeout(() => {
+        setDisplayList(true);
+      }, 100);
     } catch (error) {
       Alert.alert("Error", "Error fetching posts");
     }
@@ -85,26 +91,30 @@ const Contents = (props: any) => {
     </View>
   );
 
-  return (
-    <MasonryFlashList
-      data={filteredPosts}
-      keyExtractor={(post) => post.id}
-      renderItem={renderItem}
-      estimatedItemSize={1} // Estimated size for optimal performance
-      numColumns={2} // Setting 2 columns for masonry layout
-      showsVerticalScrollIndicator={false}
-      contentContainerStyle={styles.flashListContainer}
-      onScroll={onScroll}
-      scrollEventThrottle={16}
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-          colors={["#ff0000"]} // Optional: Refresh spinner color
-          progressBackgroundColor="#ffffff" // Optional: Background color of refresh spinner
-        />
-      }
-    />
+  return displayList ? (
+    <FadeInWrapper delay={1500}>
+      <MasonryFlashList
+        data={filteredPosts}
+        keyExtractor={(post) => post.id}
+        renderItem={renderItem}
+        estimatedItemSize={1} // Estimated size for optimal performance
+        numColumns={2} // Setting 2 columns for masonry layout
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.flashListContainer}
+        onScroll={onScroll}
+        scrollEventThrottle={16}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={["#ff0000"]} // Optional: Refresh spinner color
+            progressBackgroundColor="#ffffff" // Optional: Background color of refresh spinner
+          />
+        }
+      />
+    </FadeInWrapper>
+  ) : (
+    <Loader size="small" color={ThemeColoursPrimary.LogoColour} />
   );
 };
 
