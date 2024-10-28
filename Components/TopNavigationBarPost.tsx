@@ -11,8 +11,13 @@ import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { useSelector } from "react-redux";
 import ProfilePicture from "./ProfilePicture";
 import { RootState } from "../Redux/store";
+import Feather from "@expo/vector-icons/Feather";
 
-const TopNavigationBarPost = ({ navigation, postData }: any) => {
+const TopNavigationBarPost = ({
+  navigation,
+  postData,
+  onPressPostSetting,
+}: any) => {
   const { userDisplayName, userProfilePic, user_id: userId } = postData;
   const { userId: appUserId } = useSelector((state: RootState) => {
     return state.user;
@@ -48,19 +53,28 @@ const TopNavigationBarPost = ({ navigation, postData }: any) => {
           <Text style={styles.usernameText}>{userDisplayName}</Text>
         </TouchableOpacity>
       </View>
-      <View style={styles.followShareWrapper}>
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Follow</Text>
-        </TouchableOpacity>
 
-        <TouchableOpacity>
-          <FontAwesome6
-            name="arrow-up-right-from-square"
-            size={24}
-            color="black"
-          />
-        </TouchableOpacity>
-      </View>
+      {userId !== appUserId ? (
+        <View style={styles.followShareWrapper}>
+          <TouchableOpacity style={styles.button}>
+            <Text style={styles.buttonText}>Follow</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity activeOpacity={1}>
+            <FontAwesome6
+              name="arrow-up-right-from-square"
+              size={24}
+              color={ThemeColoursPrimary.LogoColour}
+            />
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <View style={styles.followShareWrapper}>
+          <TouchableOpacity onPressIn={onPressPostSetting} activeOpacity={1}>
+            <Feather name="more-horizontal" size={26} color="black" />
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 };

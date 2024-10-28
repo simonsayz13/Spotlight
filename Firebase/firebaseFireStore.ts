@@ -24,11 +24,7 @@ import "react-native-get-random-values";
 import { v4 as uuidv4 } from "uuid";
 import { Alert } from "react-native";
 import store from "../Redux/store";
-import {
-  addComment,
-  addReply,
-  updateCommentLikes,
-} from "../Redux/Slices/postsSlices";
+import { addComment, updateCommentLikes } from "../Redux/Slices/postsSlices";
 import { UserDetails } from "../type/Messenger";
 import {
   addToFollowings,
@@ -120,6 +116,26 @@ export const createPost = async (userId: string, postData: any) => {
     });
   } catch (e) {
     console.error("Error adding document: ", e);
+  }
+};
+
+export const deletePost = async (postId: string, userId: string) => {
+  try {
+    const postRef = doc(db, FireStoreCollections.Posts, postId);
+    const postSnap = await getDoc(postRef);
+
+    if (postSnap.exists()) {
+      const postData = postSnap.data();
+      if (postData.user_id === userId) {
+        await deleteDoc(postRef);
+      } else {
+        Alert.alert("Permission denied", "You cannot delete this post.");
+      }
+    } else {
+      console.error("Post does not exist.");
+    }
+  } catch (e) {
+    console.error("Error deleting document: ", e);
   }
 };
 
