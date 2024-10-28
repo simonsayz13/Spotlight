@@ -29,7 +29,6 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   itemTitle: {
-    flex: 1,
     fontWeight: "bold",
     fontSize: 20,
     color: ThemeColoursPrimary.SecondaryColour,
@@ -38,6 +37,7 @@ const styles = StyleSheet.create({
     flexShrink: 1, // Enables shrinking when space is limited
     flexDirection: "row",
     alignItems: "center",
+    maxWidth: 240,
   },
   itemText: {
     flexShrink: 1,

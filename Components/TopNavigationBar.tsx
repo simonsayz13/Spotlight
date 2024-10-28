@@ -11,6 +11,8 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { useState, useRef, useEffect } from "react";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { ThemeColoursPrimary, TopNavigationHomeButtons } from "../Constants/UI";
+import { Image } from "expo-image";
+import { images } from "../Constants";
 
 const { width } = Dimensions.get("window");
 
@@ -106,7 +108,7 @@ const TopNavigationBar = (props: any) => {
         </TouchableOpacity>
 
         <View style={styles.menuContainer}>
-          <Text
+          {/* <Text
             style={{
               fontFamily: "Shrikhand_400Regular",
               fontSize: 30,
@@ -114,7 +116,13 @@ const TopNavigationBar = (props: any) => {
             }}
           >
             Spotlight
-          </Text>
+          </Text> */}
+
+          <Image
+            source={images.trademark}
+            contentFit="contain"
+            style={styles.logo}
+          />
           <Animated.View
             style={[
               styles.searchBar,
@@ -261,6 +269,10 @@ const styles = StyleSheet.create({
     height: 36,
     borderColor: "black",
     paddingHorizontal: 10,
+  },
+  logo: {
+    width: 200,
+    height: 50,
   },
 });
 
