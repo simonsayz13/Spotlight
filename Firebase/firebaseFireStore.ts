@@ -119,6 +119,23 @@ export const createPost = async (userId: string, postData: any) => {
   }
 };
 
+export const updatePost = async (postId: string, postData: object) => {
+  try {
+    // Reference to the specific post document
+    const postRef = doc(db, FireStoreCollections.Posts, postId);
+
+    // Update the post with the provided data
+    await updateDoc(postRef, {
+      ...postData,
+      updatedTimeStamp: new Date().toISOString(), // Update timestamp if desired
+    });
+
+    console.log("Post updated successfully");
+  } catch (error) {
+    console.error("Error updating post:", error);
+  }
+};
+
 export const deletePost = async (postId: string, userId: string) => {
   try {
     const postRef = doc(db, FireStoreCollections.Posts, postId);

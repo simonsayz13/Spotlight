@@ -23,6 +23,7 @@ import { useSelector } from "react-redux";
 import LoginSignInStackScreen from "./Stacks/LoginSignInStack";
 import { RootState } from "../Redux/store";
 import FollowStackScreen from "./Stacks/FollowStack";
+import EditPost from "../Screens/Post/EditPost";
 const MainStack = createNativeStackNavigator();
 
 const MainNavigationStack = () => {
@@ -86,6 +87,14 @@ const MainNavigationStack = () => {
         name={"FollowStack"}
         component={FollowStackScreen}
         options={{ headerShown: false }}
+      />
+      <MainStack.Screen
+        name={PostStackScreens.EditPost}
+        component={EditPost}
+        options={{
+          presentation: "modal", // Equivalent to gestureDirection: 'vertical'
+          animation: "slide_from_bottom",
+        }}
       />
     </MainStack.Navigator>
   );

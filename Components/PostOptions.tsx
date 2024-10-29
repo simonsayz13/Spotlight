@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { StyleSheet, View, Text, TouchableOpacity, Alert } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { ThemeColoursPrimary } from "../Constants/UI";
+import { PostStackScreens, ThemeColoursPrimary } from "../Constants/UI";
 import BottomDrawer from "./BottomDrawer";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { ScrollView } from "react-native-gesture-handler";
@@ -11,20 +11,26 @@ import { RootState } from "../Redux/store";
 
 const PostOptions = ({
   setIsDrawerOpen,
-  postId,
   navigation,
   setIsLoading,
+  postData,
 }: any) => {
-  const postSettingDrawer = useRef<any>(null);
   const { userId: appUserId } = useSelector((state: RootState) => {
     return state.user;
   });
+  const postId = postData?.id;
+  const postSettingDrawer = useRef<any>(null);
   useEffect(() => {
     postSettingDrawer.current.showDrawer();
   }, []);
 
   const hideDrawer = () => {
     setIsDrawerOpen(false);
+  };
+
+  const openEditPost = () => {
+    navigation.navigate(PostStackScreens.EditPost, { postData });
+    hideDrawer();
   };
 
   const handleDeletePost = async () => {
@@ -80,7 +86,10 @@ const PostOptions = ({
         horizontal={true}
       >
         <View style={styles.actionButtonWrapper}>
-          <TouchableOpacity style={styles.optionButtonBase}>
+          <TouchableOpacity
+            style={styles.optionButtonBase}
+            onPressIn={openEditPost}
+          >
             <AntDesign
               name="edit"
               size={24}

@@ -18,7 +18,7 @@ import {
 import * as MediaLibrary from "expo-media-library";
 import { Image } from "expo-image";
 const { width } = Dimensions.get("window");
-const PhotoBrowser = ({ navigation }: any) => {
+const PhotoBrowser = ({ navigation, route }: any) => {
   const [photos, setPhotos] = useState<string[]>([]);
   const imageSize = width / 3;
   const goBack = () => {
@@ -46,9 +46,14 @@ const PhotoBrowser = ({ navigation }: any) => {
   }, []);
 
   const handlePhotoPress = (uri: string) => {
-    navigation.navigate(PostStackScreens.CreatePost, {
-      photoURI: uri,
-    });
+    if (route.params?.postData) {
+      navigation.navigate(PostStackScreens.EditPost, {
+        postData: route.params.postData,
+        photoURI: uri,
+      });
+    } else {
+      navigation.navigate(PostStackScreens.CreatePost, { photoURI: uri });
+    }
   };
 
   const renderPhoto = ({ item }: any) => (

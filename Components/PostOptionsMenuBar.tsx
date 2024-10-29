@@ -9,15 +9,21 @@ const PostOptionsMenuBar = ({
   return (
     <View style={{ flexDirection: "row", alignItems: "center" }}>
       <View style={styles.menuBarContainer}>
-        <TouchableOpacity onPressIn={goToCamera}>
-          <MaterialCommunityIcons name="camera" size={34} color="black" />
-        </TouchableOpacity>
-        <TouchableOpacity onPressIn={goToPhotoBrowser}>
-          <MaterialCommunityIcons name="image-plus" size={32} color="black" />
-        </TouchableOpacity>
-        <TouchableOpacity onPressIn={handleShowDrawer}>
-          <MaterialCommunityIcons name="tag-text" size={30} color="black" />
-        </TouchableOpacity>
+        {goToCamera && (
+          <TouchableOpacity onPressIn={goToCamera}>
+            <MaterialCommunityIcons name="camera" size={34} color="black" />
+          </TouchableOpacity>
+        )}
+        {goToPhotoBrowser && (
+          <TouchableOpacity onPressIn={goToPhotoBrowser}>
+            <MaterialCommunityIcons name="image-plus" size={32} color="black" />
+          </TouchableOpacity>
+        )}
+        {handleShowDrawer && (
+          <TouchableOpacity onPressIn={handleShowDrawer}>
+            <MaterialCommunityIcons name="tag-text" size={30} color="black" />
+          </TouchableOpacity>
+        )}
       </View>
       <TouchableOpacity style={{ marginLeft: 4 }}>
         <MaterialCommunityIcons name="map-marker" size={30} color="black" />

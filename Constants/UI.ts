@@ -106,6 +106,7 @@ export enum PostStackScreens {
   Camera = "camera",
   CreatePost = "createpost",
   ViewPhoto = "viewphoto",
+  EditPost = "editpost",
 }
 export enum MiscStackScreens {
   PhotoBrowser = "photobrowser",

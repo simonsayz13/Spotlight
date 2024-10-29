@@ -93,9 +93,9 @@ const Post = ({ navigation, route }: any) => {
       {isDrawerOpen && (
         <PostOptions
           setIsDrawerOpen={setIsDrawerOpen}
-          postId={postData.id}
           navigation={navigation}
           setIsLoading={setIsLoading}
+          postData={postData}
         />
       )}
       <ActivityLoader indicator={isLoading} text="Deleting" />

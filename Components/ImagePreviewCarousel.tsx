@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useEffect } from "react";
 import { ScrollView, TouchableOpacity, View, StyleSheet } from "react-native";
 import { Image } from "expo-image";
 import AntDesign from "@expo/vector-icons/AntDesign";
