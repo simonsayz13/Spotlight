@@ -350,6 +350,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 6,
     elevation: 20,
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
   },
   commentBar: {
     backgroundColor: "#f1f1f1",

@@ -59,6 +59,7 @@ const MainPost = ({
     <ScrollView
       contentContainerStyle={styles.scrollView}
       overScrollMode="never"
+      showsVerticalScrollIndicator={false}
     >
       {postData.media.length > 0 && <ImageCarousel images={postData.media} />}
       <View style={styles.postContentContainer}>

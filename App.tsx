@@ -11,6 +11,7 @@ import MainNavigationStack from "./Navigation/MainNavigationStack";
 import { useFonts } from "expo-font";
 import { Shrikhand_400Regular } from "@expo-google-fonts/shrikhand";
 import SplashScreen from "./Screens/Home/SplashScreen";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 const Stack = createStackNavigator();
 
@@ -36,20 +37,22 @@ export default function App() {
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
-        <SafeAreaProvider>
-          <NavigationContainer>
-            <StatusBar barStyle="dark-content" hidden={false} />
-            <Stack.Navigator
-              initialRouteName="MainNavigation"
-              screenOptions={{ headerShown: false }}
-            >
-              <Stack.Screen
-                name="MainNavigation"
-                component={MainNavigationStack}
-              />
-            </Stack.Navigator>
-          </NavigationContainer>
-        </SafeAreaProvider>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <SafeAreaProvider>
+            <NavigationContainer>
+              <StatusBar barStyle="dark-content" hidden={false} />
+              <Stack.Navigator
+                initialRouteName="MainNavigation"
+                screenOptions={{ headerShown: false }}
+              >
+                <Stack.Screen
+                  name="MainNavigation"
+                  component={MainNavigationStack}
+                />
+              </Stack.Navigator>
+            </NavigationContainer>
+          </SafeAreaProvider>
+        </GestureHandlerRootView>
       </PersistGate>
     </Provider>
   );

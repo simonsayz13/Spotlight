@@ -24,6 +24,7 @@ import LoginSignInStackScreen from "./Stacks/LoginSignInStack";
 import { RootState } from "../Redux/store";
 import FollowStackScreen from "./Stacks/FollowStack";
 import EditPost from "../Screens/Post/EditPost";
+import ImageGallery from "../Screens/Post/ImageGallery";
 const MainStack = createNativeStackNavigator();
 
 const MainNavigationStack = () => {
@@ -96,6 +97,7 @@ const MainNavigationStack = () => {
           animation: "slide_from_bottom",
         }}
       />
+      <MainStack.Screen name={"gallery"} component={ImageGallery} />
     </MainStack.Navigator>
   );
 };

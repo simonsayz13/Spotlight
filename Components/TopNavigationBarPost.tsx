@@ -60,11 +60,16 @@ const TopNavigationBarPost = ({
             <Text style={styles.buttonText}>Follow</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity activeOpacity={1}>
+          <TouchableOpacity
+            activeOpacity={1}
+            onPressIn={() => {
+              navigation.navigate("gallery");
+            }}
+          >
             <FontAwesome6
               name="arrow-up-right-from-square"
               size={24}
-              color={ThemeColoursPrimary.LogoColour}
+              color={ThemeColoursPrimary.SecondaryColour}
             />
           </TouchableOpacity>
         </View>
