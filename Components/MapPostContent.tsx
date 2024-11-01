@@ -1,5 +1,11 @@
 import React, { useMemo } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Pressable,
+} from "react-native";
 import {
   HomeStackScreens,
   ImageType,
@@ -32,7 +38,6 @@ const MapPostContent = ({ postData, navigation, hideModal }: any) => {
   const memoizedPostData = useMemo(() => postData, [postData]);
 
   const handleExpandPostPress = () => {
-    hideModal();
     navigation.navigate(HomeStackScreens.Post, {
       postData: memoizedPostData,
       customAnimation: true,
@@ -41,7 +46,6 @@ const MapPostContent = ({ postData, navigation, hideModal }: any) => {
 
   const handleUserProfilePress = () => {
     hideModal();
-    console.log(postData);
     appUserId === user_id
       ? navigation.navigate(NavigationTabs.Me)
       : navigation.navigate(ProfileStackScreens.ViewProfile, {
@@ -52,10 +56,9 @@ const MapPostContent = ({ postData, navigation, hideModal }: any) => {
   return (
     <View style={styles.container}>
       <View style={styles.userInfoContainer}>
-        <TouchableOpacity
+        <Pressable
           style={styles.userInfoContainer}
-          activeOpacity={1}
-          onPressIn={handleUserProfilePress}
+          onPress={handleUserProfilePress}
         >
           <ProfilePicture
             uri={userProfilePic}
@@ -63,7 +66,7 @@ const MapPostContent = ({ postData, navigation, hideModal }: any) => {
             type={ImageType.MapPost}
           />
           <Text style={styles.userNameText}>{userDisplayName}</Text>
-        </TouchableOpacity>
+        </Pressable>
         <View style={styles.separatorDot} />
         <Text style={styles.timeStampFont}>
           {formatRelativeTime(timeStamp)}
@@ -76,13 +79,13 @@ const MapPostContent = ({ postData, navigation, hideModal }: any) => {
               color={ThemeColoursPrimary.SecondaryColour}
             />
           </TouchableOpacity>
-          <TouchableOpacity onPressIn={handleExpandPostPress}>
+          <Pressable onPressIn={handleExpandPostPress}>
             <MaterialCommunityIcons
               name="arrow-expand"
               size={28}
               color={ThemeColoursPrimary.SecondaryColour}
             />
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </View>
       <Text style={styles.titleText} numberOfLines={1} ellipsizeMode="tail">

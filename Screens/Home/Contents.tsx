@@ -9,6 +9,7 @@ import store, { RootState } from "../../Redux/store";
 import { MasonryFlashList } from "@shopify/flash-list";
 import FadeInWrapper from "../../Components/FadeInWrapper";
 import Loader from "../../Components/Loader";
+import { Image } from "expo-image";
 
 const Contents = (props: any) => {
   const { content, navigation, showSearchBar, searchText, onScroll } = props;
@@ -31,9 +32,17 @@ const Contents = (props: any) => {
         })
       );
       store.dispatch(setPosts(postsWithUserDetails));
-      setTimeout(() => {
-        setDisplayList(true);
-      }, 100);
+
+      const mediaUrls = postsWithUserDetails
+        .map((post) => post.media || [])
+        .flat()
+        .map((mediaObj) => mediaObj.media_url); // Extract the URL from each media object
+
+      mediaUrls.forEach(async (url) => {
+        await Image.prefetch(url, "memory");
+      });
+
+      setDisplayList(true);
     } catch (error) {
       Alert.alert("Error", "Error fetching posts");
     }
@@ -41,11 +50,10 @@ const Contents = (props: any) => {
 
   // Refresh the contents page
   const onRefresh = useCallback(async () => {
-    setRefreshing(true);
-    setTimeout(() => {
-      fetchPosts();
-      setRefreshing(false);
-    }, 800); // Simulating a fetch time
+    // setRefreshing(true);
+    setDisplayList(false);
+    fetchPosts();
+    // setRefreshing(false);
   }, []);
 
   const openPost = (postData: any) => {
@@ -107,10 +115,13 @@ const Contents = (props: any) => {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={["#ff0000"]} // Optional: Refresh spinner color
+            colors={[ThemeColoursPrimary.LogoColour]} // Optional: Refresh spinner color
             progressBackgroundColor="#ffffff" // Optional: Background color of refresh spinner
           />
         }
+        onEndReached={() => {
+          console.log("reached");
+        }}
       />
     </FadeInWrapper>
   ) : (

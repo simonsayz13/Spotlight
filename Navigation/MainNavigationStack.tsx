@@ -97,7 +97,6 @@ const MainNavigationStack = () => {
           animation: "slide_from_bottom",
         }}
       />
-      <MainStack.Screen name={"gallery"} component={ImageGallery} />
     </MainStack.Navigator>
   );
 };

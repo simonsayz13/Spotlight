@@ -13,6 +13,7 @@ import {
   deleteDoc,
   arrayUnion,
   arrayRemove,
+  limit,
 } from "firebase/firestore";
 import { firestoreDB } from "./FirebaseApp";
 import {
@@ -177,7 +178,7 @@ export const getPostsByUserId = async (userId: string) => {
 export const getAllPosts = async () => {
   try {
     const postsCollection = collection(db, FireStoreCollections.Posts);
-    const q = query(postsCollection, orderBy("timeStamp", "desc"));
+    const q = query(postsCollection, orderBy("timeStamp", "desc"), limit(10));
     const snapshot = await getDocs(q);
     const postsList = snapshot.docs.map((doc) => ({
       id: doc.id,

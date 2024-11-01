@@ -6,26 +6,19 @@ import {
   Text,
   FlatList,
   Modal,
-  ScrollView,
   TouchableOpacity,
 } from "react-native";
 import { Image } from "expo-image";
 import { ThemeColoursPrimary } from "../Constants/UI";
-import {
-  Gesture,
-  GestureDetector,
-  GestureHandlerRootView,
-  TapGestureHandler,
-} from "react-native-gesture-handler";
+import { TapGestureHandler } from "react-native-gesture-handler";
 import Animated, {
   runOnJS,
-  useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
-import { quickTapGesture } from "../Util/GesturesHelper";
 import Gallery from "react-native-awesome-gallery";
-const { width: windowWidth } = Dimensions.get("window");
+import ImageModal from "./ImageModal";
+const { width: windowWidth, height: windowHeight } = Dimensions.get("window");
 const MAX_HEIGHT = 550; // Define the maximum height for images
 
 const ImageCarousel = ({ images }: any) => {
@@ -58,6 +51,9 @@ const ImageCarousel = ({ images }: any) => {
   };
 
   useEffect(() => {
+    // images.forEach((image: any) => {
+    //   Image.prefetch(image.media_url, "memory");
+    // });
     return () => {
       // Cleanup: Clear timeout on unmount to prevent memory leaks
       if (hideTimeout.current) clearTimeout(hideTimeout.current);
@@ -94,6 +90,7 @@ const ImageCarousel = ({ images }: any) => {
               height: calculatedHeight,
             }}
             contentFit="contain"
+            cachePolicy="memory"
           />
         </View>
       </TapGestureHandler>
@@ -146,17 +143,11 @@ const ImageCarousel = ({ images }: any) => {
       {/* Dots Indicator */}
       {images.length > 1 && renderDots}
 
-      <Modal visible={isGalleryVisible} transparent={true}>
-        <View style={styles.fullscreenContainer}>
-          <Gallery data={[images[currentIndex].media_url]} />
-        </View>
-        <TouchableOpacity
-          style={styles.closeButton}
-          onPress={() => setIsGalleryVisible(false)}
-        >
-          <Text style={styles.closeButtonText}>Close</Text>
-        </TouchableOpacity>
-      </Modal>
+      <ImageModal
+        imageUri={images[currentIndex].media_url}
+        isGalleryVisible={isGalleryVisible}
+        setIsGalleryVisible={setIsGalleryVisible}
+      />
     </View>
   );
 };
@@ -188,7 +179,7 @@ const styles = StyleSheet.create({
   },
   dotsContainer: {
     flexDirection: "row",
-    marginTop: 6, // Spacing between the images and the dots
+    marginTop: 4, // Spacing between the images and the dots
   },
   dot: {
     alignSelf: "center",
@@ -200,29 +191,12 @@ const styles = StyleSheet.create({
   activeDot: {
     alignSelf: "center",
     backgroundColor: ThemeColoursPrimary.LogoColour,
-    width: 10,
-    height: 10,
-    borderRadius: 10,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
   },
   inactiveDot: {
     backgroundColor: "gray",
-  },
-  fullscreenContainer: {
-    flex: 1,
-    backgroundColor: "black",
-  },
-  closeButton: {
-    position: "absolute",
-    top: 40,
-    right: 20,
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
-    borderRadius: 20,
-    padding: 10,
-  },
-  closeButtonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "bold",
   },
 });
 

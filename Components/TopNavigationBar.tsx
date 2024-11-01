@@ -108,16 +108,6 @@ const TopNavigationBar = (props: any) => {
         </TouchableOpacity>
 
         <View style={styles.menuContainer}>
-          {/* <Text
-            style={{
-              fontFamily: "Shrikhand_400Regular",
-              fontSize: 30,
-              color: ThemeColoursPrimary.LogoColour,
-            }}
-          >
-            Spotlight
-          </Text> */}
-
           <Image
             source={images.trademark}
             contentFit="contain"

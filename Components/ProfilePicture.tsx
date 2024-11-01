@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, View, Text, Pressable } from "react-native";
 import { Image } from "expo-image";
 import {
   ImageType,
@@ -12,14 +12,23 @@ const ProfilePicture = ({
   uri,
   userDisplayName,
   type = ImageType.Profile,
+  onPressFunc,
 }: any) => {
   const size = ProfilePictureSize[type as ImageType];
+
+  const handleOnPress = () => {
+    if (type === ImageType.Profile) {
+      onPressFunc(true);
+    }
+  };
+
   return (
-    <View>
+    <Pressable onPress={handleOnPress}>
       {uri ? (
         <Image
           source={{ uri }}
           style={{ width: size, height: size, borderRadius: size / 2 }}
+          cachePolicy="memory"
         />
       ) : (
         <View
@@ -33,7 +42,7 @@ const ProfilePicture = ({
           </Text>
         </View>
       )}
-    </View>
+    </Pressable>
   );
 };
 

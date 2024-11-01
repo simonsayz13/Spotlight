@@ -32,6 +32,7 @@ import {
 import { MasonryFlashList } from "@shopify/flash-list";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import ProfilePicture from "../../Components/ProfilePicture";
+import ImageModal from "../../Components/ImageModal";
 const ViewProfile = ({ navigation, route }: any) => {
   const { userId: appUserId, userFollowings: appUserFollowings } = useSelector(
     (state: RootState) => {
@@ -179,6 +180,7 @@ const ViewProfile = ({ navigation, route }: any) => {
       Alert.alert("Error", `${error}`);
     }
   };
+
   const handleBackButtonPress = () => {
     navigation.goBack();
   };
@@ -205,25 +207,36 @@ const ViewProfile = ({ navigation, route }: any) => {
     </View>
   );
 
+  const [isGalleryVisible, setIsGalleryVisible] = useState(false);
   return (
     <SafeAreaView style={styles.container}>
-      <TouchableOpacity
-        onPress={handleBackButtonPress}
-        style={styles.backButton}
-      >
-        <Ionicons
-          name="chevron-back"
-          size={32}
-          color={ThemeColoursPrimary.SecondaryColour}
-        />
-      </TouchableOpacity>
+      <ImageModal
+        imageUri={profilePicUrl}
+        isGalleryVisible={isGalleryVisible}
+        setIsGalleryVisible={setIsGalleryVisible}
+      />
+
       <Animated.View style={(styles.profileContainer, { height: heightAnim })}>
         <View style={styles.profileDetails}>
-          <ProfilePicture
-            uri={profilePicUrl}
-            userDisplayName={displayName}
-            type={ImageType.Profile}
-          />
+          <View style={styles.profilePicBackButtonContainer}>
+            <Pressable
+              onPress={handleBackButtonPress}
+              style={styles.backButton}
+            >
+              <Ionicons
+                name="chevron-back"
+                size={32}
+                color={ThemeColoursPrimary.SecondaryColour}
+              />
+            </Pressable>
+            <ProfilePicture
+              uri={profilePicUrl}
+              userDisplayName={displayName}
+              type={ImageType.Profile}
+              onPressFunc={setIsGalleryVisible}
+            />
+          </View>
+
           <View
             style={{
               flexDirection: "row",
@@ -459,14 +472,19 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: "absolute",
-    top: 56,
-    left: 14,
+    left: -130,
     zIndex: 10, // Ensure it's on top of other elements
   },
   interactionContainer: {
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
+  },
+  profilePicBackButtonContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    position: "relative",
   },
 });
 

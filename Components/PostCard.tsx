@@ -69,6 +69,7 @@ const PostCard = React.memo(({ postData, openPost, self }: any) => {
           source={{
             uri: imageUrl,
           }}
+          cachePolicy="memory"
           onLoad={onImageLoad} // Set image height after load
         />
       ) : (

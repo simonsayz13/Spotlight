@@ -16,16 +16,13 @@ import {
 } from "react-native";
 import {
   MiscStackScreens,
-  NavigationTabs,
   Tags,
   ThemeColoursPrimary,
 } from "../../Constants/UI";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { uploadImages } from "../../Firebase/firebaseStorage";
 
-import { useSelector } from "react-redux";
-import { RootState } from "../../Redux/store";
-import { createPost, updatePost } from "../../Firebase/firebaseFireStore";
+import { updatePost } from "../../Firebase/firebaseFireStore";
 import ActivityLoader from "../../Components/ActivityLoader";
 import BottomSheet from "../../Components/BottomSheet";
 import { getLocation, getLocationPermission } from "../../Util/LocationService";
