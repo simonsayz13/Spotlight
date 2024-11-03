@@ -52,7 +52,7 @@ const ViewProfile = ({ navigation, route }: any) => {
   const [isFollowed, setIsFollowed] = useState(false);
   const [ldgUserDetails, setLdgUserDetails] = useState(false);
   const [ldgSuccUserDetails, setLdgSuccUserDetails] = useState(false);
-
+  const [isGalleryVisible, setIsGalleryVisible] = useState(false);
   let heightAnim = useRef(new Animated.Value(200)).current;
 
   useEffect(() => {
@@ -207,7 +207,6 @@ const ViewProfile = ({ navigation, route }: any) => {
     </View>
   );
 
-  const [isGalleryVisible, setIsGalleryVisible] = useState(false);
   return (
     <SafeAreaView style={styles.container}>
       <ImageModal

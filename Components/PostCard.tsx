@@ -16,9 +16,9 @@ import { RootState } from "../Redux/store";
 import NoPhotoPlaceHolder from "./NoPhotoPlaceHolder";
 import ProfilePicture from "./ProfilePicture";
 
-const PostCard = React.memo(({ postData, openPost, self }: any) => {
+const PostCard = React.memo(({ postData, openPost }: any) => {
   const [displayName, setDisplayName] = useState("");
-  const [imageHeight, setImageHeight] = useState(200); // Default height
+  // const [imageHeight, setImageHeight] = useState(200); // Default height
   const { userDisplayName, userLiked } = useSelector(
     (state: RootState) => state.user
   );
@@ -31,6 +31,7 @@ const PostCard = React.memo(({ postData, openPost, self }: any) => {
     description,
   } = postData;
 
+  // console.log(postData.media[0].height);
   const imageUrl = postData.media[0]?.media_url;
 
   //@ts-ignore
@@ -38,8 +39,7 @@ const PostCard = React.memo(({ postData, openPost, self }: any) => {
 
   const fetchUserData = async () => {
     try {
-      const userDetails = await getUserDetails(userId);
-      //@ts-ignore
+      const userDetails: any = await getUserDetails(userId);
       setDisplayName(userDetails?.display_name);
     } catch (error) {}
   };
@@ -48,12 +48,8 @@ const PostCard = React.memo(({ postData, openPost, self }: any) => {
     fetchUserData();
   }, [userId]);
 
-  // Image load handler
-  const onImageLoad = (event: any) => {
-    const { width, height } = event.source;
-    const calculatedHeight = (height / width) * 150;
-    setImageHeight(calculatedHeight);
-  };
+  const imageHeight =
+    (postData.media[0]?.height / postData.media[0]?.width) * 150;
 
   return (
     <TouchableOpacity
@@ -70,7 +66,6 @@ const PostCard = React.memo(({ postData, openPost, self }: any) => {
             uri: imageUrl,
           }}
           cachePolicy="memory"
-          onLoad={onImageLoad} // Set image height after load
         />
       ) : (
         <NoPhotoPlaceHolder title={title} description={description} />
@@ -84,9 +79,7 @@ const PostCard = React.memo(({ postData, openPost, self }: any) => {
             userDisplayName={self ? userDisplayName : displayName}
             type={ImageType.PostCard}
           />
-          <Text style={styles.userFont}>
-            {self ? userDisplayName : displayName}
-          </Text>
+          <Text style={styles.userFont}>{displayName}</Text>
           <View style={styles.likes}>
             <AntDesign
               name={liked ? "heart" : "hearto"}

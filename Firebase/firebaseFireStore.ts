@@ -14,6 +14,7 @@ import {
   arrayUnion,
   arrayRemove,
   limit,
+  startAfter,
 } from "firebase/firestore";
 import { firestoreDB } from "./FirebaseApp";
 import {
@@ -175,18 +176,29 @@ export const getPostsByUserId = async (userId: string) => {
   }
 };
 
-export const getAllPosts = async () => {
+export const getPaginatedPosts = async (lastVisible?: any) => {
   try {
     const postsCollection = collection(db, FireStoreCollections.Posts);
-    const q = query(postsCollection, orderBy("timeStamp", "desc"), limit(10));
+    const q = lastVisible
+      ? query(
+          postsCollection,
+          orderBy("timeStamp", "desc"),
+          startAfter(lastVisible),
+          limit(10)
+        )
+      : query(postsCollection, orderBy("timeStamp", "desc"), limit(10));
+
     const snapshot = await getDocs(q);
-    const postsList = snapshot.docs.map((doc) => ({
+    const posts = snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
-    return postsList;
+
+    const newLastVisible = snapshot.docs[snapshot.docs.length - 1];
+    if (!newLastVisible) throw Error;
+    return { posts, lastVisible: newLastVisible };
   } catch (error) {
-    return [];
+    return { posts: [], lastVisible: null };
   }
 };
 

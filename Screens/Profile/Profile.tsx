@@ -33,6 +33,7 @@ import {
 import { MasonryFlashList } from "@shopify/flash-list";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import ProfilePicture from "../../Components/ProfilePicture";
+import ImageModal from "../../Components/ImageModal";
 const Profile = ({ navigation }: any) => {
   const [buttonStates, setButtonStates] = useState(userContentSelectorButtons);
   const {
@@ -51,7 +52,7 @@ const Profile = ({ navigation }: any) => {
   const [followers, setFollowers] = useState([]);
   const [ldgUserDetails, setLdgUserDetails] = useState(false);
   const [ldgSuccUserDetails, setLdgSuccUserDetails] = useState(false);
-
+  const [isGalleryVisible, setIsGalleryVisible] = useState(false);
   let heightAnim = useRef(new Animated.Value(200)).current;
 
   useEffect(() => {
@@ -176,12 +177,19 @@ const Profile = ({ navigation }: any) => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <ImageModal
+        imageUri={profilePicUrl}
+        isGalleryVisible={isGalleryVisible}
+        setIsGalleryVisible={setIsGalleryVisible}
+      />
+
       <Animated.View style={(styles.profileContainer, { height: heightAnim })}>
         <View style={styles.profileDetails}>
           <ProfilePicture
             uri={profilePicUrl}
             userDisplayName={displayName}
             type={ImageType.Profile}
+            onPressFunc={setIsGalleryVisible}
           />
           <View
             style={{
@@ -278,7 +286,7 @@ const Profile = ({ navigation }: any) => {
           data={postsData}
           keyExtractor={(post) => post.id}
           renderItem={renderItem}
-          estimatedItemSize={10} // Estimated size for optimal performance
+          estimatedItemSize={200} // Estimated size for optimal performance
           numColumns={2} // Setting 2 columns for masonry layout
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.flashListContainer}
