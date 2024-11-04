@@ -2,6 +2,7 @@ import {
   collection,
   doc,
   getDoc,
+  getDocs,
   onSnapshot,
   orderBy,
   query,
@@ -131,4 +132,29 @@ export const conversationListener = (
 
   // Cleanup on component unmount
   return () => subscribeConversations();
+};
+
+export const getUserConversations = async (userId: string) => {
+  // Reference to the conversations collection
+  const conversationsRef = collection(db, FireStoreCollections.Chats);
+
+  try {
+    // Query to get conversations where the user is a participant
+    const q = query(
+      conversationsRef,
+      where("participants", "array-contains", userId)
+    );
+    const querySnapshot = await getDocs(q);
+
+    // Map through the documents and retrieve conversation data
+    const conversations = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    return conversations;
+  } catch (error) {
+    console.error("Error retrieving conversations: ", error);
+    return [];
+  }
 };

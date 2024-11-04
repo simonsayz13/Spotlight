@@ -81,10 +81,7 @@ const PostOptions = ({
           />
         </TouchableOpacity>
       </View>
-      <ScrollView
-        contentContainerStyle={styles.postActionContainer}
-        horizontal={true}
-      >
+      <ScrollView contentContainerStyle={styles.postActionContainer} horizontal>
         <View style={styles.actionButtonWrapper}>
           <TouchableOpacity
             style={styles.optionButtonBase}
@@ -121,7 +118,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: 4,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
   },
   titleText: {
     alignItems: "center",
@@ -133,7 +131,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     paddingVertical: 8,
     gap: 14,
-    paddingHorizontal: 4,
+    paddingHorizontal: 8,
   },
   optionButtonBase: {
     justifyContent: "center",

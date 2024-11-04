@@ -124,3 +124,15 @@ export const getInitials = (name: string) => {
   const initials = namesArray.map((n) => n.charAt(0)).join("");
   return initials.slice(0, 2).toUpperCase(); // Limit to 2 characters
 };
+
+export const getOtherParticipants = (conversations: any, userId: any) => {
+  return conversations.map((conversation: any) => {
+    const otherParticipants = conversation.participants.filter(
+      (participantId: string) => participantId !== userId
+    );
+    return {
+      conversationId: conversation.id,
+      otherParticipantId: otherParticipants[0], // Assuming it's a one-on-one conversation
+    };
+  });
+};

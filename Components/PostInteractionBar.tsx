@@ -17,12 +17,8 @@ import {
   TouchableOpacity,
   Alert,
   Keyboard,
-  KeyboardAvoidingView,
 } from "react-native";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import Octicons from "@expo/vector-icons/Octicons";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { ThemeColoursPrimary } from "../Constants/UI";
 import {

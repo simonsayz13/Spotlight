@@ -13,9 +13,10 @@ import TopNavigationBarPost from "../../Components/TopNavigationBarPost";
 import PostInteractionBar from "../../Components/PostInteractionBar";
 import MainPost from "../../Components/MainPost";
 import { ThemeColoursPrimary } from "../../Constants/UI";
-import BottomDrawer from "../../Components/BottomDrawer";
 import PostOptions from "../../Components/PostOptions";
 import ActivityLoader from "../../Components/ActivityLoader";
+import SharePost from "../../Components/SharePost";
+import MessageModal from "../../Components/MessageModal";
 
 const Post = ({ navigation, route }: any) => {
   const { postData } = route.params;
@@ -23,8 +24,12 @@ const Post = ({ navigation, route }: any) => {
   const [replyingTo, setReplyingTo] = useState(null);
   const [bottomHeight, setBottomHeight] = useState(50); // Default height
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isOptionsDrawer, setIsOptionsDrawer] = useState(false);
+  const [isShareDrawer, setIsShareDrawer] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const overlayOpacity = useRef(new Animated.Value(0)).current;
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const [modalMessage, setModalMessage] = useState<string | null>(null);
 
   const openKeyboard = () => {
     if (postInteractionBarRef.current) {
@@ -37,13 +42,15 @@ const Post = ({ navigation, route }: any) => {
     overlayOpacity.setValue(0);
     Animated.timing(overlayOpacity, {
       toValue: 1,
-      duration: 200,
+      duration: 300,
       useNativeDriver: true,
     }).start();
   };
 
   const hideSettingDrawer = () => {
     setIsDrawerOpen(false);
+    setIsOptionsDrawer(false);
+    setIsShareDrawer(false);
     Animated.timing(overlayOpacity, {
       toValue: 0,
       duration: 300,
@@ -51,12 +58,21 @@ const Post = ({ navigation, route }: any) => {
     }).start();
   };
 
+  useEffect(() => {
+    if (isOptionsDrawer || isShareDrawer) {
+      showSettingDrawer();
+    } else {
+      hideSettingDrawer();
+    }
+  }, [isOptionsDrawer, isShareDrawer]);
+
   return (
     <SafeAreaView style={styles.container}>
       <TopNavigationBarPost
         navigation={navigation}
         postData={postData}
-        onPressPostSetting={showSettingDrawer}
+        onPressPostSetting={setIsOptionsDrawer}
+        onPressSharePost={setIsShareDrawer}
       />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -78,6 +94,13 @@ const Post = ({ navigation, route }: any) => {
           />
         </View>
       </KeyboardAvoidingView>
+
+      <MessageModal
+        message={modalMessage} // Adjust this message as needed
+        visible={modalVisible}
+        setModalVisible={setModalVisible}
+      />
+
       {isDrawerOpen && (
         <Animated.View
           style={[styles.overlay, { opacity: overlayOpacity }]}
@@ -90,14 +113,26 @@ const Post = ({ navigation, route }: any) => {
           />
         </Animated.View>
       )}
-      {isDrawerOpen && (
+
+      {isOptionsDrawer && (
         <PostOptions
-          setIsDrawerOpen={setIsDrawerOpen}
+          setIsDrawerOpen={setIsOptionsDrawer}
           navigation={navigation}
           setIsLoading={setIsLoading}
           postData={postData}
         />
       )}
+
+      {isShareDrawer && (
+        <SharePost
+          setIsDrawerOpen={setIsShareDrawer}
+          navigation={navigation}
+          postData={postData}
+          setModalVisible={setModalVisible}
+          setModalMessage={setModalMessage}
+        />
+      )}
+
       <ActivityLoader indicator={isLoading} text="Deleting" />
     </SafeAreaView>
   );

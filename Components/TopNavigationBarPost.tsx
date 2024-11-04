@@ -1,5 +1,11 @@
 import React from "react";
-import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+  Pressable,
+} from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {
   ImageType,
@@ -17,17 +23,27 @@ const TopNavigationBarPost = ({
   navigation,
   postData,
   onPressPostSetting,
+  onPressSharePost,
 }: any) => {
   const { userDisplayName, userProfilePic, user_id: userId } = postData;
   const { userId: appUserId } = useSelector((state: RootState) => {
     return state.user;
   });
+
   const goToProfile = () => {
     userId === appUserId
       ? navigation.navigate(NavigationTabs.Me)
       : navigation.navigate(ProfileStackScreens.ViewProfile, {
           userId,
         });
+  };
+
+  const onSettingsClicked = () => {
+    onPressPostSetting(true);
+  };
+
+  const onShareClicked = () => {
+    onPressSharePost(true);
   };
 
   return (
@@ -60,19 +76,19 @@ const TopNavigationBarPost = ({
             <Text style={styles.buttonText}>Follow</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity>
+          <Pressable onPressIn={onShareClicked}>
             <FontAwesome6
               name="arrow-up-right-from-square"
               size={22}
               color={ThemeColoursPrimary.SecondaryColour}
             />
-          </TouchableOpacity>
+          </Pressable>
         </View>
       ) : (
         <View style={styles.followShareWrapper}>
-          <TouchableOpacity onPressIn={onPressPostSetting} activeOpacity={1}>
+          <Pressable onPressIn={onSettingsClicked}>
             <Feather name="more-horizontal" size={26} color="black" />
-          </TouchableOpacity>
+          </Pressable>
         </View>
       )}
     </View>

@@ -53,8 +53,8 @@ const BottomDrawer = forwardRef(
     const showDrawer = () => {
       Animated.timing(slideAnim, {
         toValue: 0, // Final position
-        duration: 400, // Adjust the duration for a smooth transition
-        easing: Easing.out(Easing.ease), // Optional: Adjust easing for smoothness
+        duration: 300, // Adjust the duration for a smooth transition
+        easing: Easing.out(Easing.exp), // Optional: Adjust easing for smoothness
         useNativeDriver: true,
       }).start();
     };
@@ -62,7 +62,7 @@ const BottomDrawer = forwardRef(
     const hideDrawer = () => {
       Animated.timing(slideAnim, {
         toValue: windowHeight, // Offscreen position
-        duration: 400, // Adjust the duration for a smooth transition
+        duration: 300, // Adjust the duration for a smooth transition
         easing: Easing.in(Easing.ease), // Optional: Adjust easing for smoothness
         useNativeDriver: true,
       }).start();
@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 14,
     borderTopRightRadius: 14,
     paddingVertical: 6,
-    paddingHorizontal: 8,
+    // paddingHorizontal: 8,
     elevation: 10, // For Android shadow
     shadowColor: ThemeColoursPrimary.SecondaryColour,
     shadowOffset: { width: 0, height: -1 },
