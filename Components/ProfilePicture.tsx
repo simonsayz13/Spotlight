@@ -8,43 +8,50 @@ import {
 } from "../Constants/UI";
 import { getInitials } from "../Util/utility";
 
-const ProfilePicture = ({
-  uri,
-  userDisplayName,
-  type = ImageType.Profile,
-  onPressFunc,
-}: any) => {
-  const size = ProfilePictureSize[type as ImageType];
+const ProfilePicture = React.memo(
+  ({ uri, userDisplayName, type = ImageType.Profile, onPressFunc }: any) => {
+    const size = ProfilePictureSize[type as ImageType];
 
-  const handleOnPress = () => {
-    if (type === ImageType.Profile) {
-      onPressFunc(true);
-    }
-  };
+    const handleOnPress = () => {
+      if (type === ImageType.Profile) {
+        onPressFunc(true);
+      }
+    };
 
-  return (
-    <Pressable onPress={handleOnPress}>
-      {uri ? (
-        <Image
-          source={{ uri }}
-          style={{ width: size, height: size, borderRadius: size / 2 }}
-          cachePolicy="memory"
-        />
-      ) : (
-        <View
-          style={[
-            styles.initialsContainer,
-            { width: size, height: size, borderRadius: size / 2 },
-          ]}
-        >
-          <Text style={[styles.initialsText, { fontSize: size / 2 }]}>
-            {getInitials(userDisplayName)}
-          </Text>
-        </View>
-      )}
-    </Pressable>
-  );
-};
+    const ProfilePictureView = () => (
+      <>
+        {uri ? (
+          <Image
+            source={{ uri }}
+            style={{ width: size, height: size, borderRadius: size / 2 }}
+            cachePolicy="memory"
+          />
+        ) : (
+          <View
+            style={[
+              styles.initialsContainer,
+              { width: size, height: size, borderRadius: size / 2 },
+            ]}
+          >
+            <Text style={[styles.initialsText, { fontSize: size / 2 }]}>
+              {getInitials(userDisplayName)}
+            </Text>
+          </View>
+        )}
+      </>
+    );
+
+    return onPressFunc ? (
+      <Pressable onPress={handleOnPress}>
+        <ProfilePictureView />
+      </Pressable>
+    ) : (
+      <View>
+        <ProfilePictureView />
+      </View>
+    );
+  }
+);
 
 const styles = StyleSheet.create({
   initialsContainer: {

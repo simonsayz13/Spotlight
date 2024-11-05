@@ -1,6 +1,14 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { memo, useEffect, useRef, useState } from "react";
 import BottomDrawer from "./BottomDrawer";
-import { View, StyleSheet, Text, Pressable, ScrollView } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Text,
+  Pressable,
+  ScrollView,
+  TextInput,
+  Platform,
+} from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { ImageType, ThemeColoursPrimary } from "../Constants/UI";
 import { useSelector } from "react-redux";
@@ -13,6 +21,46 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import Feather from "@expo/vector-icons/Feather";
 import Loader from "./Loader";
 import { copyShareLink, sharePost } from "../Util/Services";
+import Animated, { SlideInDown, SlideInUp } from "react-native-reanimated";
+
+const Participant = memo(({ user, onPressConversation }: any) => {
+  const [isSelected, setIsSelected] = useState(false);
+
+  const handlePress = () => {
+    setIsSelected((prev) => !prev);
+  };
+
+  useEffect(() => {
+    if (isSelected) {
+      onPressConversation(user.otherParticipantId);
+    } else {
+      onPressConversation();
+    }
+  }, [isSelected]);
+
+  return (
+    <Pressable
+      key={user.conversationId}
+      style={styles.userProfileWrapper}
+      onPressIn={handlePress}
+    >
+      <View style={styles.profileContainer}>
+        <ProfilePicture
+          uri={user.userDetails.profilePictureUrl}
+          userDisplayName={user.userDetails.displayName}
+          type={ImageType.Contacts}
+        />
+        {isSelected && (
+          <View style={styles.checkIcon}>
+            <Feather name="check" size={16} color="white" />
+          </View>
+        )}
+      </View>
+      <Text>{user.userDetails.displayName}</Text>
+    </Pressable>
+  );
+});
+
 const SharePost = ({
   setIsDrawerOpen,
   navigation,
@@ -25,6 +73,7 @@ const SharePost = ({
   });
   const sharePostDrawer = useRef<any>(null);
   const [conversationUsers, setConversationUsers] = useState<any>(null);
+  const [selectedConversation, setSelectedConversation] = useState<any>(null);
 
   useEffect(() => {
     sharePostDrawer.current.showDrawer();
@@ -36,7 +85,6 @@ const SharePost = ({
 
   const retrieveConversations = async () => {
     const conversations = await getUserConversations(appUserId!);
-    // setConversationData();
     const conversationUsersData = await Promise.all(
       getOtherParticipants(conversations, appUserId).map(
         async (conversation: any) =>
@@ -70,6 +118,14 @@ const SharePost = ({
     setModalVisible(true);
   };
 
+  const onPressConversation = (userId: any) => {
+    if (userId) {
+      setSelectedConversation(userId);
+    } else {
+      setSelectedConversation(null);
+    }
+  };
+
   return (
     <BottomDrawer
       ref={sharePostDrawer}
@@ -94,14 +150,12 @@ const SharePost = ({
             showsHorizontalScrollIndicator={false}
           >
             {conversationUsers.map((user: any) => (
-              <View key={user.conversationId} style={styles.userProfileWrapper}>
-                <ProfilePicture
-                  uri={user.userDetails.profilePictureUrl}
-                  userDisplayName={user.userDetails.displayName}
-                  type={ImageType.Contacts}
-                />
-                <Text>{user.userDetails.displayName}</Text>
-              </View>
+              <Participant
+                key={user.conversationId}
+                user={user}
+                onPressConversation={onPressConversation}
+                isSelected={selectedConversation === user.otherParticipantId}
+              />
             ))}
           </ScrollView>
         ) : (
@@ -109,40 +163,52 @@ const SharePost = ({
             <Loader size="small" color={ThemeColoursPrimary.LogoColour} />
           </View>
         )}
-
         <View style={styles.divider} />
-
-        <ScrollView
-          contentContainerStyle={styles.shareActionContainer}
-          horizontal
-        >
-          <View style={styles.actionButtonWrapper}>
-            <Pressable
-              style={styles.shareOptionButtonBase}
-              onPressIn={onPressCopyLink}
-            >
-              <AntDesign
-                name="link"
-                size={24}
-                color={ThemeColoursPrimary.PrimaryColour}
-              />
-            </Pressable>
-            <Text style={styles.actionText}>Copy link</Text>
-          </View>
-          <Pressable
-            style={styles.actionButtonWrapper}
-            onPressIn={onPressExternalShare}
-          >
-            <View style={styles.shareOptionButtonBase}>
-              <Feather
-                name="share"
-                size={24}
-                color={ThemeColoursPrimary.PrimaryColour}
+        {selectedConversation ? (
+          <Animated.View entering={SlideInDown.duration(300)}>
+            <View style={styles.messageBarContainer}>
+              <TextInput
+                placeholder="Write a message..."
+                style={styles.messageBarInput}
               />
             </View>
-            <Text style={styles.actionText}>Share</Text>
-          </Pressable>
-        </ScrollView>
+            <Pressable style={styles.sendButton}>
+              <Text style={styles.sendButtonText}>Send</Text>
+            </Pressable>
+          </Animated.View>
+        ) : (
+          <ScrollView
+            contentContainerStyle={styles.shareActionContainer}
+            horizontal
+          >
+            <View style={styles.actionButtonWrapper}>
+              <Pressable
+                style={styles.shareOptionButtonBase}
+                onPressIn={onPressCopyLink}
+              >
+                <AntDesign
+                  name="link"
+                  size={24}
+                  color={ThemeColoursPrimary.PrimaryColour}
+                />
+              </Pressable>
+              <Text style={styles.actionText}>Copy link</Text>
+            </View>
+            <Pressable
+              style={styles.actionButtonWrapper}
+              onPressIn={onPressExternalShare}
+            >
+              <View style={styles.shareOptionButtonBase}>
+                <Feather
+                  name="share"
+                  size={24}
+                  color={ThemeColoursPrimary.PrimaryColour}
+                />
+              </View>
+              <Text style={styles.actionText}>Share</Text>
+            </Pressable>
+          </ScrollView>
+        )}
       </View>
     </BottomDrawer>
   );
@@ -163,23 +229,24 @@ const styles = StyleSheet.create({
   usersContainer: {
     flexDirection: "row",
     alignItems: "center",
-    height: 90,
+    height: Platform.OS === "android" ? 90 : 110,
   },
   userProfileWrapper: {
     alignItems: "center",
     marginHorizontal: 6,
   },
   divider: {
-    borderBottomWidth: 0.6,
-    borderColor: ThemeColoursPrimary.SecondaryColour + "20",
-    width: "100%",
-    height: 0.8,
+    height: 1,
+    width: "98%", // Same width as the TouchableOpacity
+    backgroundColor: ThemeColoursPrimary.SecondaryColour, // Gray line color
+    alignSelf: "center",
+    opacity: 0.15,
   },
   shareActionContainer: {
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    height: 90,
+    height: Platform.OS === "android" ? 90 : 110,
   },
   shareOptionButtonBase: {
     justifyContent: "center",
@@ -190,7 +257,6 @@ const styles = StyleSheet.create({
     backgroundColor: ThemeColoursPrimary.LogoColour,
   },
   actionButtonWrapper: {
-    // paddingHorizontal: 10,
     marginHorizontal: 6,
     alignItems: "center",
     gap: 2,
@@ -198,6 +264,51 @@ const styles = StyleSheet.create({
   actionText: {
     fontSize: 12,
     color: ThemeColoursPrimary.SecondaryColour + 100,
+  },
+  messageBarContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderRadius: 10,
+    backgroundColor: "#f0f0f0",
+    paddingVertical: 8,
+    marginHorizontal: 8,
+    marginTop: 8,
+    marginBottom: 4,
+  },
+  messageBarInput: {
+    flex: 1,
+    fontSize: 16,
+    paddingHorizontal: 10,
+    color: "#333",
+    height: 28,
+  },
+  sendButton: {
+    backgroundColor: ThemeColoursPrimary.LogoColour, // Linkify's theme color
+    borderRadius: 10,
+    marginTop: 4,
+    paddingVertical: Platform.OS === "android" ? 4 : 10,
+    alignItems: "center",
+    justifyContent: "center",
+    marginHorizontal: 8,
+  },
+  sendButtonText: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  profileContainer: {
+    position: "relative",
+  },
+  checkIcon: {
+    position: "absolute",
+    justifyContent: "center",
+    alignItems: "center",
+    bottom: 0,
+    right: -2,
+    width: 18,
+    height: 18,
+    borderRadius: 20,
+    backgroundColor: "green",
   },
 });
 export default SharePost;

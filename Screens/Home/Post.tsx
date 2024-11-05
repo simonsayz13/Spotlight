@@ -84,56 +84,58 @@ const Post = ({ navigation, route }: any) => {
           openKeyboard={openKeyboard}
           setReplyingTo={setReplyingTo}
         />
-        <View style={[styles.bottomView, { height: bottomHeight }]}>
-          <PostInteractionBar
-            ref={postInteractionBarRef}
-            postData={postData}
-            replyingTo={replyingTo}
-            setReplyingTo={setReplyingTo}
-            setBottomHeight={setBottomHeight}
-          />
-        </View>
-      </KeyboardAvoidingView>
 
-      <MessageModal
-        message={modalMessage} // Adjust this message as needed
-        visible={modalVisible}
-        setModalVisible={setModalVisible}
-      />
+        {!isDrawerOpen && (
+          <View style={[styles.bottomView, { height: bottomHeight }]}>
+            <PostInteractionBar
+              ref={postInteractionBarRef}
+              postData={postData}
+              replyingTo={replyingTo}
+              setReplyingTo={setReplyingTo}
+              setBottomHeight={setBottomHeight}
+            />
+          </View>
+        )}
 
-      {isDrawerOpen && (
-        <Animated.View
-          style={[styles.overlay, { opacity: overlayOpacity }]}
-          pointerEvents="auto"
-        >
-          <TouchableOpacity
-            style={styles.overlayTouchable}
-            activeOpacity={1}
-            onPress={hideSettingDrawer} // Close drawer on overlay press
-          />
-        </Animated.View>
-      )}
-
-      {isOptionsDrawer && (
-        <PostOptions
-          setIsDrawerOpen={setIsOptionsDrawer}
-          navigation={navigation}
-          setIsLoading={setIsLoading}
-          postData={postData}
-        />
-      )}
-
-      {isShareDrawer && (
-        <SharePost
-          setIsDrawerOpen={setIsShareDrawer}
-          navigation={navigation}
-          postData={postData}
+        <MessageModal
+          message={modalMessage} // Adjust this message as needed
+          visible={modalVisible}
           setModalVisible={setModalVisible}
-          setModalMessage={setModalMessage}
         />
-      )}
 
-      <ActivityLoader indicator={isLoading} text="Deleting" />
+        {isDrawerOpen && (
+          <Animated.View
+            style={[styles.overlay, { opacity: overlayOpacity }]}
+            pointerEvents="auto"
+          >
+            <TouchableOpacity
+              style={styles.overlayTouchable}
+              activeOpacity={1}
+              onPress={hideSettingDrawer} // Close drawer on overlay press
+            />
+          </Animated.View>
+        )}
+
+        {isOptionsDrawer && (
+          <PostOptions
+            setIsDrawerOpen={setIsOptionsDrawer}
+            navigation={navigation}
+            setIsLoading={setIsLoading}
+            postData={postData}
+          />
+        )}
+
+        {isShareDrawer && (
+          <SharePost
+            setIsDrawerOpen={setIsShareDrawer}
+            navigation={navigation}
+            postData={postData}
+            setModalVisible={setModalVisible}
+            setModalMessage={setModalMessage}
+          />
+        )}
+        <ActivityLoader indicator={isLoading} text="Deleting" />
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };

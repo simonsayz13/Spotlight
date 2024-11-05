@@ -129,16 +129,16 @@ const styles = StyleSheet.create({
   postActionContainer: {
     flex: 1,
     flexDirection: "row",
-    paddingVertical: 8,
+    alignItems: "center",
     gap: 14,
     paddingHorizontal: 8,
   },
   optionButtonBase: {
     justifyContent: "center",
     alignItems: "center",
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     backgroundColor: ThemeColoursPrimary.LogoColour,
   },
   actionButtonWrapper: {
