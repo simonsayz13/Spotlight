@@ -1,14 +1,68 @@
-import React from "react";
+import React, { memo, useEffect, useState } from "react";
 import { View, Text, StyleSheet, Dimensions } from "react-native";
-import { ImageType, ThemeColoursPrimary } from "../Constants/UI";
+import {
+  HomeStackScreens,
+  ImageType,
+  ThemeColoursPrimary,
+} from "../Constants/UI";
 import { useSelector } from "react-redux";
 import { RootState } from "../Redux/store";
 import ProfilePicture from "./ProfilePicture";
+import PostCard from "./PostCard";
+import { getPostById, getUserDetails } from "../Firebase/firebaseFireStore";
 
 const { width: windowWidth } = Dimensions.get("window");
 
+const SharePostMessage = memo(
+  ({ postData, openPost, message, currentUserId }: any) => {
+    const marginStyle = {
+      marginLeft: message.senderId === currentUserId ? 0 : 4,
+      marginRight: message.senderId === currentUserId ? 4 : 0,
+    };
+    return (
+      <View>
+        <View style={[styles.postCardContainer, marginStyle]}>
+          <PostCard postData={postData} openPost={openPost} />
+        </View>
+        {message.text !== "" && (
+          <View
+            style={[
+              styles.postMessageContainer,
+              marginStyle,
+              {
+                backgroundColor:
+                  message.senderId === currentUserId
+                    ? ThemeColoursPrimary.LogoColour
+                    : "#e5e5ea",
+                alignSelf:
+                  message.senderId === currentUserId
+                    ? "flex-end"
+                    : "flex-start",
+              },
+            ]}
+          >
+            <Text
+              style={[
+                styles.postMessageText,
+                {
+                  color:
+                    message.senderId === currentUserId
+                      ? ThemeColoursPrimary.PrimaryColour
+                      : ThemeColoursPrimary.SecondaryColour,
+                },
+              ]}
+            >
+              {message.text}
+            </Text>
+          </View>
+        )}
+      </View>
+    );
+  }
+);
+
 const Message = React.memo(
-  ({ message, profilePicUrl, userDisplayName }: any) => {
+  ({ message, profilePicUrl, userDisplayName, navigation }: any) => {
     const {
       userId: currentUserId,
       userProfilePhotoURL,
@@ -17,6 +71,31 @@ const Message = React.memo(
 
     const isHeader = message.type === "header";
     const isTime = message.type === "time";
+    const [postData, setPostData] = useState<any>();
+
+    const openPost = (postData: any) => {
+      navigation.navigate(HomeStackScreens.Post, {
+        postData,
+      });
+    };
+
+    const retrievePost = async (postId: string) => {
+      const post = await getPostById(postId);
+      const userDetails: any = await getUserDetails(post.user_id); // Assuming user_id is available in post
+      setPostData({
+        ...post,
+        userDisplayName: userDetails.display_name,
+        userProfilePic: userDetails.profile_picture_url,
+      });
+    };
+
+    useEffect(() => {
+      if (message.postId) {
+        retrievePost(message.postId);
+      } else {
+        setPostData(null); // Reset postData if no postId
+      }
+    }, [message]);
 
     return (
       <View
@@ -57,25 +136,34 @@ const Message = React.memo(
               type={ImageType.Post}
             />
 
-            <Text
-              style={[
-                styles.messageText,
-                {
-                  backgroundColor:
-                    message.senderId === currentUserId
-                      ? ThemeColoursPrimary.LogoColour
-                      : "#e5e5ea",
-                  color:
-                    message.senderId === currentUserId
-                      ? ThemeColoursPrimary.PrimaryColour
-                      : ThemeColoursPrimary.SecondaryColour,
-                  marginLeft: message.senderId === currentUserId ? 0 : 4,
-                  marginRight: message.senderId === currentUserId ? 4 : 0,
-                },
-              ]}
-            >
-              {message.text}
-            </Text>
+            {postData ? (
+              <SharePostMessage
+                postData={postData}
+                openPost={openPost}
+                message={message}
+                currentUserId={currentUserId}
+              />
+            ) : (
+              <Text
+                style={[
+                  styles.messageText,
+                  {
+                    backgroundColor:
+                      message.senderId === currentUserId
+                        ? ThemeColoursPrimary.LogoColour
+                        : "#e5e5ea",
+                    color:
+                      message.senderId === currentUserId
+                        ? ThemeColoursPrimary.PrimaryColour
+                        : ThemeColoursPrimary.SecondaryColour,
+                    marginLeft: message.senderId === currentUserId ? 0 : 4,
+                    marginRight: message.senderId === currentUserId ? 4 : 0,
+                  },
+                ]}
+              >
+                {message.text}
+              </Text>
+            )}
           </>
         )}
       </View>
@@ -93,12 +181,10 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
   },
   messageText: {
-    paddingHorizontal: 10,
-    paddingVertical: 10,
+    padding: 10,
     fontSize: 14,
     fontWeight: "500",
     borderRadius: 10,
-    color: ThemeColoursPrimary.SecondaryColour,
     overflow: "hidden",
   },
   timeStampText: {
@@ -110,6 +196,19 @@ const styles = StyleSheet.create({
     width: 40, // Width and height should be the same
     height: 40,
     borderRadius: 50, // Half of the width or height for a perfect circle
+  },
+  postCardContainer: { width: windowWidth * 0.5 },
+  postMessageContainer: {
+    padding: 10,
+    marginVertical: 6,
+    borderRadius: 8,
+    fontWeight: "500",
+    maxWidth: "80%",
+  },
+  postMessageText: {
+    fontSize: 14,
+    fontWeight: "500",
+    overflow: "hidden",
   },
 });
 

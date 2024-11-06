@@ -13,7 +13,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { ImageType, ThemeColoursPrimary } from "../Constants/UI";
 import { useSelector } from "react-redux";
 import { RootState } from "../Redux/store";
-import { getUserConversations } from "../Firebase/FirebaseChat";
+import { getUserConversations, sendMessage } from "../Firebase/FirebaseChat";
 import { getOtherParticipants } from "../Util/utility";
 import { getUserProfileDetails } from "../Firebase/FirebaseUsers";
 import ProfilePicture from "./ProfilePicture";
@@ -21,22 +21,15 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import Feather from "@expo/vector-icons/Feather";
 import Loader from "./Loader";
 import { copyShareLink, sharePost } from "../Util/Services";
-import Animated, { SlideInDown, SlideInUp } from "react-native-reanimated";
+import Animated, { SlideInDown } from "react-native-reanimated";
 
 const Participant = memo(({ user, onPressConversation }: any) => {
   const [isSelected, setIsSelected] = useState(false);
 
   const handlePress = () => {
     setIsSelected((prev) => !prev);
+    onPressConversation(user);
   };
-
-  useEffect(() => {
-    if (isSelected) {
-      onPressConversation(user.otherParticipantId);
-    } else {
-      onPressConversation();
-    }
-  }, [isSelected]);
 
   return (
     <Pressable
@@ -73,7 +66,10 @@ const SharePost = ({
   });
   const sharePostDrawer = useRef<any>(null);
   const [conversationUsers, setConversationUsers] = useState<any>(null);
-  const [selectedConversation, setSelectedConversation] = useState<any>(null);
+  const [selectedConversation, setSelectedConversation] = useState<Array<any>>(
+    []
+  );
+  const [shareMessage, setShareMessage] = useState<string>("");
 
   useEffect(() => {
     sharePostDrawer.current.showDrawer();
@@ -106,23 +102,51 @@ const SharePost = ({
 
   const onPressExternalShare = async () => {
     await sharePost(postData);
-    onPressClose();
     setModalMessage("Post shared successfully!");
-    setModalVisible(true);
+    closeShareSheet();
   };
 
   const onPressCopyLink = async () => {
     await copyShareLink(postData);
-    onPressClose();
     setModalMessage("Link copied to clipboard.");
+    closeShareSheet();
+  };
+
+  const closeShareSheet = () => {
+    setSelectedConversation([]);
+    onPressClose();
     setModalVisible(true);
   };
 
-  const onPressConversation = (userId: any) => {
-    if (userId) {
-      setSelectedConversation(userId);
+  const onPressConversation = (user: any) => {
+    if (selectedConversation.includes(user)) {
+      setSelectedConversation((prevArray) =>
+        prevArray.filter(
+          (arrayUser) => arrayUser.conversationId != user.conversationId
+        )
+      );
     } else {
-      setSelectedConversation(null);
+      setSelectedConversation((prevArray) => [...prevArray, user]);
+    }
+  };
+
+  const onPressSend = async () => {
+    try {
+      for (const conversation of selectedConversation) {
+        const { conversationId } = conversation;
+        console.log(conversationId);
+        await sendMessage(
+          conversationId,
+          appUserId!,
+          shareMessage,
+          postData.id
+        );
+      }
+      setModalMessage("Post shared successfully!");
+    } catch (error) {
+      setModalMessage("An error occurred while sharing the post.");
+    } finally {
+      closeShareSheet();
     }
   };
 
@@ -164,15 +188,18 @@ const SharePost = ({
           </View>
         )}
         <View style={styles.divider} />
-        {selectedConversation ? (
+        {selectedConversation.length > 0 ? (
           <Animated.View entering={SlideInDown.duration(300)}>
             <View style={styles.messageBarContainer}>
               <TextInput
+                onChangeText={(text) => {
+                  setShareMessage(text);
+                }}
                 placeholder="Write a message..."
                 style={styles.messageBarInput}
               />
             </View>
-            <Pressable style={styles.sendButton}>
+            <Pressable style={styles.sendButton} onPressIn={onPressSend}>
               <Text style={styles.sendButtonText}>Send</Text>
             </Pressable>
           </Animated.View>

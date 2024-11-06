@@ -56,7 +56,8 @@ export const createOrGetChatRoom = async (
 export const sendMessage = async (
   chatId: string,
   senderId: string,
-  text: string
+  text: string,
+  postId = null
 ) => {
   try {
     // Reference the chat room document
@@ -74,7 +75,9 @@ export const sendMessage = async (
       text,
       timestamp: new Date().toISOString(), // Use server timestamp for consistency
       read: false,
+      postId,
     };
+    console.log(newMessage);
 
     // Add the new message document to the messages subcollection
     const newMessageRef = doc(messagesCollectionRef); // Generate a unique document reference

@@ -100,16 +100,15 @@ export const clusterMessages = (messages: any) => {
           text: format(currentTimeStamp, "HH:mm"), // Format the time
         });
       }
-    } else {
-      // Add a new cluster for messages older than 24 hours
-      if (!lastTimeStamp || !isSameMinute(lastTimeStamp, currentTimeStamp)) {
-        clusteredMessages.push({
-          type: "header",
-          text: format(currentTimeStamp, "MMMM d, HH:mm"), // Format the date
-        });
-      }
+    } else if (
+      !lastTimeStamp ||
+      !isSameMinute(lastTimeStamp, currentTimeStamp)
+    ) {
+      clusteredMessages.push({
+        type: "header",
+        text: format(currentTimeStamp, "MMMM d, HH:mm"), // Format the date
+      });
     }
-
     // Add the message itself
     clusteredMessages.push(message);
     lastTimeStamp = currentTimeStamp; // Update the last timestamp

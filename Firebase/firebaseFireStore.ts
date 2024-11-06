@@ -86,8 +86,8 @@ export const getUserDetails = async (
       if (followersRef && followersRef.length > 0) {
         // Retrieve all the users being followed
         followers = await Promise.all(
-          followersRef.map(async (userRef) => {
-            const followerSnap = await getDoc(userRef);
+          followersRef.map(async (userRef: any) => {
+            const followerSnap: any = await getDoc(userRef);
             return followerSnap.data().user_id;
           })
         );
@@ -96,8 +96,8 @@ export const getUserDetails = async (
       if (followingsRef && followingsRef.length > 0) {
         // Retrieve all the users being followed
         followings = await Promise.all(
-          followingsRef.map(async (userRef) => {
-            const followingSnap = await getDoc(userRef);
+          followingsRef.map(async (userRef: any) => {
+            const followingSnap: any = await getDoc(userRef);
             return followingSnap.data().user_id;
           })
         );
@@ -310,6 +310,24 @@ export const getPostMetrics = async (
   } catch (error) {
     console.error("Error fetching field value: ", error);
     return null;
+  }
+};
+
+export const getPostById = async (postId: string) => {
+  const postRef = doc(db, FireStoreCollections.Posts, postId);
+
+  try {
+    const postSnapshot = await getDoc(postRef); // Retrieve the document snapshot
+
+    if (postSnapshot.exists()) {
+      return { ...postSnapshot.data() };
+    } else {
+      console.log("No such document!");
+      return {};
+    }
+  } catch (error) {
+    console.error("Error fetching field value: ", error);
+    return {};
   }
 };
 

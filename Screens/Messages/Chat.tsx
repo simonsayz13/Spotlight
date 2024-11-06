@@ -134,6 +134,7 @@ const Chat = ({ route, navigation }: any) => {
               message={message}
               profilePicUrl={profilePicUrl}
               userDisplayName={userName}
+              navigation={navigation}
             />
           )}
           contentContainerStyle={styles.messagesList}

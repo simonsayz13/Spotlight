@@ -55,7 +55,6 @@ const BottomDrawer = forwardRef(
     ).current;
 
     const showDrawer = () => {
-      console.log("he");
       Animated.timing(slideAnim, {
         toValue: 0, // Final position
         duration: 300, // Adjust the duration for a smooth transition
