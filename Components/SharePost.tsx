@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { ImageType, ThemeColoursPrimary } from "../Constants/UI";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../Redux/store";
 import { getUserConversations, sendMessage } from "../Firebase/FirebaseChat";
 import { getOtherParticipants } from "../Util/utility";
@@ -64,6 +64,7 @@ const SharePost = ({
   const { userId: appUserId } = useSelector((state: RootState) => {
     return state.user;
   });
+  const otherUsers = useSelector((state: RootState) => state.otherUsers);
   const sharePostDrawer = useRef<any>(null);
   const [conversationUsers, setConversationUsers] = useState<any>(null);
   const [selectedConversation, setSelectedConversation] = useState<Array<any>>(
@@ -71,6 +72,7 @@ const SharePost = ({
   );
   const [shareMessage, setShareMessage] = useState<string>("");
 
+  const dispatch = useDispatch();
   useEffect(() => {
     sharePostDrawer.current.showDrawer();
   }, []);
@@ -84,13 +86,15 @@ const SharePost = ({
     const conversationUsersData = await Promise.all(
       getOtherParticipants(conversations, appUserId).map(
         async (conversation: any) =>
-          await getUserProfileDetails(conversation.otherParticipantId).then(
-            (userDetails) => ({
-              conversationId: conversation.conversationId,
-              otherParticipantId: conversation.otherParticipantId,
-              userDetails, // This includes displayName and profile_picture
-            })
-          )
+          await getUserProfileDetails(
+            conversation.otherParticipantId,
+            otherUsers,
+            dispatch
+          ).then((userDetails) => ({
+            conversationId: conversation.conversationId,
+            otherParticipantId: conversation.otherParticipantId,
+            userDetails, // This includes displayName and profile_picture
+          }))
       )
     );
     setConversationUsers(conversationUsersData);

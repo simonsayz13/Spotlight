@@ -13,12 +13,11 @@ import {
   ProfileStackScreens,
   ThemeColoursPrimary,
 } from "../Constants/UI";
-import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { useSelector } from "react-redux";
 import ProfilePicture from "./ProfilePicture";
 import { RootState } from "../Redux/store";
 import Feather from "@expo/vector-icons/Feather";
-
+import EvilIcons from "@expo/vector-icons/EvilIcons";
 const TopNavigationBarPost = ({
   navigation,
   postData,
@@ -75,13 +74,8 @@ const TopNavigationBarPost = ({
           <TouchableOpacity style={styles.button}>
             <Text style={styles.buttonText}>Follow</Text>
           </TouchableOpacity>
-
           <Pressable onPressIn={onShareClicked}>
-            <FontAwesome6
-              name="arrow-up-right-from-square"
-              size={22}
-              color={ThemeColoursPrimary.SecondaryColour}
-            />
+            <EvilIcons name="share-apple" size={44} color="black" />
           </Pressable>
         </View>
       ) : (
@@ -128,8 +122,6 @@ const styles = StyleSheet.create({
   followShareWrapper: {
     alignItems: "center",
     flexDirection: "row",
-    gap: 10,
-    marginRight: 10,
   },
   button: {
     padding: 8,

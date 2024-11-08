@@ -32,6 +32,7 @@ import {
   addToFollowings,
   removeFromFollowings,
 } from "../Redux/Slices/userSlice";
+import { createTimeStamp } from "../Util/utility";
 
 const db = firestoreDB;
 
@@ -260,7 +261,7 @@ export const updateUserPostMetric = async (
     if (action === FireStoreAction.Add)
       func = setDoc(metricRef, {
         liked: true,
-        timestamp: Timestamp.now(),
+        timestamp: createTimeStamp(),
       });
 
     if (action === FireStoreAction.Remove) func = await deleteDoc(metricRef);

@@ -1,26 +1,26 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { StyleSheet, Alert, RefreshControl, View, Text } from "react-native";
 import PostCard from "../../Components/PostCard";
-import {
-  getPaginatedPosts,
-  getUserDetails,
-} from "../../Firebase/firebaseFireStore";
+import { getPaginatedPosts } from "../../Firebase/firebaseFireStore";
 import { HomeStackScreens, ThemeColoursPrimary } from "../../Constants/UI";
 import { setPosts } from "../../Redux/Slices/postsSlices";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import store, { RootState } from "../../Redux/store";
 import { MasonryFlashList } from "@shopify/flash-list";
 import FadeInWrapper from "../../Components/FadeInWrapper";
 import Loader from "../../Components/Loader";
+import { getUserProfileDetails } from "../../Firebase/FirebaseUsers";
 
 const Contents = (props: any) => {
   const { content, navigation, showSearchBar, searchText, onScroll } = props;
   const [refreshing, setRefreshing] = useState(false);
   const { posts } = useSelector((state: RootState) => state.posts);
+  const otherUsers = useSelector((state: RootState) => state.otherUsers);
   const [filteredPosts, setFilteredPosts] = useState<Array<any>>([]);
   const [displayList, setDisplayList] = useState<boolean>(false);
   const [bottomLoader, setBottomLoader] = useState<boolean>(false);
   const [lastVisible, setLastVisible] = useState<any>(null);
+  const dispatch = useDispatch();
 
   const fetchInitialPosts = async () => {
     try {
@@ -41,11 +41,15 @@ const Contents = (props: any) => {
   const fetchUserDetailOnPosts = async (fetchedPosts: any) => {
     return await Promise.all(
       fetchedPosts.map(async (post: any) => {
-        const userDetails: any = await getUserDetails(post.user_id); // Assuming user_id is available in post
+        let userDetails: any = await getUserProfileDetails(
+          post.user_id,
+          otherUsers,
+          dispatch
+        );
         return {
           ...post,
-          userDisplayName: userDetails.display_name,
-          userProfilePic: userDetails.profile_picture_url,
+          userDisplayName: userDetails.displayName,
+          userProfilePic: userDetails.profilePictureUrl,
         };
       })
     );

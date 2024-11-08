@@ -32,7 +32,7 @@ import ActivityLoader from "../../Components/ActivityLoader";
 import BottomSheet from "../../Components/BottomSheet";
 import { getLocation, getLocationPermission } from "../../Util/LocationService";
 import ImagePreviewCarousel from "../../Components/ImagePreviewCarousel";
-import { createMediaData } from "../../Util/utility";
+import { createMediaData, createTimeStamp } from "../../Util/utility";
 import BottomDrawer from "../../Components/BottomDrawer";
 import TagSelection from "../../Components/TagSelection";
 import PostOptionsMenuBar from "../../Components/PostOptionsMenuBar";
@@ -94,9 +94,10 @@ const CreatePost = ({ navigation, route }: any) => {
     }
     const uploadedImageURLs = await uploadImages(photoArray);
     const media = await createMediaData(uploadedImageURLs);
+    const timeStamp = createTimeStamp();
     const postData = {
       media,
-      timeStamp: new Date().toISOString(),
+      timeStamp,
       title,
       description,
       likes: 0,

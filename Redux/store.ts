@@ -12,6 +12,7 @@ import {
 } from "redux-persist/es/constants";
 import postsReducer from "./Slices/postsSlices";
 import chatReducer from "./Slices/chatSlices";
+import otherUsersReducer from "./Slices/otherUsersSlice";
 
 const persistConfig = {
   key: "root",
@@ -23,6 +24,7 @@ const rootReducer = combineReducers({
   user: userReducer,
   posts: postsReducer,
   chats: chatReducer,
+  otherUsers: otherUsersReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

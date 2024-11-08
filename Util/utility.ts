@@ -135,3 +135,7 @@ export const getOtherParticipants = (conversations: any, userId: any) => {
     };
   });
 };
+
+export const createTimeStamp = () => {
+  return new Date().toString();
+};
