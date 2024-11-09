@@ -16,6 +16,7 @@ import {
   FollowStackScreens,
   Gender,
   HomeStackScreens,
+  ImageType,
   MainStacks,
   ProfileStackScreens,
   ThemeColoursPrimary,
@@ -29,14 +30,12 @@ import {
   getUserDetails,
   getPostsByUserId,
 } from "../../Firebase/firebaseFireStore";
-import { Image } from "expo-image";
-import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import ProfileStackScreen from "../../Navigation/Stacks/ProfileStack";
 import { MasonryFlashList } from "@shopify/flash-list";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import ProfilePicture from "../../Components/ProfilePicture";
+import ImageModal from "../../Components/ImageModal";
 const Profile = ({ navigation }: any) => {
   const [buttonStates, setButtonStates] = useState(userContentSelectorButtons);
-
   const {
     userId,
     userBio,
@@ -51,10 +50,9 @@ const Profile = ({ navigation }: any) => {
   const [bio, setBio] = useState(userBio);
   const [gender, setGender] = useState("");
   const [followers, setFollowers] = useState([]);
-  // const [followings, setfollowings] = useState([]);
   const [ldgUserDetails, setLdgUserDetails] = useState(false);
   const [ldgSuccUserDetails, setLdgSuccUserDetails] = useState(false);
-
+  const [isGalleryVisible, setIsGalleryVisible] = useState(false);
   let heightAnim = useRef(new Animated.Value(200)).current;
 
   useEffect(() => {
@@ -116,7 +114,6 @@ const Profile = ({ navigation }: any) => {
         biography,
         gender,
         followers,
-        followings,
       } = data;
 
       setDisplayName(display_name);
@@ -124,7 +121,6 @@ const Profile = ({ navigation }: any) => {
       setBio(biography);
       setGender(gender);
       setFollowers(followers);
-      // setfollowings(followings);
       setLdgUserDetails(false);
       setLdgSuccUserDetails(true);
     });
@@ -157,14 +153,6 @@ const Profile = ({ navigation }: any) => {
     });
   };
 
-  const openChat = () => {
-    navigation.navigate(MessagingStackScreens.Chat, {
-      userId: opId,
-      userName: displayName,
-      profilePicUrl,
-    });
-  };
-
   const openFollowerScreen = (tabIndex) => {
     navigation.navigate("FollowStack", {
       screen: FollowStackScreens.FollowerList,
@@ -181,30 +169,6 @@ const Profile = ({ navigation }: any) => {
     });
   };
 
-  const handlePressFollowBtn = async () => {
-    try {
-      await addFollower(profileUserId, appUserID);
-      setIsFollowed(true);
-      setFollowers([...followers, appUserID]);
-    } catch (error) {
-      Alert.alert("Error", `${error}`);
-    }
-  };
-
-  const handlePressUnfollowBtn = async () => {
-    try {
-      await removeFollower(profileUserId, appUserID);
-      setIsFollowed(false);
-
-      const arr = followers?.filter(
-        (followerUserId) => followerUserId !== appUserID
-      );
-      setFollowers(arr);
-    } catch (error) {
-      Alert.alert("Error", `${error}`);
-    }
-  };
-
   const renderItem = ({ item }: any) => (
     <View style={styles.cardContainer}>
       <PostCard postData={item} openPost={openPost} navigation={navigation} />
@@ -213,13 +177,20 @@ const Profile = ({ navigation }: any) => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <ImageModal
+        imageUri={profilePicUrl}
+        isGalleryVisible={isGalleryVisible}
+        setIsGalleryVisible={setIsGalleryVisible}
+      />
+
       <Animated.View style={(styles.profileContainer, { height: heightAnim })}>
         <View style={styles.profileDetails}>
-          {!ldgUserDetails && profilePicUrl ? (
-            <Image source={{ uri: profilePicUrl }} style={styles.image} />
-          ) : (
-            <FontAwesome6 name="circle-user" size={70} color="black" />
-          )}
+          <ProfilePicture
+            uri={profilePicUrl}
+            userDisplayName={displayName}
+            type={ImageType.Profile}
+            onPressFunc={setIsGalleryVisible}
+          />
           <View
             style={{
               flexDirection: "row",
@@ -241,17 +212,8 @@ const Profile = ({ navigation }: any) => {
           <Text style={styles.metaDataFont}>IP Address: United Kingdom</Text>
         </View>
         <View style={styles.description}>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <Text style={styles.descriptionTitle}>Bio</Text>
-          </View>
           {!ldgUserDetails && (
-            <Text style={styles.descriptionText}>
+            <Text style={styles.descriptionText} numberOfLines={2}>
               {bio ?? "Add a bio in edit profile"}
             </Text>
           )}
@@ -324,7 +286,7 @@ const Profile = ({ navigation }: any) => {
           data={postsData}
           keyExtractor={(post) => post.id}
           renderItem={renderItem}
-          estimatedItemSize={10} // Estimated size for optimal performance
+          estimatedItemSize={200} // Estimated size for optimal performance
           numColumns={2} // Setting 2 columns for masonry layout
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.flashListContainer}
@@ -368,6 +330,9 @@ const styles = StyleSheet.create({
   },
   descriptionText: {
     color: ThemeColoursPrimary.SecondaryColour,
+    fontSize: 16,
+    lineHeight: 24, // Typically 1.5 times the fontSize
+    minHeight: 48,
   },
   userStatsContainer: {
     flexDirection: "row",
@@ -442,11 +407,6 @@ const styles = StyleSheet.create({
     width: "70%",
     backgroundColor: ThemeColoursPrimary.LogoColour, // Set the underline color
     borderRadius: 18,
-  },
-  image: {
-    width: 100, // Width and height should be the same
-    height: 100,
-    borderRadius: 50, // Half of the width or height for a perfect circle
   },
   flashListContainer: {
     paddingHorizontal: 2, // Padding on the sides

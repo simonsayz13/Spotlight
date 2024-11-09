@@ -263,6 +263,7 @@ const Map = ({ navigation }: any) => {
           heightPercentage={0.5}
           ref={activityFilterDrawerRef}
           isPannable={false}
+          isAbsolute
         >
           <MapFilters selectTag={selectTag} closeFilter={closeFilter} />
         </BottomDrawer>

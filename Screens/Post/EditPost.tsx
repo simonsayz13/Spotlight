@@ -15,24 +15,19 @@ import {
   KeyboardAvoidingView,
 } from "react-native";
 import {
-  HomeStackScreens,
   MiscStackScreens,
-  NavigationTabs,
-  PostStackScreens,
-  ProfileStackScreens,
+  Tags,
   ThemeColoursPrimary,
 } from "../../Constants/UI";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { uploadImages } from "../../Firebase/firebaseStorage";
 
-import { useSelector } from "react-redux";
-import { RootState } from "../../Redux/store";
-import { createPost } from "../../Firebase/firebaseFireStore";
+import { updatePost } from "../../Firebase/firebaseFireStore";
 import ActivityLoader from "../../Components/ActivityLoader";
 import BottomSheet from "../../Components/BottomSheet";
 import { getLocation, getLocationPermission } from "../../Util/LocationService";
 import ImagePreviewCarousel from "../../Components/ImagePreviewCarousel";
-import { createMediaData, createTimeStamp } from "../../Util/utility";
+import { createMediaData } from "../../Util/utility";
 import BottomDrawer from "../../Components/BottomDrawer";
 import TagSelection from "../../Components/TagSelection";
 import PostOptionsMenuBar from "../../Components/PostOptionsMenuBar";
@@ -40,34 +35,46 @@ import { ScrollView } from "react-native-gesture-handler";
 
 const { width, height } = Dimensions.get("window");
 
-const CreatePost = ({ navigation, route }: any) => {
-  const { userId } = useSelector((state: RootState) => state.user);
+const EditPost = ({ navigation, route }: any) => {
+  const {
+    id: postId,
+    title: postTitle,
+    description: postDescription,
+    isLocation: postIsLocation,
+    isComment: postIsComment,
+    isPrivate: postIsPrivate,
+    media: postMedia,
+    tags: postTags,
+  } = route.params.postData;
   const photoURI = route.params?.photoURI;
-  const [title, setTitle] = useState<string>("");
-  const [description, setDescription] = useState<string>("");
-  const [posting, setPosting] = useState<boolean>(false);
-  const [isComment, setIsComment] = useState<boolean>(true);
-  const [isLocation, setIsLocation] = useState<boolean>(false);
-  const [isPrivate, setIsPrivate] = useState<boolean>(false);
-  const [photoArray, setPhotoArray] = useState<Array<string>>([]);
-  const [tags, setTags] = useState<Array<any>>([]);
+  const mediaUrls = postMedia.map((item: any) => item.media_url);
+  const processedTags = Tags.filter((item) => postTags.includes(item.label));
+  const [title, setTitle] = useState<string>(postTitle);
+  const [description, setDescription] = useState<string>(postDescription);
+  const [isComment, setIsComment] = useState<boolean>(postIsComment);
+  const [isLocation, setIsLocation] = useState<boolean>(postIsLocation);
+  const [isPrivate, setIsPrivate] = useState<boolean>(postIsPrivate);
+  const [photoArray, setPhotoArray] = useState<Array<string>>(mediaUrls);
+  const [newPhotoArray, setNewPhotoArray] = useState<Array<string>>([]);
+  const [tags, setTags] = useState<Array<any>>(processedTags);
+  const [saving, setSaving] = useState<boolean>(false);
   const bottomDrawerRef = useRef<any>(null);
+
   const goBack = () => {
     resetStates();
     navigation.goBack();
   };
 
-  const goToCamera = () => {
-    navigation.navigate(PostStackScreens.Camera);
-  };
-
   const goToPhotoBrowser = () => {
-    navigation.navigate(MiscStackScreens.PhotoBrowser);
+    navigation.navigate(MiscStackScreens.PhotoBrowser, {
+      postData: route.params.postData,
+    });
   };
 
   useEffect(() => {
     if (photoURI) {
       setPhotoArray((prevArray) => [...prevArray, photoURI]);
+      setNewPhotoArray((prevArray) => [...prevArray, photoURI]);
       navigation.setParams({ photoURI: undefined });
     }
   }, [photoURI]);
@@ -77,7 +84,7 @@ const CreatePost = ({ navigation, route }: any) => {
     setPhotoArray([]);
     setDescription("");
     setTitle("");
-    setPosting(false);
+    setSaving(false);
     setIsComment(false);
     setIsLocation(false);
     setIsPrivate(false);
@@ -85,34 +92,31 @@ const CreatePost = ({ navigation, route }: any) => {
 
   const post = async () => {
     let coordinates = {};
-    if (!userId) {
-      return Alert.alert("Not Signed in", "Please sign in to make a post");
-    }
-    setPosting(true);
+    setSaving(true);
     if (isLocation) {
       coordinates = await getLocation();
     }
-    const uploadedImageURLs = await uploadImages(photoArray);
-    const media = await createMediaData(uploadedImageURLs);
-    const timeStamp = createTimeStamp();
-    const postData = {
+    const uploadedImageURLs = await uploadImages(newPhotoArray);
+    const newMediaData = await createMediaData(uploadedImageURLs);
+    const originalMediaData = postMedia.filter((item: any) =>
+      photoArray.includes(item.media_url)
+    );
+    const media = [...originalMediaData, ...newMediaData];
+
+    const updatedData = {
       media,
-      timeStamp,
       title,
       description,
-      likes: 0,
-      dislikes: 0,
-      favourites: 0,
-      comments: [],
       coordinates,
       isComment,
       isLocation,
       isPrivate,
+      updatedTimeStamp: new Date().toISOString(),
       tags: tags.map((tag) => tag.label),
     };
-    await createPost(userId, postData);
-    resetStates();
-    navigation.navigate(NavigationTabs.Home);
+    setSaving(false);
+    await updatePost(postId, updatedData);
+    navigation.goBack(); //navigate(NavigationTabs.Home);
   };
 
   const togglePrivateSwitch = () =>
@@ -195,7 +199,7 @@ const CreatePost = ({ navigation, route }: any) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.topBarContainer}>
-        <ActivityLoader indicator={posting} text={"Posting..."} />
+        <ActivityLoader indicator={saving} text={"Saving..."} />
         <TouchableOpacity onPressIn={goBack} style={styles.closeButton}>
           <Ionicons
             name="close"
@@ -213,7 +217,7 @@ const CreatePost = ({ navigation, route }: any) => {
           onPressIn={post}
           disabled={!title}
         >
-          <Text style={styles.buttonText}>Post</Text>
+          <Text style={styles.buttonText}>Save</Text>
         </TouchableOpacity>
       </View>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -279,7 +283,6 @@ const CreatePost = ({ navigation, route }: any) => {
       <BottomSheet
         menuBar={
           <PostOptionsMenuBar
-            goToCamera={goToCamera}
             goToPhotoBrowser={goToPhotoBrowser}
             handleShowDrawer={handleShowDrawer}
           />
@@ -405,4 +408,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export { CreatePost };
+export default EditPost;

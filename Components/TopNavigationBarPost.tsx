@@ -1,25 +1,48 @@
 import React from "react";
-import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+  Pressable,
+} from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {
+  ImageType,
   NavigationTabs,
   ProfileStackScreens,
   ThemeColoursPrimary,
 } from "../Constants/UI";
-import { Image } from "expo-image";
-import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { useSelector } from "react-redux";
-const TopNavigationBarPost = ({ navigation, postData }: any) => {
+import ProfilePicture from "./ProfilePicture";
+import { RootState } from "../Redux/store";
+import Feather from "@expo/vector-icons/Feather";
+import EvilIcons from "@expo/vector-icons/EvilIcons";
+const TopNavigationBarPost = ({
+  navigation,
+  postData,
+  onPressPostSetting,
+  onPressSharePost,
+}: any) => {
   const { userDisplayName, userProfilePic, user_id: userId } = postData;
   const { userId: appUserId } = useSelector((state: RootState) => {
     return state.user;
   });
+
   const goToProfile = () => {
     userId === appUserId
       ? navigation.navigate(NavigationTabs.Me)
       : navigation.navigate(ProfileStackScreens.ViewProfile, {
           userId,
         });
+  };
+
+  const onSettingsClicked = () => {
+    onPressPostSetting(true);
+  };
+
+  const onShareClicked = () => {
+    onPressSharePost(true);
   };
 
   return (
@@ -37,31 +60,31 @@ const TopNavigationBarPost = ({ navigation, postData }: any) => {
           />
         </TouchableOpacity>
         <TouchableOpacity style={styles.userWrapper} onPress={goToProfile}>
-          {userProfilePic ? (
-            <Image
-              source={{ uri: userProfilePic }}
-              style={styles.profileImage}
-            />
-          ) : (
-            <FontAwesome6 name="circle-user" size={40} color="black" />
-          )}
-
+          <ProfilePicture
+            uri={userProfilePic}
+            userDisplayName={userDisplayName}
+            type={ImageType.Post}
+          />
           <Text style={styles.usernameText}>{userDisplayName}</Text>
         </TouchableOpacity>
       </View>
-      <View style={styles.followShareWrapper}>
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Follow</Text>
-        </TouchableOpacity>
 
-        <TouchableOpacity>
-          <FontAwesome6
-            name="arrow-up-right-from-square"
-            size={24}
-            color="black"
-          />
-        </TouchableOpacity>
-      </View>
+      {userId !== appUserId ? (
+        <View style={styles.followShareWrapper}>
+          <TouchableOpacity style={styles.button}>
+            <Text style={styles.buttonText}>Follow</Text>
+          </TouchableOpacity>
+          <Pressable onPressIn={onShareClicked}>
+            <EvilIcons name="share-apple" size={44} color="black" />
+          </Pressable>
+        </View>
+      ) : (
+        <View style={styles.followShareWrapper}>
+          <Pressable onPressIn={onSettingsClicked}>
+            <Feather name="more-horizontal" size={26} color="black" />
+          </Pressable>
+        </View>
+      )}
     </View>
   );
 };
@@ -99,13 +122,6 @@ const styles = StyleSheet.create({
   followShareWrapper: {
     alignItems: "center",
     flexDirection: "row",
-    gap: 10,
-    marginRight: 10,
-  },
-  profileImage: {
-    width: 40, // Width and height should be the same
-    height: 42,
-    borderRadius: 50, // Half of the width or height for a perfect circle
   },
   button: {
     padding: 8,
@@ -113,7 +129,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
-    height: 36,
   },
   buttonText: {
     fontSize: 16,

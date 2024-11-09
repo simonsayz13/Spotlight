@@ -1,8 +1,14 @@
 import React, { useMemo } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import { Image } from "expo-image";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Pressable,
+} from "react-native";
 import {
   HomeStackScreens,
+  ImageType,
   NavigationTabs,
   ProfileStackScreens,
   ThemeColoursPrimary,
@@ -13,6 +19,7 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useSelector } from "react-redux";
+import ProfilePicture from "./ProfilePicture";
 const MapPostContent = ({ postData, navigation, hideModal }: any) => {
   const { userId: appUserId } = useSelector((state: RootState) => {
     return state.user;
@@ -31,7 +38,6 @@ const MapPostContent = ({ postData, navigation, hideModal }: any) => {
   const memoizedPostData = useMemo(() => postData, [postData]);
 
   const handleExpandPostPress = () => {
-    hideModal();
     navigation.navigate(HomeStackScreens.Post, {
       postData: memoizedPostData,
       customAnimation: true,
@@ -40,7 +46,6 @@ const MapPostContent = ({ postData, navigation, hideModal }: any) => {
 
   const handleUserProfilePress = () => {
     hideModal();
-    console.log(postData);
     appUserId === user_id
       ? navigation.navigate(NavigationTabs.Me)
       : navigation.navigate(ProfileStackScreens.ViewProfile, {
@@ -51,14 +56,17 @@ const MapPostContent = ({ postData, navigation, hideModal }: any) => {
   return (
     <View style={styles.container}>
       <View style={styles.userInfoContainer}>
-        <TouchableOpacity
+        <Pressable
           style={styles.userInfoContainer}
-          activeOpacity={1}
-          onPressIn={handleUserProfilePress}
+          onPress={handleUserProfilePress}
         >
-          <Image source={{ uri: userProfilePic }} style={styles.profileImage} />
+          <ProfilePicture
+            uri={userProfilePic}
+            userDisplayName={userDisplayName}
+            type={ImageType.MapPost}
+          />
           <Text style={styles.userNameText}>{userDisplayName}</Text>
-        </TouchableOpacity>
+        </Pressable>
         <View style={styles.separatorDot} />
         <Text style={styles.timeStampFont}>
           {formatRelativeTime(timeStamp)}
@@ -71,13 +79,13 @@ const MapPostContent = ({ postData, navigation, hideModal }: any) => {
               color={ThemeColoursPrimary.SecondaryColour}
             />
           </TouchableOpacity>
-          <TouchableOpacity onPressIn={handleExpandPostPress}>
+          <Pressable onPressIn={handleExpandPostPress}>
             <MaterialCommunityIcons
               name="arrow-expand"
               size={28}
               color={ThemeColoursPrimary.SecondaryColour}
             />
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </View>
       <Text style={styles.titleText} numberOfLines={1} ellipsizeMode="tail">
@@ -134,15 +142,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
-  profileImage: {
-    width: 34, // Width and height should be the same
-    height: 34,
-    borderRadius: 50, // Half of the width or height for a perfect circle
-    marginRight: 4,
-  },
   userNameText: {
     fontSize: 16,
     fontWeight: "bold",
+    marginLeft: 4,
   },
   separatorDot: {
     height: 3.5,

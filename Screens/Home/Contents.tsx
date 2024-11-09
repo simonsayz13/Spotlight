@@ -1,52 +1,77 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { StyleSheet, Alert, RefreshControl, View, Text } from "react-native";
 import PostCard from "../../Components/PostCard";
-import { getAllPosts, getUserDetails } from "../../Firebase/firebaseFireStore";
+import { getPaginatedPosts } from "../../Firebase/firebaseFireStore";
 import { HomeStackScreens, ThemeColoursPrimary } from "../../Constants/UI";
 import { setPosts } from "../../Redux/Slices/postsSlices";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import store, { RootState } from "../../Redux/store";
 import { MasonryFlashList } from "@shopify/flash-list";
 import FadeInWrapper from "../../Components/FadeInWrapper";
 import Loader from "../../Components/Loader";
+import { getUserProfileDetails } from "../../Firebase/FirebaseUsers";
 
 const Contents = (props: any) => {
   const { content, navigation, showSearchBar, searchText, onScroll } = props;
   const [refreshing, setRefreshing] = useState(false);
   const { posts } = useSelector((state: RootState) => state.posts);
-  const [filteredPosts, setFilteredPosts] = useState([]);
-  const [displayList, setDisplayList] = useState(false);
+  const otherUsers = useSelector((state: RootState) => state.otherUsers);
+  const [filteredPosts, setFilteredPosts] = useState<Array<any>>([]);
+  const [displayList, setDisplayList] = useState<boolean>(false);
+  const [bottomLoader, setBottomLoader] = useState<boolean>(false);
+  const [lastVisible, setLastVisible] = useState<any>(null);
+  const dispatch = useDispatch();
 
-  const fetchPosts = async () => {
+  const fetchInitialPosts = async () => {
     try {
-      const fetchedPosts = await getAllPosts();
-      const postsWithUserDetails = await Promise.all(
-        fetchedPosts.map(async (post: any) => {
-          const userDetails = await getUserDetails(post.user_id); // Assuming user_id is available in post
-          return {
-            ...post,
-            userDisplayName: userDetails.display_name,
-            userProfilePic: userDetails.profile_picture_url,
-          };
-        })
+      const fetchedPosts: any = await getPaginatedPosts();
+      setLastVisible(fetchedPosts.lastVisible);
+      const postsWithUserDetails = await fetchUserDetailOnPosts(
+        fetchedPosts.posts
       );
+      setFilteredPosts(postsWithUserDetails);
       store.dispatch(setPosts(postsWithUserDetails));
-      setTimeout(() => {
-        setDisplayList(true);
-      }, 100);
+      setDisplayList(true);
+      setRefreshing(false);
     } catch (error) {
       Alert.alert("Error", "Error fetching posts");
     }
   };
 
+  const fetchUserDetailOnPosts = async (fetchedPosts: any) => {
+    return await Promise.all(
+      fetchedPosts.map(async (post: any) => {
+        let userDetails: any = await getUserProfileDetails(
+          post.user_id,
+          otherUsers,
+          dispatch
+        );
+        return {
+          ...post,
+          userDisplayName: userDetails.displayName,
+          userProfilePic: userDetails.profilePictureUrl,
+        };
+      })
+    );
+  };
+
   // Refresh the contents page
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    setTimeout(() => {
-      fetchPosts();
-      setRefreshing(false);
-    }, 800); // Simulating a fetch time
+    fetchInitialPosts();
   }, []);
+
+  const loadMorePosts = async () => {
+    const fetchedPosts: any = await getPaginatedPosts(lastVisible);
+    fetchedPosts.posts.length < 10
+      ? setLastVisible(null)
+      : setLastVisible(fetchedPosts.lastVisible);
+    const postsWithUserDetails = await fetchUserDetailOnPosts(
+      fetchedPosts.posts
+    );
+    setFilteredPosts((prevPosts) => [...prevPosts, ...postsWithUserDetails]);
+    setBottomLoader(false);
+  };
 
   const openPost = (postData: any) => {
     navigation.navigate(HomeStackScreens.Post, {
@@ -56,14 +81,8 @@ const Contents = (props: any) => {
 
   // Hook for loading data
   useEffect(() => {
-    fetchPosts();
+    fetchInitialPosts();
   }, [content]);
-
-  useEffect(() => {
-    if (posts) {
-      setFilteredPosts(posts);
-    }
-  }, [posts]);
 
   // Change the display of posts based on if search bar is active
   useEffect(() => {
@@ -79,7 +98,7 @@ const Contents = (props: any) => {
     if (searchText === "") {
       return setFilteredPosts([]);
     }
-    const filtered = posts.filter((post) =>
+    const filtered = posts.filter((post: any) =>
       post?.title?.toLowerCase().includes(searchText.toLowerCase())
     );
     setFilteredPosts(filtered);
@@ -91,26 +110,42 @@ const Contents = (props: any) => {
     </View>
   );
 
+  const renderBottomLoader = () =>
+    bottomLoader && (
+      <View style={styles.bottomLoaderContainer}>
+        <Loader size="small" color={ThemeColoursPrimary.LogoColour} />
+      </View>
+    );
+
+  const onReachedEnd = () => {
+    if (lastVisible) {
+      setBottomLoader(true);
+      loadMorePosts();
+    }
+  };
+
   return displayList ? (
     <FadeInWrapper delay={1500}>
       <MasonryFlashList
         data={filteredPosts}
-        keyExtractor={(post) => post.id}
+        keyExtractor={(post: any) => post.id}
         renderItem={renderItem}
-        estimatedItemSize={1} // Estimated size for optimal performance
+        estimatedItemSize={200} // Estimated size for optimal performance
         numColumns={2} // Setting 2 columns for masonry layout
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.flashListContainer}
         onScroll={onScroll}
-        scrollEventThrottle={16}
+        ListFooterComponent={renderBottomLoader}
+        scrollEventThrottle={30}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={["#ff0000"]} // Optional: Refresh spinner color
-            progressBackgroundColor="#ffffff" // Optional: Background color of refresh spinner
+            colors={[ThemeColoursPrimary.LogoColour]} // Optional: Refresh spinner color
           />
         }
+        onEndReachedThreshold={0.2}
+        onEndReached={onReachedEnd}
       />
     </FadeInWrapper>
   ) : (
@@ -126,6 +161,11 @@ const styles = StyleSheet.create({
     flex: 1,
     marginHorizontal: 2, // Horizontal gap between the cards
     marginBottom: 4, // Vertical gap between rows
+  },
+  bottomLoaderContainer: {
+    flex: 1,
+    marginTop: 20,
+    marginBottom: 60,
   },
 });
 

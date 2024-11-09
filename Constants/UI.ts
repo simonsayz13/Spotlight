@@ -81,6 +81,7 @@ export enum ProfileStackScreens {
   LoginSignUp = "loginsignup",
   EditProfile = "editprofile",
   ViewProfile = "viewprofile",
+  EditScreen = "edit",
   SignIn = "signin",
   SignUp = "signup",
 }
@@ -105,6 +106,7 @@ export enum PostStackScreens {
   Camera = "camera",
   CreatePost = "createpost",
   ViewPhoto = "viewphoto",
+  EditPost = "editpost",
 }
 export enum MiscStackScreens {
   PhotoBrowser = "photobrowser",
@@ -123,7 +125,7 @@ export enum ThemeColoursPrimary {
   ThirdColour = "red",
   LogoColour = "#0a74da", //#ec5050
   GreyColour = "#b9b9b9",
-  BackgroundColour = "#f1f1f1",
+  BackgroundColour = "#edebeb", //"#f1f1f1",
   GoldColour = "#ffd700",
 }
 
@@ -138,7 +140,6 @@ export enum EditProfileType {
   Bio = "Bio",
   Gender = "Gender",
   Age = "Age",
-  Education = "Education",
   Location = "Location",
 }
 
@@ -147,3 +148,27 @@ export enum Gender {
   Female = "Female",
   Other = "Other",
 }
+
+export enum ImageType {
+  Profile = "profile",
+  Contacts = "contacts",
+  Post = "post",
+  PostCard = "postcard",
+  MapPost = "mappost",
+}
+
+export const ProfilePictureSize: Record<ImageType, number> = {
+  [ImageType.Profile]: 100,
+  [ImageType.Contacts]: 60,
+  [ImageType.Post]: 42,
+  [ImageType.PostCard]: 18,
+  [ImageType.MapPost]: 34,
+};
+
+export const EditProfileTypeMap: Record<EditProfileType, string> = {
+  [EditProfileType.Name]: "display_name",
+  [EditProfileType.Bio]: "biography",
+  [EditProfileType.Gender]: "gender",
+  [EditProfileType.Age]: "age",
+  [EditProfileType.Location]: "location",
+};

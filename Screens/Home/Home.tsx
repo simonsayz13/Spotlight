@@ -31,8 +31,8 @@ const HomeScreen = ({ navigation }: any) => {
   const [content, setContent] = useState("Explore");
   const [searchText, setSearchText] = useState("");
   const [showSearchBar, setShowSearchBar] = useState(false);
-  const [isMenuVisible, setIsMenuVisible] = useState(true);
-  const lastScrollY = useRef(0);
+  const [isDropDownMenuVisible, setIsDropDownMenuVisible] = useState(true);
+  let lastScrollY = 0;
   const changeContent = useCallback((content: string) => {
     setContent(content);
   }, []);
@@ -62,17 +62,16 @@ const HomeScreen = ({ navigation }: any) => {
 
   const handlePressSearchBtn = () => {
     showSearchBar ? fetchNewItem() : setShowSearchBar((prev: boolean) => !prev);
-    setIsMenuVisible(false);
+    setIsDropDownMenuVisible(false);
   };
 
   const handlePressMenuBtn = (cb: any) => {
     showSearchBar ? setShowSearchBar((prev: boolean) => !prev) : cb();
-    setIsMenuVisible(true);
+    setIsDropDownMenuVisible(true);
   };
 
   const handlePressInClearBtn = () => {
     setSearchText(""); // Reset the searchText state
-    // Keyboard.dismiss(); // Optionally dismiss the keyboard
   };
 
   useEffect(() => {
@@ -83,12 +82,14 @@ const HomeScreen = ({ navigation }: any) => {
 
   const handleScroll = (event: any) => {
     const offsetY = event.nativeEvent.contentOffset.y;
-    if (offsetY - lastScrollY.current > 20) {
-      setIsMenuVisible(false);
-    } else if (lastScrollY.current - offsetY > 20) {
-      setIsMenuVisible(true);
+    if (offsetY < lastScrollY && offsetY <= 2) {
+      setIsDropDownMenuVisible(true);
+    } else if (offsetY > lastScrollY && offsetY > 10) {
+      setIsDropDownMenuVisible(false);
+    } else {
+      setIsDropDownMenuVisible(true);
     }
-    lastScrollY.current = offsetY;
+    lastScrollY = offsetY;
   };
 
   return (
@@ -104,7 +105,7 @@ const HomeScreen = ({ navigation }: any) => {
               handlePressSearchBtn={handlePressSearchBtn}
               handlePressMenuBtn={() => handlePressMenuBtn(openDrawer)}
               handlePressInClearBtn={handlePressInClearBtn}
-              isMenuVisible={isMenuVisible}
+              isDropDownMenuVisible={isDropDownMenuVisible}
             />
             <View style={styles.contentWrapper}>
               <Contents

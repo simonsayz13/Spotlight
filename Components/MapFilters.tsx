@@ -19,11 +19,11 @@ const MapFilters = ({ selectTag, closeFilter }: any) => {
         </Text>
         <TouchableOpacity
           onPress={closeFilter}
-          style={{ alignSelf: "flex-end" }}
+          style={{ alignSelf: "flex-end", paddingRight: 8 }}
         >
           <Ionicons
             name="close"
-            size={32}
+            size={28}
             color={ThemeColoursPrimary.SecondaryColour}
           />
         </TouchableOpacity>

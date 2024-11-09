@@ -17,12 +17,8 @@ import {
   TouchableOpacity,
   Alert,
   Keyboard,
-  KeyboardAvoidingView,
 } from "react-native";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import Octicons from "@expo/vector-icons/Octicons";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { ThemeColoursPrimary } from "../Constants/UI";
 import {
@@ -97,7 +93,7 @@ const PostInteractionBar = forwardRef(
       setInputActive(true);
       Animated.timing(inputWidth, {
         toValue: screenWidth - 16, // Full width when the keyboard is open (adjust based on screen size)
-        duration: 300,
+        duration: 200,
         useNativeDriver: false,
       }).start();
     };
@@ -109,8 +105,8 @@ const PostInteractionBar = forwardRef(
 
     const handleKeyboardDidHide = () => {
       Animated.timing(inputWidth, {
-        toValue: 200, // Initial width when the keyboard is closed
-        duration: 300,
+        toValue: screenWidth * 0.5, //200, // Initial width when the keyboard is closed
+        duration: 200,
         useNativeDriver: false,
       }).start();
       setInputActive(false);
@@ -262,7 +258,6 @@ const PostInteractionBar = forwardRef(
               }
               onFocus={showKeyboard}
               onBlur={handleKeyboardDidHide}
-              placeholderTextColor={ThemeColoursPrimary.SecondaryColour}
               onChangeText={(text) => setCommentInput(text)}
               onContentSizeChange={(event) => {
                 const { contentSize } = event.nativeEvent; // Correctly accessing the contentSize
@@ -300,9 +295,7 @@ const PostInteractionBar = forwardRef(
                   }
                 />
               </TouchableOpacity>
-              <Text style={{ color: ThemeColoursPrimary.SecondaryColour }}>
-                {currentLikes}
-              </Text>
+              <Text style={styles.metricText}>{currentLikes}</Text>
             </View>
             <View style={styles.actionWrapper}>
               <TouchableOpacity onPressIn={onClickFavourite}>
@@ -316,9 +309,7 @@ const PostInteractionBar = forwardRef(
                   }
                 />
               </TouchableOpacity>
-              <Text style={{ color: ThemeColoursPrimary.SecondaryColour }}>
-                {currentFavourites}
-              </Text>
+              <Text style={styles.metricText}>{currentFavourites}</Text>
             </View>
             <View style={styles.actionWrapper}>
               <TouchableOpacity onPressIn={showKeyboard}>
@@ -328,9 +319,7 @@ const PostInteractionBar = forwardRef(
                   color={ThemeColoursPrimary.SecondaryColour}
                 />
               </TouchableOpacity>
-              <Text style={{ color: ThemeColoursPrimary.SecondaryColour }}>
-                {comments.length}
-              </Text>
+              <Text style={styles.metricText}>{comments.length}</Text>
             </View>
           </View>
         )}
@@ -350,12 +339,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 6,
     elevation: 20,
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
   },
   commentBar: {
-    backgroundColor: "#f1f1f1",
+    backgroundColor: "#f0f0f0",
     borderRadius: 8,
-    borderColor: ThemeColoursPrimary.SecondaryColour,
-    borderWidth: 1.2,
     flexDirection: "row",
     alignItems: "center",
     paddingLeft: 10,
@@ -363,7 +352,7 @@ const styles = StyleSheet.create({
   },
   input: {
     width: "100%", // Full width
-    color: ThemeColoursPrimary.SecondaryColour,
+    color: "#333",
     fontSize: 16, // Font size
     paddingVertical: 0, // Reset default padding
     paddingHorizontal: 4, // Add horizontal padding
@@ -373,13 +362,16 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    marginLeft: 4,
+    marginLeft: 10,
   },
   actionWrapper: {
-    width: 54,
     alignItems: "center",
     flexDirection: "row",
-    gap: 2,
+    gap: 4,
+  },
+  metricText: {
+    color: ThemeColoursPrimary.SecondaryColour,
+    minWidth: 24,
   },
   commentStyle: { flexDirection: "row" },
   iconContainer: {

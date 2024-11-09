@@ -17,6 +17,7 @@ import {
   Gender,
   guestContentSelectorButtons,
   HomeStackScreens,
+  ImageType,
   MessagingStackScreens,
   ThemeColoursPrimary,
 } from "../../Constants/UI";
@@ -28,10 +29,10 @@ import {
   addFollower,
   removeFollower,
 } from "../../Firebase/firebaseFireStore";
-import { useFocusEffect } from "@react-navigation/native";
-import { Image } from "expo-image";
 import { MasonryFlashList } from "@shopify/flash-list";
 import AntDesign from "@expo/vector-icons/AntDesign";
+import ProfilePicture from "../../Components/ProfilePicture";
+import ImageModal from "../../Components/ImageModal";
 const ViewProfile = ({ navigation, route }: any) => {
   const { userId: appUserId, userFollowings: appUserFollowings } = useSelector(
     (state: RootState) => {
@@ -51,7 +52,7 @@ const ViewProfile = ({ navigation, route }: any) => {
   const [isFollowed, setIsFollowed] = useState(false);
   const [ldgUserDetails, setLdgUserDetails] = useState(false);
   const [ldgSuccUserDetails, setLdgSuccUserDetails] = useState(false);
-
+  const [isGalleryVisible, setIsGalleryVisible] = useState(false);
   let heightAnim = useRef(new Animated.Value(200)).current;
 
   useEffect(() => {
@@ -179,6 +180,7 @@ const ViewProfile = ({ navigation, route }: any) => {
       Alert.alert("Error", `${error}`);
     }
   };
+
   const handleBackButtonPress = () => {
     navigation.goBack();
   };
@@ -207,24 +209,33 @@ const ViewProfile = ({ navigation, route }: any) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <TouchableOpacity
-        onPress={handleBackButtonPress}
-        style={styles.backButton}
-      >
-        <Ionicons
-          name="chevron-back"
-          size={32}
-          color={ThemeColoursPrimary.SecondaryColour}
-        />
-      </TouchableOpacity>
+      <ImageModal
+        imageUri={profilePicUrl}
+        isGalleryVisible={isGalleryVisible}
+        setIsGalleryVisible={setIsGalleryVisible}
+      />
+
       <Animated.View style={(styles.profileContainer, { height: heightAnim })}>
         <View style={styles.profileDetails}>
-          {!ldgUserDetails && profilePicUrl ? (
-            <Image source={{ uri: profilePicUrl }} style={styles.image} />
-          ) : (
-            <View style={styles.image} />
-            // <FontAwesome6 name="circle-user" size={70} color="black" />
-          )}
+          <View style={styles.profilePicBackButtonContainer}>
+            <Pressable
+              onPress={handleBackButtonPress}
+              style={styles.backButton}
+            >
+              <Ionicons
+                name="chevron-back"
+                size={32}
+                color={ThemeColoursPrimary.SecondaryColour}
+              />
+            </Pressable>
+            <ProfilePicture
+              uri={profilePicUrl}
+              userDisplayName={displayName}
+              type={ImageType.Profile}
+              onPressFunc={setIsGalleryVisible}
+            />
+          </View>
+
           <View
             style={{
               flexDirection: "row",
@@ -450,11 +461,6 @@ const styles = StyleSheet.create({
     backgroundColor: ThemeColoursPrimary.LogoColour, // Set the underline color
     borderRadius: 18,
   },
-  image: {
-    width: 100, // Width and height should be the same
-    height: 100,
-    borderRadius: 50, // Half of the width or height for a perfect circle
-  },
   flashListContainer: {
     paddingHorizontal: 2, // Padding on the sides
   },
@@ -465,14 +471,19 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: "absolute",
-    top: 56,
-    left: 14,
+    left: -130,
     zIndex: 10, // Ensure it's on top of other elements
   },
   interactionContainer: {
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
+  },
+  profilePicBackButtonContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    position: "relative",
   },
 });
 

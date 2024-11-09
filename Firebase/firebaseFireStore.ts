@@ -13,6 +13,8 @@ import {
   deleteDoc,
   arrayUnion,
   arrayRemove,
+  limit,
+  startAfter,
 } from "firebase/firestore";
 import { firestoreDB } from "./FirebaseApp";
 import {
@@ -24,16 +26,13 @@ import "react-native-get-random-values";
 import { v4 as uuidv4 } from "uuid";
 import { Alert } from "react-native";
 import store from "../Redux/store";
-import {
-  addComment,
-  addReply,
-  updateCommentLikes,
-} from "../Redux/Slices/postsSlices";
+import { addComment, updateCommentLikes } from "../Redux/Slices/postsSlices";
 import { UserDetails } from "../type/Messenger";
 import {
   addToFollowings,
   removeFromFollowings,
 } from "../Redux/Slices/userSlice";
+import { createTimeStamp } from "../Util/utility";
 
 const db = firestoreDB;
 
@@ -88,8 +87,8 @@ export const getUserDetails = async (
       if (followersRef && followersRef.length > 0) {
         // Retrieve all the users being followed
         followers = await Promise.all(
-          followersRef.map(async (userRef) => {
-            const followerSnap = await getDoc(userRef);
+          followersRef.map(async (userRef: any) => {
+            const followerSnap: any = await getDoc(userRef);
             return followerSnap.data().user_id;
           })
         );
@@ -98,8 +97,8 @@ export const getUserDetails = async (
       if (followingsRef && followingsRef.length > 0) {
         // Retrieve all the users being followed
         followings = await Promise.all(
-          followingsRef.map(async (userRef) => {
-            const followingSnap = await getDoc(userRef);
+          followingsRef.map(async (userRef: any) => {
+            const followingSnap: any = await getDoc(userRef);
             return followingSnap.data().user_id;
           })
         );
@@ -123,6 +122,43 @@ export const createPost = async (userId: string, postData: any) => {
   }
 };
 
+export const updatePost = async (postId: string, postData: object) => {
+  try {
+    // Reference to the specific post document
+    const postRef = doc(db, FireStoreCollections.Posts, postId);
+
+    // Update the post with the provided data
+    await updateDoc(postRef, {
+      ...postData,
+      updatedTimeStamp: new Date().toISOString(), // Update timestamp if desired
+    });
+
+    console.log("Post updated successfully");
+  } catch (error) {
+    console.error("Error updating post:", error);
+  }
+};
+
+export const deletePost = async (postId: string, userId: string) => {
+  try {
+    const postRef = doc(db, FireStoreCollections.Posts, postId);
+    const postSnap = await getDoc(postRef);
+
+    if (postSnap.exists()) {
+      const postData = postSnap.data();
+      if (postData.user_id === userId) {
+        await deleteDoc(postRef);
+      } else {
+        Alert.alert("Permission denied", "You cannot delete this post.");
+      }
+    } else {
+      console.error("Post does not exist.");
+    }
+  } catch (e) {
+    console.error("Error deleting document: ", e);
+  }
+};
+
 export const getPostsByUserId = async (userId: string) => {
   try {
     // Reference the 'posts' collection
@@ -141,18 +177,29 @@ export const getPostsByUserId = async (userId: string) => {
   }
 };
 
-export const getAllPosts = async () => {
+export const getPaginatedPosts = async (lastVisible?: any) => {
   try {
     const postsCollection = collection(db, FireStoreCollections.Posts);
-    const q = query(postsCollection, orderBy("timeStamp", "desc"));
+    const q = lastVisible
+      ? query(
+          postsCollection,
+          orderBy("timeStamp", "desc"),
+          startAfter(lastVisible),
+          limit(10)
+        )
+      : query(postsCollection, orderBy("timeStamp", "desc"), limit(10));
+
     const snapshot = await getDocs(q);
-    const postsList = snapshot.docs.map((doc) => ({
+    const posts = snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
-    return postsList;
+
+    const newLastVisible = snapshot.docs[snapshot.docs.length - 1];
+    if (!newLastVisible) throw Error;
+    return { posts, lastVisible: newLastVisible };
   } catch (error) {
-    return [];
+    return { posts: [], lastVisible: null };
   }
 };
 
@@ -214,7 +261,7 @@ export const updateUserPostMetric = async (
     if (action === FireStoreAction.Add)
       func = setDoc(metricRef, {
         liked: true,
-        timestamp: Timestamp.now(),
+        timestamp: createTimeStamp(),
       });
 
     if (action === FireStoreAction.Remove) func = await deleteDoc(metricRef);
@@ -264,6 +311,24 @@ export const getPostMetrics = async (
   } catch (error) {
     console.error("Error fetching field value: ", error);
     return null;
+  }
+};
+
+export const getPostById = async (postId: string) => {
+  const postRef = doc(db, FireStoreCollections.Posts, postId);
+
+  try {
+    const postSnapshot = await getDoc(postRef); // Retrieve the document snapshot
+
+    if (postSnapshot.exists()) {
+      return { ...postSnapshot.data() };
+    } else {
+      console.log("No such document!");
+      return {};
+    }
+  } catch (error) {
+    console.error("Error fetching field value: ", error);
+    return {};
   }
 };
 

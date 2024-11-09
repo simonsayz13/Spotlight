@@ -3,7 +3,6 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  Animated,
   TextInput,
   Dimensions,
 } from "react-native";
@@ -11,6 +10,14 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { useState, useRef, useEffect } from "react";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { ThemeColoursPrimary, TopNavigationHomeButtons } from "../Constants/UI";
+import { Image } from "expo-image";
+import { images } from "../Constants";
+import Animated, {
+  interpolate,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 
 const { width } = Dimensions.get("window");
 
@@ -23,20 +30,19 @@ const TopNavigationBar = (props: any) => {
     handlePressSearchBtn,
     handlePressMenuBtn,
     handlePressInClearBtn,
-    isMenuVisible,
+    isDropDownMenuVisible,
   } = props;
-
   const inputRef = useRef<TextInput>(null);
   const [buttonStates, setButtonStates] = useState(TopNavigationHomeButtons);
-  const [searchBarOpacity] = useState(new Animated.Value(0)); // Start with opacity 0 (invisible)
-  const [searchBarTranslateX] = useState(new Animated.Value(10)); // Start with position off-screen
-  const [underlinePosition] = useState(
-    new Animated.Value(
-      width / buttonStates.length +
-        (width / buttonStates.length - width / 4) / 2
-    )
+  const translateY = useSharedValue(-50);
+  const underlinePosition = useSharedValue(
+    width / buttonStates.length + (width / buttonStates.length - width / 4) / 2
   );
-  const menuButtonTranslateY = useRef(new Animated.Value(0)).current;
+  const dropdownHeight = useSharedValue(0);
+
+  dropdownHeight.value = withTiming(isDropDownMenuVisible ? 30 : 0, {
+    duration: 300,
+  }); // Adjust height as needed
 
   const handlePress = (id: number, index: number) => {
     setButtonStates((prevStates) =>
@@ -50,49 +56,38 @@ const TopNavigationBar = (props: any) => {
     );
     const clickedScreen = buttonStates.find((item) => id == item.id)?.label;
     setContent(clickedScreen);
-
-    // Animate underline to the new tab
-    Animated.timing(underlinePosition, {
-      toValue:
-        index * (width / buttonStates.length) +
-        (width / buttonStates.length - width / 4) / 2, // width divided by the number of buttons
-      duration: 200, // Duration of animation
-      useNativeDriver: true, // Use native driver for better performance
-    }).start();
+    // // Animate underline to the new tab
+    underlinePosition.value = withTiming(
+      index * (width / buttonStates.length) +
+        (width / buttonStates.length - width / 4) / 2,
+      { duration: 100 }
+    );
   };
+  const animatedStyleSearchBar = useAnimatedStyle(() => ({
+    transform: [{ translateY: translateY.value }],
+  }));
+
+  const animatedMenuStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(dropdownHeight.value, [0, 30], [0, 1], "clamp"),
+    height: dropdownHeight.value,
+    zIndex: isDropDownMenuVisible ? 0 : -10,
+  }));
+
+  const animatedUnderlineStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(dropdownHeight.value, [0, 30], [0, 1], "clamp"),
+    transform: [{ translateX: underlinePosition.value }],
+  }));
 
   //> Hooks
+  useEffect(() => {
+    translateY.value = withTiming(showSearchBar ? 0 : -16, { duration: 300 });
+  }, [showSearchBar]);
+
   useEffect(() => {
     if (showSearchBar && inputRef?.current) {
       inputRef.current?.focus();
     }
   }, [showSearchBar]);
-
-  //* Animate Search appreance based on showSearchBar
-  useEffect(() => {
-    Animated.parallel([
-      Animated.timing(searchBarOpacity, {
-        toValue: !showSearchBar ? 0 : 1, // Fade out if it's currently visible, fade in otherwise
-        duration: !showSearchBar ? 0 : 200, // Duration of 300 milliseconds
-        useNativeDriver: true, // Use native driver for better performance
-      }),
-
-      Animated.timing(searchBarTranslateX, {
-        toValue: !showSearchBar ? 10 : -2, // Move up if it's currently visible, move down otherwise
-        duration: !showSearchBar ? 0 : 200, // Duration of 300 milliseconds
-        useNativeDriver: true, // Use native driver for better performance
-      }),
-    ]).start();
-  }, [showSearchBar]);
-
-  useEffect(() => {
-    // Animate the menu button view
-    Animated.timing(menuButtonTranslateY, {
-      toValue: isMenuVisible ? 0 : -50, // Adjust the value to control how much it moves
-      duration: 200,
-      useNativeDriver: true,
-    }).start();
-  }, [isMenuVisible]);
 
   return (
     <View style={{ marginBottom: 2 }}>
@@ -100,72 +95,60 @@ const TopNavigationBar = (props: any) => {
         <TouchableOpacity onPress={handlePressMenuBtn}>
           <Ionicons
             name={showSearchBar ? "chevron-back" : "menu"}
-            size={32}
+            size={30}
             color={ThemeColoursPrimary.SecondaryColour}
           />
         </TouchableOpacity>
 
         <View style={styles.menuContainer}>
-          <Text
-            style={{
-              fontFamily: "Shrikhand_400Regular",
-              fontSize: 30,
-              color: ThemeColoursPrimary.LogoColour,
-            }}
-          >
-            Spotlight
-          </Text>
-          <Animated.View
-            style={[
-              styles.searchBar,
-              {
-                opacity: searchBarOpacity,
-                transform: [{ translateX: searchBarTranslateX }],
-              },
-            ]}
-            pointerEvents={showSearchBar ? "auto" : "none"}
-          >
-            <View style={[styles.searchBarWrapper]}>
-              <TextInput
-                ref={inputRef}
-                style={styles.input}
-                placeholder="Search..."
-                value={searchText}
-                onChange={handleSearchBarChange}
-              />
-              {searchText.length > 0 && (
-                <TouchableOpacity onPressIn={handlePressInClearBtn}>
-                  <AntDesign name="closecircleo" size={20} color="black" />
-                </TouchableOpacity>
-              )}
-            </View>
-          </Animated.View>
+          {!showSearchBar ? (
+            <Image
+              source={images.trademark}
+              contentFit="contain"
+              style={styles.logo}
+            />
+          ) : (
+            <Animated.View
+              style={[styles.searchBar, animatedStyleSearchBar]}
+              pointerEvents={showSearchBar ? "auto" : "none"}
+            >
+              <View style={styles.searchBarWrapper}>
+                <TextInput
+                  ref={inputRef}
+                  style={styles.input}
+                  placeholder="Search..."
+                  value={searchText}
+                  onChange={handleSearchBarChange}
+                />
+                {searchText.length > 0 && (
+                  <TouchableOpacity onPressIn={handlePressInClearBtn}>
+                    <AntDesign name="closecircleo" size={20} color="black" />
+                  </TouchableOpacity>
+                )}
+              </View>
+            </Animated.View>
+          )}
         </View>
-        <TouchableOpacity onPress={handlePressSearchBtn}>
+        <TouchableOpacity
+          onPress={handlePressSearchBtn}
+          style={{ marginLeft: 4 }}
+        >
           <Ionicons
             name="search"
-            size={26}
+            size={28}
             color={ThemeColoursPrimary.SecondaryColour}
           />
         </TouchableOpacity>
       </View>
-      <Animated.View
-        style={{
-          zIndex: -10,
-          transform: [{ translateY: menuButtonTranslateY }],
-          height: isMenuVisible ? "auto" : 0, // Adjust height based on visibility
-          opacity: menuButtonTranslateY.interpolate({
-            inputRange: [-50, 0],
-            outputRange: [0, 1],
-            extrapolate: "clamp",
-          }),
-        }}
-      >
+
+      <Animated.View style={animatedMenuStyle}>
         <View
           style={{
-            paddingTop: 4,
-            paddingBottom: 6,
+            position: "absolute",
+            bottom: 3,
             flexDirection: "row",
+            paddingVertical: 4,
+            zIndex: 0,
           }}
         >
           {buttonStates.map((button, index) => (
@@ -189,12 +172,7 @@ const TopNavigationBar = (props: any) => {
           ))}
         </View>
         <Animated.View
-          style={[
-            styles.customUnderline,
-            {
-              transform: [{ translateX: underlinePosition }], // Move based on animated value
-            },
-          ]}
+          style={[styles.customUnderline, animatedUnderlineStyle]}
         />
       </Animated.View>
     </View>
@@ -203,9 +181,6 @@ const TopNavigationBar = (props: any) => {
 
 const styles = StyleSheet.create({
   container: {
-    top: 0,
-    left: 0,
-    right: 0,
     paddingHorizontal: 8,
     alignItems: "center",
     flexDirection: "row",
@@ -213,6 +188,8 @@ const styles = StyleSheet.create({
     backgroundColor: ThemeColoursPrimary.PrimaryColour,
     borderBottomWidth: 0.4,
     borderBottomColor: ThemeColoursPrimary.GreyColour,
+    height: 50,
+    zIndex: 100,
   },
   menuContainer: {
     flex: 1,
@@ -247,20 +224,25 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 8,
+    paddingHorizontal: 12,
   },
   searchBar: {
-    flexGrow: 1,
     width: "100%",
-    position: "absolute",
     backgroundColor: ThemeColoursPrimary.BackgroundColour,
     borderRadius: 20,
-    borderWidth: 2,
   },
   input: {
     height: 36,
     borderColor: "black",
-    paddingHorizontal: 10,
+  },
+  logo: {
+    width: 200,
+    height: 50,
+  },
+  buttonRow: {
+    paddingTop: 4,
+    paddingBottom: 6,
+    flexDirection: "row",
   },
 });
 

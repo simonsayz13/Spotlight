@@ -19,11 +19,15 @@ const { height: windowHeight } = Dimensions.get("window");
 type ComponentProps = {
   heightPercentage: number;
   isPannable: boolean;
+  isAbsolute?: boolean;
   children: ReactNode;
 };
 
 const BottomDrawer = forwardRef(
-  ({ heightPercentage, isPannable, children }: ComponentProps, ref) => {
+  (
+    { heightPercentage, isPannable, isAbsolute, children }: ComponentProps,
+    ref
+  ) => {
     const slideAnim = useRef(new Animated.Value(windowHeight)).current;
 
     const modalPanResponder = useRef(
@@ -53,8 +57,8 @@ const BottomDrawer = forwardRef(
     const showDrawer = () => {
       Animated.timing(slideAnim, {
         toValue: 0, // Final position
-        duration: 400, // Adjust the duration for a smooth transition
-        easing: Easing.out(Easing.ease), // Optional: Adjust easing for smoothness
+        duration: 300, // Adjust the duration for a smooth transition
+        easing: Easing.out(Easing.exp), // Optional: Adjust easing for smoothness
         useNativeDriver: true,
       }).start();
     };
@@ -62,8 +66,8 @@ const BottomDrawer = forwardRef(
     const hideDrawer = () => {
       Animated.timing(slideAnim, {
         toValue: windowHeight, // Offscreen position
-        duration: 400, // Adjust the duration for a smooth transition
-        easing: Easing.in(Easing.ease), // Optional: Adjust easing for smoothness
+        duration: 300, // Adjust the duration for a smooth transition
+        easing: Easing.in(Easing.exp), // Optional: Adjust easing for smoothness
         useNativeDriver: true,
       }).start();
     };
@@ -81,6 +85,7 @@ const BottomDrawer = forwardRef(
             transform: [{ translateY: slideAnim }],
             height: windowHeight * heightPercentage,
           },
+          isAbsolute && { position: "absolute" },
         ]}
         {...(isPannable ? modalPanResponder.panHandlers : {})}
       >
@@ -93,7 +98,6 @@ const BottomDrawer = forwardRef(
 
 const styles = StyleSheet.create({
   modalContainer: {
-    position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
@@ -101,12 +105,12 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 14,
     borderTopRightRadius: 14,
     paddingVertical: 6,
-    paddingHorizontal: 8,
+    // paddingHorizontal: 8,
     elevation: 10, // For Android shadow
-    shadowColor: ThemeColoursPrimary.SecondaryColour,
-    shadowOffset: { width: 0, height: -1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
+    // shadowColor: ThemeColoursPrimary.SecondaryColour,
+    // shadowOffset: { width: 0, height: -1 },
+    // shadowOpacity: 0.2,
+    // shadowRadius: 2,
     zIndex: 100,
   },
   panIndicator: {

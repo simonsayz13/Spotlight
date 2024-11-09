@@ -20,12 +20,12 @@ const BottomSheet = ({ children, menuBar, heightPercentage }: any) => {
     Animated.parallel([
       Animated.timing(slideAnim, {
         toValue: windowHeight * 0.1,
-        duration: 300,
+        duration: 200,
         useNativeDriver: true,
       }),
       Animated.timing(iconRotation, {
         toValue: 1, // 1 for down icon
-        duration: 300,
+        duration: 200,
         useNativeDriver: true,
       }),
     ]).start();
@@ -36,12 +36,12 @@ const BottomSheet = ({ children, menuBar, heightPercentage }: any) => {
     Animated.parallel([
       Animated.timing(slideAnim, {
         toValue: sheetHeight,
-        duration: 300,
+        duration: 200,
         useNativeDriver: true,
       }),
       Animated.timing(iconRotation, {
         toValue: 0, // 0 for up icon
-        duration: 300,
+        duration: 200,
         useNativeDriver: true,
       }),
     ]).start();

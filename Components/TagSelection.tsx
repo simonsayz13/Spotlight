@@ -47,7 +47,7 @@ const TagSelection = ({ handleSetTags }: any) => {
           <Text style={styles.confirmButtonText}>Save</Text>
         </TouchableOpacity>
       </View>
-      <View style={styles.tagSelectionBodyContainer}>
+      <View>
         {tags.map((tag: Tag) => (
           <TouchableOpacity
             key={tag.id}
@@ -79,21 +79,20 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginHorizontal: 6,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
   },
   tagTitle: {
     fontSize: 20,
     fontWeight: "bold",
     textAlign: "center", // Center the text itself (optional, in case of long text)
   },
-  tagSelectionBodyContainer: {
-    marginTop: 10,
-  },
   tagItem: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     paddingVertical: 10,
+    marginHorizontal: 8,
     borderBottomWidth: 1,
     borderBottomColor: "#ddd",
   },

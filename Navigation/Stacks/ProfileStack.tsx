@@ -3,7 +3,7 @@ import { ProfileStackScreens } from "../../Constants/UI";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Profile from "../../Screens/Profile/Profile";
 import EditProfile from "../../Screens/Profile/EditProfile";
-import FollowerList from "../../Screens/Profile/FollowerList";
+import EditScreen from "../../Screens/Profile/EditScreen";
 
 const ProfileStack = createNativeStackNavigator();
 
@@ -18,6 +18,10 @@ const ProfileStackScreen = () => {
       <ProfileStack.Screen
         name={ProfileStackScreens.EditProfile}
         component={EditProfile}
+      />
+      <ProfileStack.Screen
+        name={ProfileStackScreens.EditScreen}
+        component={EditScreen}
       />
     </ProfileStack.Navigator>
   );

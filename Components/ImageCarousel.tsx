@@ -1,32 +1,28 @@
 import React, { useEffect, useState, useRef } from "react";
-import {
-  Dimensions,
-  StyleSheet,
-  View,
-  Text,
-  FlatList,
-  Animated,
-} from "react-native";
+import { Dimensions, StyleSheet, View, Text, FlatList } from "react-native";
 import { Image } from "expo-image";
 import { ThemeColoursPrimary } from "../Constants/UI";
-
-const { width: windowWidth } = Dimensions.get("window");
+import { TapGestureHandler } from "react-native-gesture-handler";
+import Animated, {
+  runOnJS,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
+import ImageModal from "./ImageModal";
+const { width: windowWidth, height: windowHeight } = Dimensions.get("window");
 const MAX_HEIGHT = 550; // Define the maximum height for images
 
 const ImageCarousel = ({ images }: any) => {
+  const [isGalleryVisible, setIsGalleryVisible] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showIndicator, setShowIndicator] = useState(false);
-  const indicatorOpacity = useRef(new Animated.Value(0)).current; // Create a ref for opacity
+  const indicatorOpacity = useSharedValue(0); // Create a ref for opacity
   const hideTimeout = useRef<any>(null); // Use a ref to hold the timeout ID
 
   const handleScroll = (event: any) => {
     // Show the indicator when scrolling starts
     setShowIndicator(true);
-    Animated.timing(indicatorOpacity, {
-      toValue: 0.4,
-      duration: 1,
-      useNativeDriver: true,
-    }).start();
+    indicatorOpacity.value = withTiming(0.4, { duration: 100 });
 
     // Calculate the new index
     const index = Math.round(event.nativeEvent.contentOffset.x / windowWidth);
@@ -39,24 +35,23 @@ const ImageCarousel = ({ images }: any) => {
 
     // Set timeout to hide the indicator after 3 seconds of inactivity
     hideTimeout.current = setTimeout(() => {
-      Animated.timing(indicatorOpacity, {
-        toValue: 0, // Fade out
-        duration: 500,
-        useNativeDriver: true,
-      }).start(() => {
-        setShowIndicator(false); // Hide after animation completes
+      indicatorOpacity.value = withTiming(0, { duration: 500 }, () => {
+        runOnJS(setShowIndicator)(false); // Hide after animation completes
       });
     }, 3000);
   };
 
   useEffect(() => {
     return () => {
-      // Cleanup: Clear timeout on unmount to prevent memory leaks
       if (hideTimeout.current) clearTimeout(hideTimeout.current);
     };
   }, []);
 
-  const renderItem = ({ item }: any) => {
+  const onClickImage = () => {
+    setIsGalleryVisible(true);
+  };
+
+  const renderImage = ({ item, index }: any) => {
     // Calculate dimensions for each image
     const { width, height } = item;
     let calculatedHeight = (windowWidth / width) * height; // Calculate height based on aspect ratio
@@ -69,16 +64,23 @@ const ImageCarousel = ({ images }: any) => {
     }
 
     return (
-      <View style={styles.imageContainer}>
-        <Image
-          source={{ uri: item.media_url }}
-          style={{
-            width: calculatedWidth,
-            height: calculatedHeight,
-          }}
-          contentFit="contain"
-        />
-      </View>
+      <TapGestureHandler
+        numberOfTaps={1}
+        maxDurationMs={200} // Adjust as needed to filter out scrolls
+        onActivated={onClickImage}
+      >
+        <View style={styles.imageContainer}>
+          <Image
+            source={{ uri: item.media_url }}
+            style={{
+              width: calculatedWidth,
+              height: calculatedHeight,
+            }}
+            contentFit="contain"
+            cachePolicy="disk"
+          />
+        </View>
+      </TapGestureHandler>
     );
   };
 
@@ -105,7 +107,7 @@ const ImageCarousel = ({ images }: any) => {
       {/* FlatList for horizontal scrolling */}
       <FlatList
         data={images}
-        renderItem={renderItem}
+        renderItem={renderImage}
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
@@ -127,6 +129,12 @@ const ImageCarousel = ({ images }: any) => {
 
       {/* Dots Indicator */}
       {images.length > 1 && renderDots}
+
+      <ImageModal
+        imageUri={images[currentIndex].media_url}
+        isGalleryVisible={isGalleryVisible}
+        setIsGalleryVisible={setIsGalleryVisible}
+      />
     </View>
   );
 };
@@ -158,7 +166,7 @@ const styles = StyleSheet.create({
   },
   dotsContainer: {
     flexDirection: "row",
-    marginTop: 6, // Spacing between the images and the dots
+    marginTop: 4, // Spacing between the images and the dots
   },
   dot: {
     alignSelf: "center",
@@ -170,9 +178,9 @@ const styles = StyleSheet.create({
   activeDot: {
     alignSelf: "center",
     backgroundColor: ThemeColoursPrimary.LogoColour,
-    width: 10,
-    height: 10,
-    borderRadius: 10,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
   },
   inactiveDot: {
     backgroundColor: "gray",

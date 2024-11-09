@@ -1,7 +1,11 @@
 import React, { useEffect, useRef } from "react";
-import { Animated, StyleSheet } from "react-native";
+import { Animated, Platform, StyleSheet, View } from "react-native";
 
 const FadeInWrapper = ({ delay, children }) => {
+  if (Platform.OS === "android") {
+    return <View style={styles.container}>{children}</View>;
+  }
+
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   // Step 2: Define the fade-in animation
@@ -14,14 +18,14 @@ const FadeInWrapper = ({ delay, children }) => {
   }, [fadeAnim]);
 
   return (
-    <Animated.View style={[styles.fadingContainer, { opacity: fadeAnim }]}>
+    <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
       {children}
     </Animated.View>
   );
 };
 
 const styles = StyleSheet.create({
-  fadingContainer: {
+  container: {
     flex: 1,
   },
 });
