@@ -136,6 +136,7 @@ const Contents = (props: any) => {
         contentContainerStyle={styles.flashListContainer}
         onScroll={onScroll}
         ListFooterComponent={renderBottomLoader}
+        scrollEventThrottle={30}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -143,7 +144,7 @@ const Contents = (props: any) => {
             colors={[ThemeColoursPrimary.LogoColour]} // Optional: Refresh spinner color
           />
         }
-        onEndReachedThreshold={0.05}
+        onEndReachedThreshold={0.2}
         onEndReached={onReachedEnd}
       />
     </FadeInWrapper>

@@ -65,7 +65,7 @@ const PostCard = React.memo(({ postData, openPost }: any) => {
           source={{
             uri: imageUrl,
           }}
-          cachePolicy="memory"
+          cachePolicy="disk"
         />
       ) : (
         <NoPhotoPlaceHolder title={title} description={description} />

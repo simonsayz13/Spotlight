@@ -5,7 +5,6 @@ import {
   StyleSheet,
   TextInput,
   Dimensions,
-  Animated as RNAnimated,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useState, useRef, useEffect } from "react";
@@ -14,15 +13,7 @@ import { ThemeColoursPrimary, TopNavigationHomeButtons } from "../Constants/UI";
 import { Image } from "expo-image";
 import { images } from "../Constants";
 import Animated, {
-  FadeIn,
-  FadeOut,
-  SlideInDown,
-  SlideInLeft,
-  SlideInRight,
-  SlideInUp,
-  SlideOutLeft,
-  SlideOutRight,
-  SlideOutUp,
+  interpolate,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
@@ -39,19 +30,19 @@ const TopNavigationBar = (props: any) => {
     handlePressSearchBtn,
     handlePressMenuBtn,
     handlePressInClearBtn,
-    isMenuVisible,
+    isDropDownMenuVisible,
   } = props;
-
   const inputRef = useRef<TextInput>(null);
   const [buttonStates, setButtonStates] = useState(TopNavigationHomeButtons);
   const translateY = useSharedValue(-50);
-  const [underlinePosition] = useState(
-    new RNAnimated.Value(
-      width / buttonStates.length +
-        (width / buttonStates.length - width / 4) / 2
-    )
+  const underlinePosition = useSharedValue(
+    width / buttonStates.length + (width / buttonStates.length - width / 4) / 2
   );
-  const menuButtonTranslateY = useRef(new RNAnimated.Value(0)).current;
+  const dropdownHeight = useSharedValue(0);
+
+  dropdownHeight.value = withTiming(isDropDownMenuVisible ? 30 : 0, {
+    duration: 300,
+  }); // Adjust height as needed
 
   const handlePress = (id: number, index: number) => {
     setButtonStates((prevStates) =>
@@ -65,40 +56,38 @@ const TopNavigationBar = (props: any) => {
     );
     const clickedScreen = buttonStates.find((item) => id == item.id)?.label;
     setContent(clickedScreen);
-
-    // Animate underline to the new tab
-    RNAnimated.timing(underlinePosition, {
-      toValue:
-        index * (width / buttonStates.length) +
-        (width / buttonStates.length - width / 4) / 2, // width divided by the number of buttons
-      duration: 200, // Duration of animation
-      useNativeDriver: true, // Use native driver for better performance
-    }).start();
+    // // Animate underline to the new tab
+    underlinePosition.value = withTiming(
+      index * (width / buttonStates.length) +
+        (width / buttonStates.length - width / 4) / 2,
+      { duration: 100 }
+    );
   };
-
-  // Toggle translateY value based on showSearchBar
-  useEffect(() => {
-    translateY.value = withTiming(showSearchBar ? 0 : -16, { duration: 300 });
-  }, [showSearchBar]);
   const animatedStyleSearchBar = useAnimatedStyle(() => ({
     transform: [{ translateY: translateY.value }],
   }));
 
+  const animatedMenuStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(dropdownHeight.value, [0, 30], [0, 1], "clamp"),
+    height: dropdownHeight.value,
+    zIndex: isDropDownMenuVisible ? 0 : -10,
+  }));
+
+  const animatedUnderlineStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(dropdownHeight.value, [0, 30], [0, 1], "clamp"),
+    transform: [{ translateX: underlinePosition.value }],
+  }));
+
   //> Hooks
+  useEffect(() => {
+    translateY.value = withTiming(showSearchBar ? 0 : -16, { duration: 300 });
+  }, [showSearchBar]);
+
   useEffect(() => {
     if (showSearchBar && inputRef?.current) {
       inputRef.current?.focus();
     }
   }, [showSearchBar]);
-
-  useEffect(() => {
-    // Animate the menu button view
-    RNAnimated.timing(menuButtonTranslateY, {
-      toValue: isMenuVisible ? 0 : -50, // Adjust the value to control how much it moves
-      duration: 200,
-      useNativeDriver: true,
-    }).start();
-  }, [isMenuVisible]);
 
   return (
     <View style={{ marginBottom: 2 }}>
@@ -152,23 +141,14 @@ const TopNavigationBar = (props: any) => {
         </TouchableOpacity>
       </View>
 
-      <RNAnimated.View
-        style={{
-          zIndex: -10,
-          transform: [{ translateY: menuButtonTranslateY }],
-          height: isMenuVisible ? "auto" : 0, // Adjust height based on visibility
-          opacity: menuButtonTranslateY.interpolate({
-            inputRange: [-50, 0],
-            outputRange: [0, 1],
-            extrapolate: "clamp",
-          }),
-        }}
-      >
+      <Animated.View style={animatedMenuStyle}>
         <View
           style={{
-            paddingTop: 4,
-            paddingBottom: 6,
+            position: "absolute",
+            bottom: 3,
             flexDirection: "row",
+            paddingVertical: 4,
+            zIndex: 0,
           }}
         >
           {buttonStates.map((button, index) => (
@@ -191,15 +171,10 @@ const TopNavigationBar = (props: any) => {
             </TouchableOpacity>
           ))}
         </View>
-        <RNAnimated.View
-          style={[
-            styles.customUnderline,
-            {
-              transform: [{ translateX: underlinePosition }], // Move based on animated value
-            },
-          ]}
+        <Animated.View
+          style={[styles.customUnderline, animatedUnderlineStyle]}
         />
-      </RNAnimated.View>
+      </Animated.View>
     </View>
   );
 };
@@ -214,6 +189,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.4,
     borderBottomColor: ThemeColoursPrimary.GreyColour,
     height: 50,
+    zIndex: 100,
   },
   menuContainer: {
     flex: 1,
@@ -252,7 +228,6 @@ const styles = StyleSheet.create({
   },
   searchBar: {
     width: "100%",
-    // position: "absolute",
     backgroundColor: ThemeColoursPrimary.BackgroundColour,
     borderRadius: 20,
   },
@@ -263,6 +238,11 @@ const styles = StyleSheet.create({
   logo: {
     width: 200,
     height: 50,
+  },
+  buttonRow: {
+    paddingTop: 4,
+    paddingBottom: 6,
+    flexDirection: "row",
   },
 });
 

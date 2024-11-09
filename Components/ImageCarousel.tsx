@@ -1,13 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import {
-  Dimensions,
-  StyleSheet,
-  View,
-  Text,
-  FlatList,
-  Modal,
-  TouchableOpacity,
-} from "react-native";
+import { Dimensions, StyleSheet, View, Text, FlatList } from "react-native";
 import { Image } from "expo-image";
 import { ThemeColoursPrimary } from "../Constants/UI";
 import { TapGestureHandler } from "react-native-gesture-handler";
@@ -16,7 +8,6 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
-import Gallery from "react-native-awesome-gallery";
 import ImageModal from "./ImageModal";
 const { width: windowWidth, height: windowHeight } = Dimensions.get("window");
 const MAX_HEIGHT = 550; // Define the maximum height for images
@@ -51,11 +42,7 @@ const ImageCarousel = ({ images }: any) => {
   };
 
   useEffect(() => {
-    // images.forEach((image: any) => {
-    //   Image.prefetch(image.media_url, "memory");
-    // });
     return () => {
-      // Cleanup: Clear timeout on unmount to prevent memory leaks
       if (hideTimeout.current) clearTimeout(hideTimeout.current);
     };
   }, []);
@@ -90,7 +77,7 @@ const ImageCarousel = ({ images }: any) => {
               height: calculatedHeight,
             }}
             contentFit="contain"
-            cachePolicy="memory"
+            cachePolicy="disk"
           />
         </View>
       </TapGestureHandler>
