@@ -56,7 +56,6 @@ const Participant = memo(({ user, onPressConversation }: any) => {
 
 const SharePost = ({
   setIsDrawerOpen,
-  navigation,
   postData,
   setModalVisible,
   setModalMessage,
@@ -71,8 +70,8 @@ const SharePost = ({
     []
   );
   const [shareMessage, setShareMessage] = useState<string>("");
-
   const dispatch = useDispatch();
+
   useEffect(() => {
     sharePostDrawer.current.showDrawer();
   }, []);

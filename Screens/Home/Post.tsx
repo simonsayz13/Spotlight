@@ -7,7 +7,7 @@ import {
   Platform,
   Text,
   TouchableOpacity,
-  Animated,
+  // Animated,
 } from "react-native";
 import TopNavigationBarPost from "../../Components/TopNavigationBarPost";
 import PostInteractionBar from "../../Components/PostInteractionBar";
@@ -17,6 +17,11 @@ import PostOptions from "../../Components/PostOptions";
 import ActivityLoader from "../../Components/ActivityLoader";
 import SharePost from "../../Components/SharePost";
 import MessageModal from "../../Components/MessageModal";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+} from "react-native-reanimated";
 
 const Post = ({ navigation, route }: any) => {
   const { postData } = route.params;
@@ -27,9 +32,12 @@ const Post = ({ navigation, route }: any) => {
   const [isOptionsDrawer, setIsOptionsDrawer] = useState(false);
   const [isShareDrawer, setIsShareDrawer] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const overlayOpacity = useRef(new Animated.Value(0)).current;
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [modalMessage, setModalMessage] = useState<string | null>(null);
+  const overlayOpacity = useSharedValue(0); // Replace with a shared value
+  const overlayAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: overlayOpacity.value,
+  }));
 
   const openKeyboard = () => {
     if (postInteractionBarRef.current) {
@@ -39,23 +47,14 @@ const Post = ({ navigation, route }: any) => {
 
   const showSettingDrawer = () => {
     setIsDrawerOpen(true);
-    overlayOpacity.setValue(0);
-    Animated.timing(overlayOpacity, {
-      toValue: 1,
-      duration: 300,
-      useNativeDriver: true,
-    }).start();
+    overlayOpacity.value = withTiming(1, { duration: 300 });
   };
 
   const hideSettingDrawer = () => {
     setIsDrawerOpen(false);
     setIsOptionsDrawer(false);
     setIsShareDrawer(false);
-    Animated.timing(overlayOpacity, {
-      toValue: 0,
-      duration: 300,
-      useNativeDriver: true,
-    }).start();
+    overlayOpacity.value = withTiming(0, { duration: 300 });
   };
 
   useEffect(() => {
@@ -76,7 +75,7 @@ const Post = ({ navigation, route }: any) => {
       />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
-        style={styles.container}
+        style={{ flex: 1, overflow: "hidden" }}
       >
         <MainPost
           postData={postData}
@@ -105,7 +104,7 @@ const Post = ({ navigation, route }: any) => {
 
         {isDrawerOpen && (
           <Animated.View
-            style={[styles.overlay, { opacity: overlayOpacity }]}
+            style={[styles.overlay, overlayAnimatedStyle]}
             pointerEvents="auto"
           >
             <TouchableOpacity
@@ -124,7 +123,6 @@ const Post = ({ navigation, route }: any) => {
             postData={postData}
           />
         )}
-
         {isShareDrawer && (
           <SharePost
             setIsDrawerOpen={setIsShareDrawer}
@@ -132,6 +130,7 @@ const Post = ({ navigation, route }: any) => {
             postData={postData}
             setModalVisible={setModalVisible}
             setModalMessage={setModalMessage}
+            isShareDrawer={isShareDrawer}
           />
         )}
         <ActivityLoader indicator={isLoading} text="Deleting" />
