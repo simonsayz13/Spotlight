@@ -32,7 +32,7 @@ const HomeScreen = ({ navigation }: any) => {
   const [searchText, setSearchText] = useState("");
   const [showSearchBar, setShowSearchBar] = useState(false);
   const [isDropDownMenuVisible, setIsDropDownMenuVisible] = useState(true);
-  let lastScrollY = 0;
+  const lastScrollY = useRef(0);
   const changeContent = useCallback((content: string) => {
     setContent(content);
   }, []);
@@ -82,14 +82,12 @@ const HomeScreen = ({ navigation }: any) => {
 
   const handleScroll = (event: any) => {
     const offsetY = event.nativeEvent.contentOffset.y;
-    if (offsetY < lastScrollY && offsetY <= 2) {
+    if (lastScrollY.current - offsetY > 20) {
       setIsDropDownMenuVisible(true);
-    } else if (offsetY > lastScrollY && offsetY > 10) {
+    } else if (offsetY - lastScrollY.current > 20) {
       setIsDropDownMenuVisible(false);
-    } else {
-      setIsDropDownMenuVisible(true);
     }
-    lastScrollY = offsetY;
+    lastScrollY.current = offsetY;
   };
 
   return (

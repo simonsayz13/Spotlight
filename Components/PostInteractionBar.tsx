@@ -1,6 +1,5 @@
 import React, {
   forwardRef,
-  useCallback,
   useEffect,
   useImperativeHandle,
   useRef,
@@ -11,7 +10,6 @@ import {
   View,
   Text,
   TextInput,
-  Animated,
   Dimensions,
   Platform,
   TouchableOpacity,
@@ -41,292 +39,287 @@ import {
   setUserFavourites,
   removeUserFavourites,
 } from "../Redux/Slices/userSlice";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 
 const screenWidth = Dimensions.get("window").width;
-const PostInteractionBar = forwardRef(
-  ({ postData, replyingTo, setReplyingTo, setBottomHeight }: any, ref) => {
-    const {
-      userId,
-      userLiked,
-      userFavourites,
-      userDisplayName,
-      userProfilePhotoURL,
-    } = useSelector((state: RootState) => state.user);
-    const { likes, comments, favourites, id: postId } = postData;
-    const [inputWidth] = useState(new Animated.Value(screenWidth * 0.5));
-    const [inputActive, setInputActive] = useState(false);
-    const [currentLikes, setCurrentLikes] = useState(likes);
-    const [currentFavourites, setCurrentFavourites] = useState(favourites);
-    const [commentInput, setCommentInput] = useState<string>("");
-    //@ts-ignore
-    const liked = userLiked.includes(postId);
-    //@ts-ignore
-    const favourited = userFavourites.includes(postId);
-    const [inputHeight, setInputHeight] = useState(34);
-    const textInputRef = useRef<TextInput>(null);
-    const isFirstRender = useRef(true);
-    useEffect(() => {
-      if (isFirstRender.current) {
-        isFirstRender.current = false; // Set to false after first render
-        return;
-      }
-      if (commentInput) {
-        Animated.timing(inputWidth, {
-          toValue: screenWidth - 76, // Full width when the keyboard is open (adjust based on screen size)
-          duration: 100,
-          useNativeDriver: false,
-        }).start();
-      }
-      if (inputActive && !commentInput) {
-        Animated.timing(inputWidth, {
-          toValue: screenWidth - 16, // Full width when the keyboard is open (adjust based on screen size)
-          duration: 100,
-          useNativeDriver: false,
-        }).start();
-      }
-    }, [commentInput]);
+const PostInteractionBar = forwardRef((props: any, ref) => {
+  const {
+    postData,
+    replyingTo,
+    setReplyingTo,
+    setBottomHeight,
+    setIsCommentActive,
+  } = props;
+  const {
+    userId,
+    userLiked,
+    userFavourites,
+    userDisplayName,
+    userProfilePhotoURL,
+  } = useSelector((state: RootState) => state.user);
+  const { likes, comments, favourites, id: postId } = postData;
+  const inputWidth = useSharedValue(screenWidth * 0.5);
+  const [inputActive, setInputActive] = useState(false);
+  const [currentLikes, setCurrentLikes] = useState(likes);
+  const [currentFavourites, setCurrentFavourites] = useState(favourites);
+  const [commentInput, setCommentInput] = useState<string>("");
+  //@ts-ignore
+  const liked = userLiked.includes(postId);
+  //@ts-ignore
+  const favourited = userFavourites.includes(postId);
+  const [inputHeight, setInputHeight] = useState(34);
+  const textInputRef = useRef<TextInput>(null);
+  const isFirstRender = useRef(true);
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false; // Set to false after first render
+      return;
+    }
+    if (commentInput) {
+      inputWidth.value = withTiming(screenWidth - 76, { duration: 100 });
+    } else if (inputActive && !commentInput) {
+      inputWidth.value = withTiming(screenWidth - 16, { duration: 100 });
+    }
+  }, [commentInput]);
 
-    const showKeyboard = () => {
+  const showKeyboard = () => {
+    if (textInputRef.current) {
+      textInputRef.current.focus();
+    }
+    setInputActive(true);
+    setIsCommentActive(true);
+    inputWidth.value = withTiming(screenWidth - 16, { duration: 200 });
+  };
+
+  const animatedInputWidth = useAnimatedStyle(() => ({
+    width: inputWidth.value,
+  }));
+
+  useImperativeHandle(ref, () => ({
+    showKeyboard,
+    handleKeyboardDidHide,
+  }));
+
+  const handleKeyboardDidHide = () => {
+    inputWidth.value = withTiming(screenWidth * 0.5, { duration: 200 });
+    setInputActive(false);
+    setReplyingTo(null);
+    setBottomHeight(50);
+    setCommentInput("");
+    setIsCommentActive(false);
+    Keyboard.dismiss();
+  };
+
+  const onClickLike = () => {
+    if (!liked) {
+      updatePostMetric(
+        postId,
+        FireStorePostField.Likes,
+        FireStoreAction.Increment
+      );
+      updateUserPostMetric(
+        userId!,
+        FireStorePostField.Likes,
+        postId,
+        FireStoreAction.Add
+      );
+      store.dispatch(incrementLikes({ [FireStorePostField.PostID]: postId }));
+      setCurrentLikes(currentLikes + 1);
+      store.dispatch(setUserLiked({ [FireStorePostField.PostID]: postId }));
+    } else {
+      updatePostMetric(
+        postId,
+        FireStorePostField.Likes,
+        FireStoreAction.Decrement
+      );
+      updateUserPostMetric(
+        userId!,
+        FireStorePostField.Likes,
+        postId,
+        FireStoreAction.Remove
+      );
+      store.dispatch(decrementLikes({ [FireStorePostField.PostID]: postId }));
+      setCurrentLikes(currentLikes - 1);
+      store.dispatch(removeUserLiked({ [FireStorePostField.PostID]: postId }));
+    }
+  };
+
+  const onClickFavourite = () => {
+    if (!favourited) {
+      updatePostMetric(
+        postId,
+        FireStorePostField.Favourites,
+        FireStoreAction.Increment
+      );
+      updateUserPostMetric(
+        userId!,
+        FireStorePostField.Favourites,
+        postId,
+        FireStoreAction.Add
+      );
+      store.dispatch(
+        incrementFavourites({ [FireStorePostField.PostID]: postId })
+      );
+      setCurrentFavourites(currentFavourites + 1);
+      store.dispatch(
+        setUserFavourites({ [FireStorePostField.PostID]: postId })
+      );
+    } else {
+      updatePostMetric(
+        postId,
+        FireStorePostField.Favourites,
+        FireStoreAction.Decrement
+      );
+
+      updateUserPostMetric(
+        userId!,
+        FireStorePostField.Favourites,
+        postId,
+        FireStoreAction.Remove
+      );
+      store.dispatch(
+        decrementFavourites({ [FireStorePostField.PostID]: postId })
+      );
+      setCurrentFavourites(currentFavourites - 1);
+      store.dispatch(
+        removeUserFavourites({ [FireStorePostField.PostID]: postId })
+      );
+    }
+  };
+
+  const handlePostComment = async () => {
+    try {
+      await addCommentOrReply(
+        postId,
+        userId!,
+        userDisplayName!,
+        userProfilePhotoURL!,
+        commentInput
+      );
       if (textInputRef.current) {
-        textInputRef.current.focus();
+        textInputRef.current.clear();
+        setCommentInput(""); // Also clear the state if you're managing it
       }
-      setInputActive(true);
-      Animated.timing(inputWidth, {
-        toValue: screenWidth - 16, // Full width when the keyboard is open (adjust based on screen size)
-        duration: 200,
-        useNativeDriver: false,
-      }).start();
-    };
+      Keyboard.dismiss();
+    } catch (error) {
+      Alert.alert("Error", "Error posting comment");
+    }
+  };
 
-    useImperativeHandle(ref, () => ({
-      showKeyboard,
-      handleKeyboardDidHide,
-    }));
-
-    const handleKeyboardDidHide = () => {
-      Animated.timing(inputWidth, {
-        toValue: screenWidth * 0.5, //200, // Initial width when the keyboard is closed
-        duration: 200,
-        useNativeDriver: false,
-      }).start();
-      setInputActive(false);
-      setReplyingTo(null);
-      setBottomHeight(50);
-      setCommentInput("");
-    };
-
-    const onClickLike = () => {
-      if (!liked) {
-        updatePostMetric(
-          postId,
-          FireStorePostField.Likes,
-          FireStoreAction.Increment
-        );
-        updateUserPostMetric(
-          userId!,
-          FireStorePostField.Likes,
-          postId,
-          FireStoreAction.Add
-        );
-        store.dispatch(incrementLikes({ [FireStorePostField.PostID]: postId }));
-        setCurrentLikes(currentLikes + 1);
-        store.dispatch(setUserLiked({ [FireStorePostField.PostID]: postId }));
-      } else {
-        updatePostMetric(
-          postId,
-          FireStorePostField.Likes,
-          FireStoreAction.Decrement
-        );
-        updateUserPostMetric(
-          userId!,
-          FireStorePostField.Likes,
-          postId,
-          FireStoreAction.Remove
-        );
-        store.dispatch(decrementLikes({ [FireStorePostField.PostID]: postId }));
-        setCurrentLikes(currentLikes - 1);
-        store.dispatch(
-          removeUserLiked({ [FireStorePostField.PostID]: postId })
-        );
+  const handleReply = async () => {
+    try {
+      await addCommentOrReply(
+        postId,
+        userId!,
+        userDisplayName!,
+        userProfilePhotoURL!,
+        commentInput,
+        replyingTo.commentId,
+        replyingTo.parentCommentId
+          ? { userId: replyingTo.userId, displayName: replyingTo.displayName }
+          : null
+      );
+      if (textInputRef.current) {
+        textInputRef.current.clear();
+        setCommentInput(""); // Also clear the state if you're managing it
       }
-    };
+      Keyboard.dismiss();
+    } catch (error) {
+      Alert.alert("Error", "Error posting reply");
+    }
+  };
 
-    const onClickFavourite = () => {
-      if (!favourited) {
-        updatePostMetric(
-          postId,
-          FireStorePostField.Favourites,
-          FireStoreAction.Increment
-        );
-        updateUserPostMetric(
-          userId!,
-          FireStorePostField.Favourites,
-          postId,
-          FireStoreAction.Add
-        );
-        store.dispatch(
-          incrementFavourites({ [FireStorePostField.PostID]: postId })
-        );
-        setCurrentFavourites(currentFavourites + 1);
-        store.dispatch(
-          setUserFavourites({ [FireStorePostField.PostID]: postId })
-        );
-      } else {
-        updatePostMetric(
-          postId,
-          FireStorePostField.Favourites,
-          FireStoreAction.Decrement
-        );
-
-        updateUserPostMetric(
-          userId!,
-          FireStorePostField.Favourites,
-          postId,
-          FireStoreAction.Remove
-        );
-        store.dispatch(
-          decrementFavourites({ [FireStorePostField.PostID]: postId })
-        );
-        setCurrentFavourites(currentFavourites - 1);
-        store.dispatch(
-          removeUserFavourites({ [FireStorePostField.PostID]: postId })
-        );
-      }
-    };
-
-    const handlePostComment = async () => {
-      try {
-        await addCommentOrReply(
-          postId,
-          userId!,
-          userDisplayName!,
-          userProfilePhotoURL!,
-          commentInput
-        );
-        if (textInputRef.current) {
-          textInputRef.current.clear();
-          setCommentInput(""); // Also clear the state if you're managing it
-        }
-        Keyboard.dismiss();
-      } catch (error) {
-        Alert.alert("Error", "Error posting comment");
-      }
-    };
-
-    const handleReply = async () => {
-      try {
-        await addCommentOrReply(
-          postId,
-          userId!,
-          userDisplayName!,
-          userProfilePhotoURL!,
-          commentInput,
-          replyingTo.commentId,
-          replyingTo.parentCommentId
-            ? { userId: replyingTo.userId, displayName: replyingTo.displayName }
-            : null
-        );
-        if (textInputRef.current) {
-          textInputRef.current.clear();
-          setCommentInput(""); // Also clear the state if you're managing it
-        }
-        Keyboard.dismiss();
-      } catch (error) {
-        Alert.alert("Error", "Error posting reply");
-      }
-    };
-
-    return (
-      <View
-        style={[styles.container, { gap: Platform.OS === "android" ? 4 : 0 }]}
+  return (
+    <View
+      style={[styles.container, { gap: Platform.OS === "android" ? 4 : 0 }]}
+    >
+      <Animated.View
+        style={[styles.commentBar, animatedInputWidth, { height: inputHeight }]}
       >
-        <Animated.View
-          style={[
-            styles.commentBar,
-            { width: inputWidth, height: inputHeight },
-          ]}
-        >
-          <View style={styles.commentStyle}>
-            <TextInput
-              multiline={true}
-              ref={textInputRef}
-              style={styles.input}
-              placeholder={
-                replyingTo
-                  ? `Replying to ${replyingTo.displayName}`
-                  : "Add a comment"
+        <View style={styles.commentStyle}>
+          <TextInput
+            multiline={true}
+            ref={textInputRef}
+            style={styles.input}
+            placeholder={
+              replyingTo
+                ? `Replying to ${replyingTo.displayName}`
+                : "Add a comment"
+            }
+            onFocus={showKeyboard}
+            onBlur={handleKeyboardDidHide}
+            onChangeText={(text) => setCommentInput(text)}
+            onContentSizeChange={(event) => {
+              const { contentSize } = event.nativeEvent; // Correctly accessing the contentSize
+              if (contentSize) {
+                setInputHeight(Math.min(contentSize.height + 20, 100)); // Add extra padding
+                if (Math.min(contentSize.height + 20, 100) < 50)
+                  setBottomHeight(50);
+                if (Math.min(contentSize.height + 20, 100) > 50)
+                  setBottomHeight(Math.min(contentSize.height + 30, 110));
               }
-              onFocus={showKeyboard}
-              onBlur={handleKeyboardDidHide}
-              onChangeText={(text) => setCommentInput(text)}
-              onContentSizeChange={(event) => {
-                const { contentSize } = event.nativeEvent; // Correctly accessing the contentSize
-                if (contentSize) {
-                  setInputHeight(Math.min(contentSize.height + 20, 100)); // Add extra padding
-                  if (Math.min(contentSize.height + 20, 100) < 50)
-                    setBottomHeight(50);
-                  if (Math.min(contentSize.height + 20, 100) > 50)
-                    setBottomHeight(Math.min(contentSize.height + 30, 110));
-                }
-              }}
-            />
-          </View>
-        </Animated.View>
+            }}
+          />
+        </View>
+      </Animated.View>
 
-        {Boolean(commentInput) && inputActive && (
-          <TouchableOpacity
-            style={styles.button}
-            onPressIn={replyingTo ? handleReply : handlePostComment}
-          >
-            <Text style={styles.buttonText}>Send</Text>
-          </TouchableOpacity>
-        )}
-        {!inputActive && (
-          <View style={styles.actionsContainer}>
-            <View style={styles.actionWrapper}>
-              <TouchableOpacity onPressIn={onClickLike}>
-                <AntDesign
-                  name={liked ? "heart" : "hearto"}
-                  size={28}
-                  color={
-                    liked
-                      ? ThemeColoursPrimary.LogoColour
-                      : ThemeColoursPrimary.SecondaryColour
-                  }
-                />
-              </TouchableOpacity>
-              <Text style={styles.metricText}>{currentLikes}</Text>
-            </View>
-            <View style={styles.actionWrapper}>
-              <TouchableOpacity onPressIn={onClickFavourite}>
-                <AntDesign
-                  name={favourited ? "star" : "staro"}
-                  size={28}
-                  color={
-                    favourited
-                      ? ThemeColoursPrimary.GoldColour
-                      : ThemeColoursPrimary.SecondaryColour
-                  }
-                />
-              </TouchableOpacity>
-              <Text style={styles.metricText}>{currentFavourites}</Text>
-            </View>
-            <View style={styles.actionWrapper}>
-              <TouchableOpacity onPressIn={showKeyboard}>
-                <Ionicons
-                  name="chatbubble-ellipses-outline"
-                  size={28}
-                  color={ThemeColoursPrimary.SecondaryColour}
-                />
-              </TouchableOpacity>
-              <Text style={styles.metricText}>{comments.length}</Text>
-            </View>
+      {Boolean(commentInput) && inputActive && (
+        <TouchableOpacity
+          style={styles.button}
+          onPressIn={replyingTo ? handleReply : handlePostComment}
+        >
+          <Text style={styles.buttonText}>Send</Text>
+        </TouchableOpacity>
+      )}
+      {!inputActive && (
+        <View style={styles.actionsContainer}>
+          <View style={styles.actionWrapper}>
+            <TouchableOpacity onPressIn={onClickLike}>
+              <AntDesign
+                name={liked ? "heart" : "hearto"}
+                size={28}
+                color={
+                  liked
+                    ? ThemeColoursPrimary.LogoColour
+                    : ThemeColoursPrimary.SecondaryColour
+                }
+              />
+            </TouchableOpacity>
+            <Text style={styles.metricText}>{currentLikes}</Text>
           </View>
-        )}
-      </View>
-    );
-  }
-);
+          <View style={styles.actionWrapper}>
+            <TouchableOpacity onPressIn={onClickFavourite}>
+              <AntDesign
+                name={favourited ? "star" : "staro"}
+                size={28}
+                color={
+                  favourited
+                    ? ThemeColoursPrimary.GoldColour
+                    : ThemeColoursPrimary.SecondaryColour
+                }
+              />
+            </TouchableOpacity>
+            <Text style={styles.metricText}>{currentFavourites}</Text>
+          </View>
+          <View style={styles.actionWrapper}>
+            <TouchableOpacity onPressIn={showKeyboard}>
+              <Ionicons
+                name="chatbubble-ellipses-outline"
+                size={28}
+                color={ThemeColoursPrimary.SecondaryColour}
+              />
+            </TouchableOpacity>
+            <Text style={styles.metricText}>{comments.length}</Text>
+          </View>
+        </View>
+      )}
+    </View>
+  );
+});
 
 const styles = StyleSheet.create({
   container: {
@@ -341,6 +334,7 @@ const styles = StyleSheet.create({
     elevation: 20,
     borderTopLeftRadius: 8,
     borderTopRightRadius: 8,
+    zIndex: 10,
   },
   commentBar: {
     backgroundColor: "#f0f0f0",

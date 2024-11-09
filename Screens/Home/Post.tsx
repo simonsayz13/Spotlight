@@ -31,6 +31,7 @@ const Post = ({ navigation, route }: any) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isOptionsDrawer, setIsOptionsDrawer] = useState(false);
   const [isShareDrawer, setIsShareDrawer] = useState(false);
+  const [isCommentActive, setIsCommentActive] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [modalMessage, setModalMessage] = useState<string | null>(null);
@@ -51,19 +52,21 @@ const Post = ({ navigation, route }: any) => {
   };
 
   const hideSettingDrawer = () => {
+    postInteractionBarRef.current.handleKeyboardDidHide();
     setIsDrawerOpen(false);
     setIsOptionsDrawer(false);
     setIsShareDrawer(false);
+    setIsCommentActive(false);
     overlayOpacity.value = withTiming(0, { duration: 300 });
   };
 
   useEffect(() => {
-    if (isOptionsDrawer || isShareDrawer) {
+    if (isOptionsDrawer || isShareDrawer || isCommentActive) {
       showSettingDrawer();
     } else {
       hideSettingDrawer();
     }
-  }, [isOptionsDrawer, isShareDrawer]);
+  }, [isOptionsDrawer, isShareDrawer, isCommentActive]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -84,18 +87,6 @@ const Post = ({ navigation, route }: any) => {
           setReplyingTo={setReplyingTo}
         />
 
-        {!isDrawerOpen && (
-          <View style={[styles.bottomView, { height: bottomHeight }]}>
-            <PostInteractionBar
-              ref={postInteractionBarRef}
-              postData={postData}
-              replyingTo={replyingTo}
-              setReplyingTo={setReplyingTo}
-              setBottomHeight={setBottomHeight}
-            />
-          </View>
-        )}
-
         <MessageModal
           message={modalMessage} // Adjust this message as needed
           visible={modalVisible}
@@ -113,6 +104,19 @@ const Post = ({ navigation, route }: any) => {
               onPress={hideSettingDrawer} // Close drawer on overlay press
             />
           </Animated.View>
+        )}
+
+        {!isOptionsDrawer && !isShareDrawer && (
+          <View style={[styles.bottomView, { height: bottomHeight }]}>
+            <PostInteractionBar
+              ref={postInteractionBarRef}
+              postData={postData}
+              replyingTo={replyingTo}
+              setReplyingTo={setReplyingTo}
+              setBottomHeight={setBottomHeight}
+              setIsCommentActive={setIsCommentActive}
+            />
+          </View>
         )}
 
         {isOptionsDrawer && (
@@ -151,7 +155,7 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     backgroundColor: "rgba(0, 0, 0, 0.5)", // Adjust opacity as needed
-    zIndex: 1,
+    zIndex: 0,
   },
   overlayTouchable: {
     flex: 1,
