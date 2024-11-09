@@ -13,6 +13,7 @@ import {
 import postsReducer from "./Slices/postsSlices";
 import chatReducer from "./Slices/chatSlices";
 import otherUsersReducer from "./Slices/otherUsersSlice";
+import conversationsReducer from "./Slices/conversationSlice";
 
 const persistConfig = {
   key: "root",
@@ -25,6 +26,7 @@ const rootReducer = combineReducers({
   posts: postsReducer,
   chats: chatReducer,
   otherUsers: otherUsersReducer,
+  conversations: conversationsReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

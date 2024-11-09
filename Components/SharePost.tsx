@@ -13,7 +13,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { ImageType, ThemeColoursPrimary } from "../Constants/UI";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../Redux/store";
-import { getUserConversations, sendMessage } from "../Firebase/FirebaseChat";
+import { sendMessage } from "../Firebase/FirebaseChat";
 import { getOtherParticipants } from "../Util/utility";
 import { getUserProfileDetails } from "../Firebase/FirebaseUsers";
 import ProfilePicture from "./ProfilePicture";
@@ -63,6 +63,10 @@ const SharePost = ({
   const { userId: appUserId } = useSelector((state: RootState) => {
     return state.user;
   });
+  const { conversations } = useSelector(
+    (state: RootState) => state.conversations
+  );
+
   const otherUsers = useSelector((state: RootState) => state.otherUsers);
   const sharePostDrawer = useRef<any>(null);
   const [conversationUsers, setConversationUsers] = useState<any>(null);
@@ -81,7 +85,6 @@ const SharePost = ({
   };
 
   const retrieveConversations = async () => {
-    const conversations = await getUserConversations(appUserId!);
     const conversationUsersData = await Promise.all(
       getOtherParticipants(conversations, appUserId).map(
         async (conversation: any) =>

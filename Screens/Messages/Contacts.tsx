@@ -16,16 +16,16 @@ import {
   ThemeColoursPrimary,
 } from "../../Constants/UI";
 import { ScrollView } from "react-native-gesture-handler";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../Redux/store";
 import { useEffect, useRef, useState } from "react";
-import { getUserDetails, searchUsers } from "../../Firebase/firebaseFireStore";
-import { conversationListener } from "../../Firebase/FirebaseChat";
+import { searchUsers } from "../../Firebase/firebaseFireStore";
 import { formatRelativeTime } from "../../Util/utility";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { UserDetails } from "../../type/Messenger";
 import ActivityLoader from "../../Components/ActivityLoader";
 import ProfilePicture from "../../Components/ProfilePicture";
+import { getUserProfileDetails } from "../../Firebase/FirebaseUsers";
 
 const { width: windowWidth, height: windowHeight } = Dimensions.get("window");
 
@@ -33,8 +33,12 @@ const Contacts = ({ navigation }: any) => {
   const { userId: currentUserId } = useSelector(
     (state: RootState) => state.user
   );
+  const { conversations } = useSelector(
+    (state: RootState) => state.conversations
+  );
+  const otherUsers = useSelector((state: RootState) => state.otherUsers);
+  // const [conversations, setConversations] = useState<Array<any>>([]);
 
-  const [conversations, setConversations] = useState<Array<any>>([]);
   const [userDetails, setUserDetails] = useState<{
     [key: string]: UserDetails;
   }>({});
@@ -43,12 +47,7 @@ const Contacts = ({ navigation }: any) => {
   const [isDropdownVisible, setIsDropdownVisible] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true); // Add loading state
   const textInputRef = useRef<TextInput>(null);
-  useEffect(() => {
-    const unsubscribe = conversationListener(currentUserId!, setConversations);
-    return () => {
-      unsubscribe();
-    };
-  }, [currentUserId]);
+  const dispatch = useDispatch();
 
   const clearSearch = () => {
     setSearchQuery(""); // Reset the searchQuery state
@@ -81,7 +80,11 @@ const Contacts = ({ navigation }: any) => {
             (userId: any) => userId !== currentUserId
           );
           if (userId && !userDetails[userId]) {
-            const details = await getUserDetails(userId);
+            const details = await getUserProfileDetails(
+              userId,
+              otherUsers,
+              dispatch
+            );
             newDetails[userId] = details;
           }
         })
@@ -195,23 +198,23 @@ const Contacts = ({ navigation }: any) => {
               const userId = conversation.participants.find(
                 (userId: string) => userId != currentUserId
               );
-              const { display_name: displayName, profile_picture_url } =
+              const { displayName, profilePictureUrl } =
                 userDetails[userId || ""] || {};
               return (
                 <TouchableOpacity
                   key={`key_${userId}`}
                   onPress={() => {
                     goToChat(
-                      userId,
+                      userId!,
                       displayName!,
-                      profile_picture_url!,
+                      profilePictureUrl!,
                       conversation.id
                     );
                   }}
                 >
                   <View style={styles.messageCardContainer}>
                     <ProfilePicture
-                      uri={profile_picture_url}
+                      uri={profilePictureUrl}
                       userDisplayName={displayName}
                       type={ImageType.Contacts}
                     />

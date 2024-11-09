@@ -176,7 +176,6 @@ const styles = StyleSheet.create({
     backgroundColor: ThemeColoursPrimary.PrimaryColour,
   },
   messagesList: {
-    // flexGrow: 1,
     paddingHorizontal: 8,
   },
   topBarContainer: {
