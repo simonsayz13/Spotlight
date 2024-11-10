@@ -71,9 +71,14 @@ const TopNavigationBarPost = ({
 
       {userId !== appUserId ? (
         <View style={styles.followShareWrapper}>
-          <TouchableOpacity style={styles.button}>
+          <Pressable
+            style={styles.button}
+            onPressIn={() => {
+              navigation.navigate("ExamplePostList");
+            }}
+          >
             <Text style={styles.buttonText}>Follow</Text>
-          </TouchableOpacity>
+          </Pressable>
           <Pressable onPressIn={onShareClicked}>
             <EvilIcons name="share-apple" size={44} color="black" />
           </Pressable>

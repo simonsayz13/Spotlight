@@ -24,7 +24,7 @@ import LoginSignInStackScreen from "./Stacks/LoginSignInStack";
 import { RootState } from "../Redux/store";
 import FollowStackScreen from "./Stacks/FollowStack";
 import EditPost from "../Screens/Post/EditPost";
-import ImageGallery from "../Screens/Post/ImageGallery";
+import ExamplePostListStack from "./ExamplePostListStack";
 const MainStack = createNativeStackNavigator();
 
 const MainNavigationStack = () => {
@@ -96,6 +96,10 @@ const MainNavigationStack = () => {
           presentation: "modal", // Equivalent to gestureDirection: 'vertical'
           animation: "slide_from_bottom",
         }}
+      />
+      <MainStack.Screen
+        name={"ExamplePostList"}
+        component={ExamplePostListStack}
       />
     </MainStack.Navigator>
   );

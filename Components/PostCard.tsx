@@ -1,11 +1,5 @@
-import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Platform,
-} from "react-native";
+import React from "react";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { ImageType, ThemeColoursPrimary } from "../Constants/UI";
