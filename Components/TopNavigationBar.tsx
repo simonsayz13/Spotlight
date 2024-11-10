@@ -71,6 +71,8 @@ const TopNavigationBar = (props: any) => {
     opacity: interpolate(dropdownHeight.value, [0, 30], [0, 1], "clamp"),
     height: dropdownHeight.value,
     zIndex: isDropDownMenuVisible ? 0 : -10,
+    backgroundColor: ThemeColoursPrimary.PrimaryColour,
+    marginBottom: isDropDownMenuVisible ? 4 : 0,
   }));
 
   const animatedUnderlineStyle = useAnimatedStyle(() => ({
@@ -90,7 +92,7 @@ const TopNavigationBar = (props: any) => {
   }, [showSearchBar]);
 
   return (
-    <View style={{ marginBottom: 2 }}>
+    <View>
       <View style={styles.container}>
         <TouchableOpacity onPress={handlePressMenuBtn}>
           <Ionicons
@@ -142,15 +144,7 @@ const TopNavigationBar = (props: any) => {
       </View>
 
       <Animated.View style={animatedMenuStyle}>
-        <View
-          style={{
-            position: "absolute",
-            bottom: 3,
-            flexDirection: "row",
-            paddingVertical: 4,
-            zIndex: 0,
-          }}
-        >
+        <View style={styles.buttonContainer}>
           {buttonStates.map((button, index) => (
             <TouchableOpacity
               key={button.id}
@@ -239,10 +233,12 @@ const styles = StyleSheet.create({
     width: 200,
     height: 50,
   },
-  buttonRow: {
-    paddingTop: 4,
-    paddingBottom: 6,
+  buttonContainer: {
+    position: "absolute",
+    bottom: 3,
     flexDirection: "row",
+    paddingVertical: 4,
+    zIndex: 0,
   },
 });
 

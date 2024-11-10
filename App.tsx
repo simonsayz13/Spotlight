@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 
 import { createStackNavigator } from "@react-navigation/stack";
-import { StatusBar } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import store, { persistor, RootState } from "./Redux/store";
 import { Provider, useDispatch, useSelector } from "react-redux";
@@ -13,6 +12,10 @@ import { Shrikhand_400Regular } from "@expo-google-fonts/shrikhand";
 import SplashScreen from "./Screens/Home/SplashScreen";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { conversationListener } from "./Firebase/FirebaseChat";
+import { LogBox } from "react-native";
+
+// Suppress specific warnings from Firestore or Firebase
+LogBox.ignoreLogs(["@firebase/firestore: Firestore"]);
 
 const Stack = createStackNavigator();
 

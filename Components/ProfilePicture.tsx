@@ -24,7 +24,7 @@ const ProfilePicture = React.memo(
           <Image
             source={{ uri }}
             style={{ width: size, height: size, borderRadius: size / 2 }}
-            cachePolicy="disk"
+            cachePolicy="memory-disk"
           />
         ) : (
           <View

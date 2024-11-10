@@ -127,6 +127,7 @@ export enum ThemeColoursPrimary {
   GreyColour = "#b9b9b9",
   BackgroundColour = "#edebeb", //"#f1f1f1",
   GoldColour = "#ffd700",
+  LightGreyBackground = "#f2f2f2",
 }
 
 export enum LoginStatus {

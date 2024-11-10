@@ -10,43 +10,28 @@ import {
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { ImageType, ThemeColoursPrimary } from "../Constants/UI";
 import { Image } from "expo-image";
-import { getUserDetails } from "../Firebase/firebaseFireStore";
 import { useSelector } from "react-redux";
 import { RootState } from "../Redux/store";
 import NoPhotoPlaceHolder from "./NoPhotoPlaceHolder";
 import ProfilePicture from "./ProfilePicture";
 
 const PostCard = React.memo(({ postData, openPost }: any) => {
-  const [displayName, setDisplayName] = useState("");
-  // const [imageHeight, setImageHeight] = useState(200); // Default height
-  const { userDisplayName, userLiked } = useSelector(
+  const { userDisplayName: appUserDisplayName, userLiked } = useSelector(
     (state: RootState) => state.user
   );
   const {
     title,
-    user_id: userId,
     likes,
     id: postId,
     userProfilePic,
     description,
+    userDisplayName,
   } = postData;
 
-  // console.log(postData.media[0].height);
   const imageUrl = postData.media[0]?.media_url;
 
   //@ts-ignore
   const liked = userLiked.includes(postId);
-
-  const fetchUserData = async () => {
-    try {
-      const userDetails: any = await getUserDetails(userId);
-      setDisplayName(userDetails?.display_name);
-    } catch (error) {}
-  };
-
-  useEffect(() => {
-    fetchUserData();
-  }, [userId]);
 
   const imageHeight =
     (postData.media[0]?.height / postData.media[0]?.width) * 150;
@@ -65,7 +50,8 @@ const PostCard = React.memo(({ postData, openPost }: any) => {
           source={{
             uri: imageUrl,
           }}
-          cachePolicy="disk"
+          contentFit="cover"
+          cachePolicy="memory-disk"
         />
       ) : (
         <NoPhotoPlaceHolder title={title} description={description} />
@@ -76,10 +62,10 @@ const PostCard = React.memo(({ postData, openPost }: any) => {
         <View style={styles.cardDetails}>
           <ProfilePicture
             uri={userProfilePic}
-            userDisplayName={self ? userDisplayName : displayName}
+            userDisplayName={self ? appUserDisplayName : userDisplayName}
             type={ImageType.PostCard}
           />
-          <Text style={styles.userFont}>{displayName}</Text>
+          <Text style={styles.userFont}>{userDisplayName}</Text>
           <View style={styles.likes}>
             <AntDesign
               name={liked ? "heart" : "hearto"}
@@ -102,17 +88,6 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: ThemeColoursPrimary.PrimaryColour,
     borderRadius: 4,
-    ...Platform.select({
-      ios: {
-        shadowColor: "#000", // Shadow color
-        shadowOffset: { width: 0, height: 2 }, // Similar to elevation height
-        shadowOpacity: 0.2, // How transparent the shadow is
-        shadowRadius: 4, // The blur or spread radius of the shadow
-      },
-      android: {
-        elevation: 2, // Android's elevation property
-      },
-    }),
     width: "100%", // Adjust the width to fit multiple cards in a row
   },
   image: {

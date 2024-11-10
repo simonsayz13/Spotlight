@@ -128,7 +128,7 @@ const Contents = (props: any) => {
     <FadeInWrapper delay={1500}>
       <MasonryFlashList
         data={filteredPosts}
-        keyExtractor={(post: any) => post.id}
+        keyExtractor={(item) => item.id}
         renderItem={renderItem}
         estimatedItemSize={200} // Estimated size for optimal performance
         numColumns={2} // Setting 2 columns for masonry layout

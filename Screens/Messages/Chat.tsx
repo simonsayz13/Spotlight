@@ -126,24 +126,25 @@ const Chat = ({ route, navigation }: any) => {
           </TouchableOpacity>
         </View>
 
-        <FlashList
-          ref={FlatListRef}
-          data={clusterMessages(messages).reverse()}
-          renderItem={({ item: message }) => (
-            <Message
-              message={message}
-              profilePicUrl={profilePicUrl}
-              userDisplayName={userName}
-              navigation={navigation}
-            />
-          )}
-          contentContainerStyle={styles.messagesList}
-          onLayout={scrollToTop}
-          estimatedItemSize={50}
-          inverted={true}
-          bounces={false}
-        />
-
+        <View style={styles.messagContainer}>
+          <FlashList
+            ref={FlatListRef}
+            data={clusterMessages(messages).reverse()}
+            renderItem={({ item: message }) => (
+              <Message
+                message={message}
+                profilePicUrl={profilePicUrl}
+                userDisplayName={userName}
+                navigation={navigation}
+              />
+            )}
+            contentContainerStyle={styles.messagesList}
+            onLayout={scrollToTop}
+            estimatedItemSize={50}
+            inverted={true}
+            bounces={false}
+          />
+        </View>
         <View style={styles.messageBarContainer}>
           <View style={styles.messageBar}>
             <TextInput
@@ -174,6 +175,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: ThemeColoursPrimary.PrimaryColour,
+  },
+  messagContainer: {
+    flex: 1,
+    height: "100%",
+    backgroundColor: ThemeColoursPrimary.LightGreyBackground,
   },
   messagesList: {
     paddingHorizontal: 8,

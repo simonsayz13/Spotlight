@@ -105,6 +105,7 @@ const HomeScreen = ({ navigation }: any) => {
               handlePressInClearBtn={handlePressInClearBtn}
               isDropDownMenuVisible={isDropDownMenuVisible}
             />
+
             <View style={styles.contentWrapper}>
               <Contents
                 content={content}
@@ -151,6 +152,7 @@ const styles = StyleSheet.create({
   mainContent: {
     flex: 1,
     justifyContent: "center",
+    backgroundColor: ThemeColoursPrimary.LightGreyBackground,
   },
 });
 

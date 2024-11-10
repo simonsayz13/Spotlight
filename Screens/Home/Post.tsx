@@ -41,9 +41,8 @@ const Post = ({ navigation, route }: any) => {
   }));
 
   const openKeyboard = () => {
-    if (postInteractionBarRef.current) {
+    if (postInteractionBarRef.current)
       postInteractionBarRef.current.showKeyboard();
-    }
   };
 
   const showSettingDrawer = () => {
@@ -52,7 +51,8 @@ const Post = ({ navigation, route }: any) => {
   };
 
   const hideSettingDrawer = () => {
-    postInteractionBarRef.current.handleKeyboardDidHide();
+    if (postInteractionBarRef.current)
+      postInteractionBarRef.current.handleKeyboardDidHide();
     setIsDrawerOpen(false);
     setIsOptionsDrawer(false);
     setIsShareDrawer(false);

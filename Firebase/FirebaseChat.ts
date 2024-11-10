@@ -132,7 +132,6 @@ export const conversationListener = (
       id: doc.id,
       ...doc.data(),
     }));
-    console.log("pew pew pew");
     dispatch(
       setConversations(sortConversationsByLastMessage(conversationList))
     );
