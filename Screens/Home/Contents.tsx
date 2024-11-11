@@ -73,40 +73,34 @@ const Contents = (props: any) => {
     setBottomLoader(false);
   };
 
-  const openPost = (postData: any) => {
-    navigation.navigate(HomeStackScreens.Post, {
-      postData: postData,
-    });
-  };
-
   // Hook for loading data
   useEffect(() => {
     fetchInitialPosts();
   }, [content]);
 
   // Change the display of posts based on if search bar is active
-  useEffect(() => {
-    if (showSearchBar) {
-      setFilteredPosts([]);
-    } else {
-      setFilteredPosts(posts);
-    }
-  }, [showSearchBar]);
+  // useEffect(() => {
+  //   if (showSearchBar) {
+  //     setFilteredPosts([]);
+  //   } else {
+  //     setFilteredPosts(posts);
+  //   }
+  // }, [showSearchBar, posts]);
 
   // Filter the posts whose title contain the search text
-  useEffect(() => {
-    if (searchText === "") {
-      return setFilteredPosts([]);
-    }
-    const filtered = posts.filter((post: any) =>
-      post?.title?.toLowerCase().includes(searchText.toLowerCase())
-    );
-    setFilteredPosts(filtered);
-  }, [searchText]);
+  // useEffect(() => {
+  //   if (searchText === "") {
+  //     return setFilteredPosts([]);
+  //   }
+  //   const filtered = posts.filter((post: any) =>
+  //     post?.title?.toLowerCase().includes(searchText.toLowerCase())
+  //   );
+  //   setFilteredPosts(filtered);
+  // }, [searchText]);
 
   const renderItem = ({ item }: any) => (
     <View style={styles.cardContainer}>
-      <PostCard postData={item} openPost={openPost} navigation={navigation} />
+      <PostCard postData={item} navigation={navigation} />
     </View>
   );
 

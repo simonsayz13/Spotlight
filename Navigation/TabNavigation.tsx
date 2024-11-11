@@ -8,7 +8,6 @@ import {
 } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import HomeStack from "./Stacks/HomeStack";
-import FontAwesome6 from "@expo/vector-icons/FontAwesome";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Map } from "../Screens/Map/Map";
 import ProfileStack from "./Stacks/ProfileStack";
@@ -121,16 +120,6 @@ const TabNavigation = ({ navigation }: any) => {
         onPress={() => navigation.navigate(PostStackScreens.CreatePost)} // Navigate to your Post screen
         activeOpacity={1}
       >
-        {/* <FontAwesome
-          name="plus-square-o"
-          size={40}
-          color={ThemeColoursPrimary.LogoColour}
-        /> */}
-        {/* <FontAwesome6
-          name="bolt"
-          size={40}
-          color={ThemeColoursPrimary.LogoColour}
-        /> */}
         <Feather name="plus" size={44} color={ThemeColoursPrimary.LogoColour} />
       </TouchableOpacity>
     </KeyboardAvoidingView>
@@ -141,18 +130,18 @@ const styles = StyleSheet.create({
   customPostButton: {
     position: "absolute",
     bottom: Platform.OS === "ios" ? 30 : 2, // Adjust position for different platforms
-    left: width / 2 - 30, // Center the button horizontally
+    left: width / 2 - 28, // Center the button horizontally
     backgroundColor: ThemeColoursPrimary.PrimaryColour,
     borderRadius: 35,
-    width: 60,
-    height: 60,
+    width: 56,
+    height: 56,
     justifyContent: "center",
     alignItems: "center",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
-    shadowRadius: 3,
-    elevation: 5, // Android shadow
+    shadowRadius: 2,
+    elevation: 4, // Android shadow
   },
 });
 

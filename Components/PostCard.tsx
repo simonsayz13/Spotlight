@@ -1,21 +1,19 @@
-import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Platform,
-} from "react-native";
+import React from "react";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { ImageType, ThemeColoursPrimary } from "../Constants/UI";
+import {
+  HomeStackScreens,
+  ImageType,
+  ThemeColoursPrimary,
+} from "../Constants/UI";
 import { Image } from "expo-image";
 import { useSelector } from "react-redux";
 import { RootState } from "../Redux/store";
 import NoPhotoPlaceHolder from "./NoPhotoPlaceHolder";
 import ProfilePicture from "./ProfilePicture";
 
-const PostCard = React.memo(({ postData, openPost }: any) => {
+const PostCard = ({ postData, navigation }: any) => {
   const { userDisplayName: appUserDisplayName, userLiked } = useSelector(
     (state: RootState) => state.user
   );
@@ -35,6 +33,12 @@ const PostCard = React.memo(({ postData, openPost }: any) => {
 
   const imageHeight =
     (postData.media[0]?.height / postData.media[0]?.width) * 150;
+
+  const openPost = (postData: any) => {
+    navigation.navigate(HomeStackScreens.Post, {
+      postData: postData,
+    });
+  };
 
   return (
     <TouchableOpacity
@@ -82,7 +86,7 @@ const PostCard = React.memo(({ postData, openPost }: any) => {
       </View>
     </TouchableOpacity>
   );
-});
+};
 
 const styles = StyleSheet.create({
   card: {

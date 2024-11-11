@@ -143,32 +143,34 @@ const TopNavigationBar = (props: any) => {
         </TouchableOpacity>
       </View>
 
-      <Animated.View style={animatedMenuStyle}>
-        <View style={styles.buttonContainer}>
-          {buttonStates.map((button, index) => (
-            <TouchableOpacity
-              key={button.id}
-              onPress={() => handlePress(button.id, index)}
-              style={{ width: width / 3 }}
-            >
-              <View style={styles.textWrapper}>
-                <Text
-                  style={
-                    button.clicked
-                      ? styles.menuButtonClicked
-                      : styles.menuButton
-                  }
-                >
-                  {button.label}
-                </Text>
-              </View>
-            </TouchableOpacity>
-          ))}
-        </View>
-        <Animated.View
-          style={[styles.customUnderline, animatedUnderlineStyle]}
-        />
-      </Animated.View>
+      {!showSearchBar && (
+        <Animated.View style={animatedMenuStyle}>
+          <View style={styles.buttonContainer}>
+            {buttonStates.map((button, index) => (
+              <TouchableOpacity
+                key={button.id}
+                onPress={() => handlePress(button.id, index)}
+                style={{ width: width / 3 }}
+              >
+                <View style={styles.textWrapper}>
+                  <Text
+                    style={
+                      button.clicked
+                        ? styles.menuButtonClicked
+                        : styles.menuButton
+                    }
+                  >
+                    {button.label}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+          <Animated.View
+            style={[styles.customUnderline, animatedUnderlineStyle]}
+          />
+        </Animated.View>
+      )}
     </View>
   );
 };

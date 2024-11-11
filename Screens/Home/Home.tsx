@@ -17,6 +17,7 @@ import { getPostsBySearch } from "../../Firebase/firebaseFireStore";
 import { setPosts } from "../../Redux/Slices/postsSlices";
 import store from "../../Redux/store";
 import { delay } from "../../Util/utility";
+import PostSearchView from "../../Components/PostSearchView";
 
 const DrawerMenu = () => {
   return (
@@ -61,7 +62,8 @@ const HomeScreen = ({ navigation }: any) => {
   };
 
   const handlePressSearchBtn = () => {
-    showSearchBar ? fetchNewItem() : setShowSearchBar((prev: boolean) => !prev);
+    if (!showSearchBar) setShowSearchBar((prev: boolean) => !prev);
+    // showSearchBar ? fetchNewItem() :
     setIsDropDownMenuVisible(false);
   };
 
@@ -81,7 +83,9 @@ const HomeScreen = ({ navigation }: any) => {
   }, [showSearchBar]);
 
   const handleScroll = (event: any) => {
+    // if (showSearchBar) return;
     const offsetY = event.nativeEvent.contentOffset.y;
+
     if (lastScrollY.current - offsetY > 20) {
       setIsDropDownMenuVisible(true);
     } else if (offsetY - lastScrollY.current > 20) {
@@ -107,6 +111,8 @@ const HomeScreen = ({ navigation }: any) => {
             />
 
             <View style={styles.contentWrapper}>
+              <PostSearchView visible={showSearchBar} />
+
               <Contents
                 content={content}
                 navigation={navigation}
