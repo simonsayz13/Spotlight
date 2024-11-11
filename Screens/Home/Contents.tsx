@@ -16,7 +16,7 @@ const Contents = (props: any) => {
   const [refreshing, setRefreshing] = useState(false);
   const { posts } = useSelector((state: RootState) => state.posts);
   const otherUsers = useSelector((state: RootState) => state.otherUsers);
-  const [filteredPosts, setFilteredPosts] = useState<Array<any>>([]);
+  const [displayPosts, setDisplayPosts] = useState<Array<any>>([]);
   const [displayList, setDisplayList] = useState<boolean>(false);
   const [bottomLoader, setBottomLoader] = useState<boolean>(false);
   const [lastVisible, setLastVisible] = useState<any>(null);
@@ -29,12 +29,12 @@ const Contents = (props: any) => {
       const postsWithUserDetails = await fetchUserDetailOnPosts(
         fetchedPosts.posts
       );
-      setFilteredPosts(postsWithUserDetails);
+      setDisplayPosts(postsWithUserDetails);
       store.dispatch(setPosts(postsWithUserDetails));
       setDisplayList(true);
       setRefreshing(false);
     } catch (error) {
-      Alert.alert("Error", "Error fetching posts");
+      Alert.alert("Oops", "Could not fetch any posts");
     }
   };
 
@@ -69,7 +69,7 @@ const Contents = (props: any) => {
     const postsWithUserDetails = await fetchUserDetailOnPosts(
       fetchedPosts.posts
     );
-    setFilteredPosts((prevPosts) => [...prevPosts, ...postsWithUserDetails]);
+    setDisplayPosts((prevPosts) => [...prevPosts, ...postsWithUserDetails]);
     setBottomLoader(false);
   };
 
@@ -79,13 +79,9 @@ const Contents = (props: any) => {
   }, [content]);
 
   // Change the display of posts based on if search bar is active
-  // useEffect(() => {
-  //   if (showSearchBar) {
-  //     setFilteredPosts([]);
-  //   } else {
-  //     setFilteredPosts(posts);
-  //   }
-  // }, [showSearchBar, posts]);
+  useEffect(() => {
+    setDisplayPosts(posts);
+  }, [posts]);
 
   // Filter the posts whose title contain the search text
   // useEffect(() => {
@@ -121,7 +117,7 @@ const Contents = (props: any) => {
   return displayList ? (
     <FadeInWrapper delay={1500}>
       <MasonryFlashList
-        data={filteredPosts}
+        data={displayPosts}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         estimatedItemSize={200} // Estimated size for optimal performance

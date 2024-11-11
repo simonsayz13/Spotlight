@@ -15,9 +15,11 @@ import DrawerNavigationBar from "../../Components/DrawerNavigationBar";
 import { ThemeColoursPrimary } from "../../Constants/UI";
 import { getPostsBySearch } from "../../Firebase/firebaseFireStore";
 import { setPosts } from "../../Redux/Slices/postsSlices";
-import store from "../../Redux/store";
+import store, { RootState } from "../../Redux/store";
 import { delay } from "../../Util/utility";
 import PostSearchView from "../../Components/PostSearchView";
+import { getUserProfileDetails } from "../../Firebase/FirebaseUsers";
+import { useDispatch, useSelector } from "react-redux";
 
 const DrawerMenu = () => {
   return (
@@ -33,7 +35,10 @@ const HomeScreen = ({ navigation }: any) => {
   const [searchText, setSearchText] = useState("");
   const [showSearchBar, setShowSearchBar] = useState(false);
   const [isDropDownMenuVisible, setIsDropDownMenuVisible] = useState(true);
+  const [searchPostResult, setSearchPostResult] = useState<Array<any>>([]);
+  const otherUsers = useSelector((state: RootState) => state.otherUsers);
   const lastScrollY = useRef(0);
+  const dispatch = useDispatch();
   const changeContent = useCallback((content: string) => {
     setContent(content);
   }, []);
@@ -47,12 +52,29 @@ const HomeScreen = ({ navigation }: any) => {
   const fetchPostsBySearch = async (searchText: string = "") => {
     try {
       const data = await getPostsBySearch(searchText);
-      setShowSearchBar(false);
-      await delay(200); // Delay to ensure pst dsiplay can only happen after searchText is reset
-      store.dispatch(setPosts(data));
+      await delay(200); // Delay to ensure pst display can only happen after searchText is reset
+      const postsWithUserDetails = await fetchUserDetailOnPosts(data);
+      setSearchPostResult(postsWithUserDetails);
     } catch (error) {
       Alert.alert("Error", "Error fetching posts");
     }
+  };
+
+  const fetchUserDetailOnPosts = async (fetchedPosts: any) => {
+    return await Promise.all(
+      fetchedPosts.map(async (post: any) => {
+        let userDetails: any = await getUserProfileDetails(
+          post.user_id,
+          otherUsers,
+          dispatch
+        );
+        return {
+          ...post,
+          userDisplayName: userDetails.displayName,
+          userProfilePic: userDetails.profilePictureUrl,
+        };
+      })
+    );
   };
 
   const fetchNewItem = () => {
@@ -62,8 +84,7 @@ const HomeScreen = ({ navigation }: any) => {
   };
 
   const handlePressSearchBtn = () => {
-    if (!showSearchBar) setShowSearchBar((prev: boolean) => !prev);
-    // showSearchBar ? fetchNewItem() :
+    showSearchBar ? fetchNewItem() : setShowSearchBar(true);
     setIsDropDownMenuVisible(false);
   };
 
@@ -111,7 +132,12 @@ const HomeScreen = ({ navigation }: any) => {
             />
 
             <View style={styles.contentWrapper}>
-              <PostSearchView visible={showSearchBar} />
+              <PostSearchView
+                visible={showSearchBar}
+                postData={searchPostResult}
+                searchText={searchText}
+                navigation={navigation}
+              />
 
               <Contents
                 content={content}
