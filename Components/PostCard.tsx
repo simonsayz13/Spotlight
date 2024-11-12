@@ -32,7 +32,7 @@ const PostCard = ({ postData, navigation }: any) => {
   const liked = userLiked.includes(postId);
 
   const imageHeight =
-    (postData.media[0]?.height / postData.media[0]?.width) * 150;
+    (postData.media[0]?.height / postData.media[0]?.width) * 130;
 
   const openPost = (postData: any) => {
     navigation.navigate(HomeStackScreens.Post, {

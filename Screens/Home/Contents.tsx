@@ -10,6 +10,7 @@ import { MasonryFlashList } from "@shopify/flash-list";
 import FadeInWrapper from "../../Components/FadeInWrapper";
 import Loader from "../../Components/Loader";
 import { getUserProfileDetails } from "../../Firebase/FirebaseUsers";
+import { fetchUserDetailOnPosts } from "../../Util/Services";
 
 const Contents = (props: any) => {
   const { content, navigation, showSearchBar, searchText, onScroll } = props;
@@ -25,34 +26,19 @@ const Contents = (props: any) => {
   const fetchInitialPosts = async () => {
     try {
       const fetchedPosts: any = await getPaginatedPosts();
-      setLastVisible(fetchedPosts.lastVisible);
       const postsWithUserDetails = await fetchUserDetailOnPosts(
-        fetchedPosts.posts
+        fetchedPosts.posts,
+        otherUsers,
+        dispatch
       );
+      // store.dispatch(setPosts(postsWithUserDetails));
       setDisplayPosts(postsWithUserDetails);
-      store.dispatch(setPosts(postsWithUserDetails));
+      setLastVisible(fetchedPosts.lastVisible);
       setDisplayList(true);
       setRefreshing(false);
     } catch (error) {
       Alert.alert("Oops", "Could not fetch any posts");
     }
-  };
-
-  const fetchUserDetailOnPosts = async (fetchedPosts: any) => {
-    return await Promise.all(
-      fetchedPosts.map(async (post: any) => {
-        let userDetails: any = await getUserProfileDetails(
-          post.user_id,
-          otherUsers,
-          dispatch
-        );
-        return {
-          ...post,
-          userDisplayName: userDetails.displayName,
-          userProfilePic: userDetails.profilePictureUrl,
-        };
-      })
-    );
   };
 
   // Refresh the contents page
@@ -67,7 +53,9 @@ const Contents = (props: any) => {
       ? setLastVisible(null)
       : setLastVisible(fetchedPosts.lastVisible);
     const postsWithUserDetails = await fetchUserDetailOnPosts(
-      fetchedPosts.posts
+      fetchedPosts.posts,
+      otherUsers,
+      dispatch
     );
     setDisplayPosts((prevPosts) => [...prevPosts, ...postsWithUserDetails]);
     setBottomLoader(false);
@@ -79,20 +67,16 @@ const Contents = (props: any) => {
   }, [content]);
 
   // Change the display of posts based on if search bar is active
-  useEffect(() => {
-    setDisplayPosts(posts);
-  }, [posts]);
-
-  // Filter the posts whose title contain the search text
   // useEffect(() => {
-  //   if (searchText === "") {
-  //     return setFilteredPosts([]);
-  //   }
-  //   const filtered = posts.filter((post: any) =>
-  //     post?.title?.toLowerCase().includes(searchText.toLowerCase())
-  //   );
-  //   setFilteredPosts(filtered);
-  // }, [searchText]);
+  //   setDisplayPosts(posts);
+  // }, [posts]);
+
+  const onReachedEnd = () => {
+    if (lastVisible) {
+      setBottomLoader(true);
+      loadMorePosts();
+    }
+  };
 
   const renderItem = ({ item }: any) => (
     <View style={styles.cardContainer}>
@@ -107,20 +91,13 @@ const Contents = (props: any) => {
       </View>
     );
 
-  const onReachedEnd = () => {
-    if (lastVisible) {
-      setBottomLoader(true);
-      loadMorePosts();
-    }
-  };
-
   return displayList ? (
     <FadeInWrapper delay={1500}>
       <MasonryFlashList
         data={displayPosts}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
-        estimatedItemSize={200} // Estimated size for optimal performance
+        estimatedItemSize={150} // Estimated size for optimal performance
         numColumns={2} // Setting 2 columns for masonry layout
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.flashListContainer}

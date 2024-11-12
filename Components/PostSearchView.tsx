@@ -1,47 +1,56 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, Dimensions } from "react-native";
+import { View, Text, StyleSheet, Dimensions, Platform } from "react-native";
 import FadeInWrapper from "./FadeInWrapper";
 import { MasonryFlashList } from "@shopify/flash-list";
 import PostCard from "./PostCard";
 import { ThemeColoursPrimary } from "../Constants/UI";
+import { Entypo } from "@expo/vector-icons";
 const { height, width } = Dimensions.get("window");
 
 const PostSearchView = (props: any) => {
   const { visible, postData, searchText, navigation } = props;
+
   if (!visible) return null;
-  const [message, setMessage] = useState(
-    "Looking for something specific? Start typing here..."
-  );
 
-  useEffect(() => {
-    if (searchText !== "")
-      setMessage(
-        `Unfortunately, there is no similar post found on ${searchText}`
-      );
-    console.log(postData);
-  }, [postData]);
-
-  useEffect(() => {
-    console.log(searchText);
-  }, [searchText]);
-
-  const renderItem = ({ item }: any) => (
-    <View style={styles.cardContainer}>
-      <PostCard postData={item} navigation={navigation} />
+  const NotFoundMessage = () => (
+    <View style={styles.messageContainer}>
+      <Entypo
+        name="emoji-sad"
+        size={40}
+        color="black"
+        style={styles.notFoundIcon}
+      />
+      <Text style={styles.messageText}>
+        {"Sorry, we couldn't find any posts matching:\n"}
+        <Text style={styles.notFoundSearchText}>{`"${searchText}"`}</Text>
+      </Text>
     </View>
   );
 
+  const SearchPromptText = () => (
+    <View style={styles.messageContainer}>
+      <Text>{"Looking for something specific? Search here..."}</Text>
+    </View>
+  );
+
+  const MessagePrompt = () =>
+    postData[0] === "notFound" ? <NotFoundMessage /> : <SearchPromptText />;
+
   return (
     <View style={styles.dropdown}>
-      {postData.length === 0 ? (
-        <Text style={styles.searchPromptText}>{message}</Text>
+      {postData.length === 0 || postData[0] === "notFound" ? (
+        <MessagePrompt />
       ) : (
         <FadeInWrapper delay={1500}>
           <View style={styles.flashListWrapper}>
             <MasonryFlashList
               data={postData}
-              keyExtractor={(item) => item.id}
-              renderItem={renderItem}
+              keyExtractor={(item: any) => item.id}
+              renderItem={({ item }: any) => (
+                <View style={styles.cardContainer}>
+                  <PostCard postData={item} navigation={navigation} />
+                </View>
+              )}
               estimatedItemSize={200} // Estimated size for optimal performance
               numColumns={2} // Setting 2 columns for masonry layout
               showsVerticalScrollIndicator={false}
@@ -58,7 +67,7 @@ const PostSearchView = (props: any) => {
 
 const styles = StyleSheet.create({
   dropdown: {
-    backgroundColor: "white",
+    backgroundColor: ThemeColoursPrimary.LightGreyBackground,
     height: "100%", // Takes full height of parent
     width: "100%", // Takes full width of parent
     alignItems: "center",
@@ -72,7 +81,6 @@ const styles = StyleSheet.create({
   },
   cardContainer: {
     flex: 1,
-    width: "100%",
     marginHorizontal: 2, // Horizontal gap between the cards
     marginBottom: 4, // Vertical gap between rows
   },
@@ -85,6 +93,22 @@ const styles = StyleSheet.create({
     backgroundColor: ThemeColoursPrimary.LightGreyBackground,
     height: height,
     width: width,
+  },
+  messageContainer: {
+    alignItems: "center", // Center align items
+    padding: 10,
+  },
+  notFoundIcon: {
+    marginBottom: 8, // Space between icon and message text
+  },
+  messageText: {
+    fontSize: Platform.OS === "android" ? 14 : 16,
+    color: "black",
+    textAlign: "center", // Center align text if it spans multiple lines
+  },
+  notFoundSearchText: {
+    fontSize: Platform.OS === "android" ? 16 : 18,
+    fontWeight: "bold", // Bold style
   },
 });
 

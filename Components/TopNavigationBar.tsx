@@ -121,6 +121,7 @@ const TopNavigationBar = (props: any) => {
                   placeholder="Search..."
                   value={searchText}
                   onChange={handleSearchBarChange}
+                  onSubmitEditing={handlePressSearchBtn}
                 />
                 {searchText.length > 0 && (
                   <TouchableOpacity onPressIn={handlePressInClearBtn}>
@@ -228,6 +229,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   input: {
+    width: "95%",
     height: 36,
     borderColor: "black",
   },

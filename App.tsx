@@ -12,7 +12,7 @@ import { Shrikhand_400Regular } from "@expo-google-fonts/shrikhand";
 import SplashScreen from "./Screens/Home/SplashScreen";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { conversationListener } from "./Firebase/FirebaseChat";
-import { LogBox } from "react-native";
+import { LogBox, StatusBar } from "react-native";
 
 // Suppress specific warnings from Firestore or Firebase
 LogBox.ignoreLogs(["@firebase/firestore: Firestore"]);
@@ -50,7 +50,7 @@ const MainApp = () => {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         <NavigationContainer>
-          {/* <StatusBar barStyle="dark-content" hidden={false} /> */}
+          <StatusBar />
           <MainNavigationStack />
         </NavigationContainer>
       </SafeAreaProvider>

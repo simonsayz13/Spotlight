@@ -20,6 +20,7 @@ import { delay } from "../../Util/utility";
 import PostSearchView from "../../Components/PostSearchView";
 import { getUserProfileDetails } from "../../Firebase/FirebaseUsers";
 import { useDispatch, useSelector } from "react-redux";
+import { fetchUserDetailOnPosts } from "../../Util/Services";
 
 const DrawerMenu = () => {
   return (
@@ -51,30 +52,18 @@ const HomeScreen = ({ navigation }: any) => {
 
   const fetchPostsBySearch = async (searchText: string = "") => {
     try {
-      const data = await getPostsBySearch(searchText);
-      await delay(200); // Delay to ensure pst display can only happen after searchText is reset
-      const postsWithUserDetails = await fetchUserDetailOnPosts(data);
-      setSearchPostResult(postsWithUserDetails);
+      const fetchedPost = await getPostsBySearch(searchText);
+      const postsWithUserDetails = await fetchUserDetailOnPosts(
+        fetchedPost,
+        otherUsers,
+        dispatch
+      );
+      postsWithUserDetails.length === 0
+        ? setSearchPostResult(["notFound"])
+        : setSearchPostResult(postsWithUserDetails);
     } catch (error) {
-      Alert.alert("Error", "Error fetching posts");
+      Alert.alert("Oops", "Could not fetch any posts");
     }
-  };
-
-  const fetchUserDetailOnPosts = async (fetchedPosts: any) => {
-    return await Promise.all(
-      fetchedPosts.map(async (post: any) => {
-        let userDetails: any = await getUserProfileDetails(
-          post.user_id,
-          otherUsers,
-          dispatch
-        );
-        return {
-          ...post,
-          userDisplayName: userDetails.displayName,
-          userProfilePic: userDetails.profilePictureUrl,
-        };
-      })
-    );
   };
 
   const fetchNewItem = () => {
@@ -90,11 +79,13 @@ const HomeScreen = ({ navigation }: any) => {
 
   const handlePressMenuBtn = (cb: any) => {
     showSearchBar ? setShowSearchBar((prev: boolean) => !prev) : cb();
+    setSearchPostResult([]);
     setIsDropDownMenuVisible(true);
   };
 
   const handlePressInClearBtn = () => {
     setSearchText(""); // Reset the searchText state
+    setSearchPostResult([]);
   };
 
   useEffect(() => {
