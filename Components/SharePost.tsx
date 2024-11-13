@@ -140,7 +140,6 @@ const SharePost = ({
     try {
       for (const conversation of selectedConversation) {
         const { conversationId } = conversation;
-        console.log(conversationId);
         await sendMessage(
           conversationId,
           appUserId!,

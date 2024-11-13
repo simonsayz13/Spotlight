@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -48,7 +48,7 @@ const ViewProfile = ({ navigation, route }: any) => {
   const [bio, setBio] = useState("");
   const [gender, setGender] = useState("");
   const [followers, setFollowers] = useState([]);
-  const [followings, setfollowings] = useState([]);
+  const [followings, setFollowings] = useState([]);
   const [isFollowed, setIsFollowed] = useState(false);
   const [ldgUserDetails, setLdgUserDetails] = useState(false);
   const [ldgSuccUserDetails, setLdgSuccUserDetails] = useState(false);
@@ -122,11 +122,11 @@ const ViewProfile = ({ navigation, route }: any) => {
       setBio(biography);
       setGender(gender);
       setFollowers(followers);
-      setfollowings(followings);
+      setFollowings(followings);
       setProfileUserId(user_id);
       setLdgUserDetails(false);
       setLdgSuccUserDetails(true);
-      followers?.find((followerId) => followerId === appUserId) &&
+      followers?.find((followerId: string) => followerId === appUserId) &&
         setIsFollowed(true);
     });
   }, [userId]);

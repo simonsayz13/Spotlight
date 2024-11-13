@@ -68,6 +68,7 @@ export const Tags = [
 export enum MainStacks {
   Login = "LoginStack",
   MainTab = "MainTabStack",
+  HomeStack = "HomeStack",
 }
 export enum HomeStackScreens {
   Home = "home",
@@ -89,6 +90,10 @@ export enum ProfileStackScreens {
 export enum FollowStackScreens {
   FollowerList = "followerList",
   FollowingList = "followingList",
+}
+
+export enum OtherScreens {
+  AboutUs = "aboutus",
 }
 export enum NavigationTabs {
   Me = "Me",

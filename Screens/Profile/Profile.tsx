@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -17,12 +17,10 @@ import {
   Gender,
   HomeStackScreens,
   ImageType,
-  MainStacks,
   ProfileStackScreens,
   ThemeColoursPrimary,
   userContentSelectorButtons,
 } from "../../Constants/UI";
-import { logOut } from "../../Firebase/firebaseAuth";
 import PostCard from "../../Components/PostCard";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -31,7 +29,6 @@ import {
   getPostsByUserId,
 } from "../../Firebase/firebaseFireStore";
 import { MasonryFlashList } from "@shopify/flash-list";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import ProfilePicture from "../../Components/ProfilePicture";
 import ImageModal from "../../Components/ImageModal";
 const Profile = ({ navigation }: any) => {
@@ -136,11 +133,6 @@ const Profile = ({ navigation }: any) => {
           : { ...button, clicked: false }
       )
     );
-  };
-
-  const handleLogout = () => {
-    logOut();
-    navigation.replace(MainStacks.Login);
   };
 
   const handleEdit = () => {
@@ -249,13 +241,6 @@ const Profile = ({ navigation }: any) => {
               <AntDesign
                 name="edit"
                 size={19}
-                color={ThemeColoursPrimary.PrimaryColour}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={handleLogout}>
-              <MaterialIcons
-                name="logout"
-                size={20}
                 color={ThemeColoursPrimary.PrimaryColour}
               />
             </TouchableOpacity>

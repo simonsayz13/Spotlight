@@ -78,7 +78,6 @@ export const sendMessage = async (
       read: false,
       postId,
     };
-    console.log(newMessage);
 
     // Add the new message document to the messages subcollection
     const newMessageRef = doc(messagesCollectionRef); // Generate a unique document reference
@@ -122,6 +121,7 @@ export const conversationListener = (
   dispatch: any
   // setConversations: SetStateAction<any>
 ) => {
+  if (!currentUserId) return;
   const conversationsRef = collection(db, FireStoreCollections.Chats);
   const q = query(
     conversationsRef,
