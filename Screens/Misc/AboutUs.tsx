@@ -8,14 +8,15 @@ import {
   View,
 } from "react-native";
 import { Image } from "expo-image";
-import { MainStacks, ThemeColoursPrimary } from "../../Constants/UI";
+import { ThemeColoursPrimary } from "../../Constants/UI";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import images from "../../Constants/images";
 const AboutUs = (props: any) => {
   const { navigation } = props;
 
   const handleBackButtonPress = () => {
-    navigation.navigate(MainStacks.HomeStack, { screen: "Home" });
+    navigation.toggleDrawer();
+    // navigation.navigate(MainStacks.HomeStack, { screen: "Home" });
   };
 
   const handleEmailPress = () => {

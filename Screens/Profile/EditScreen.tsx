@@ -14,7 +14,6 @@ import {
   EditProfileType,
   EditProfileTypeMap,
   Gender,
-  ThemeColours,
   ThemeColoursPrimary,
 } from "../../Constants/UI";
 import { updateProfileField } from "../../Firebase/firebaseFireStore";

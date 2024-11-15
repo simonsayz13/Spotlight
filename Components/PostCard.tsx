@@ -1,5 +1,11 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Pressable,
+} from "react-native";
 
 import AntDesign from "@expo/vector-icons/AntDesign";
 import {
@@ -13,7 +19,7 @@ import { RootState } from "../Redux/store";
 import NoPhotoPlaceHolder from "./NoPhotoPlaceHolder";
 import ProfilePicture from "./ProfilePicture";
 
-const PostCard = ({ postData, navigation }: any) => {
+const PostCard = React.memo(({ postData, navigation }: any) => {
   const { userDisplayName: appUserDisplayName, userLiked } = useSelector(
     (state: RootState) => state.user
   );
@@ -41,9 +47,8 @@ const PostCard = ({ postData, navigation }: any) => {
   };
 
   return (
-    <TouchableOpacity
+    <Pressable
       style={styles.card}
-      activeOpacity={1}
       onPress={() => {
         openPost(postData);
       }}
@@ -84,9 +89,9 @@ const PostCard = ({ postData, navigation }: any) => {
           </View>
         </View>
       </View>
-    </TouchableOpacity>
+    </Pressable>
   );
-};
+});
 
 const styles = StyleSheet.create({
   card: {

@@ -2,15 +2,14 @@ import React, { useCallback, useEffect, useState } from "react";
 import { StyleSheet, Alert, RefreshControl, View, Text } from "react-native";
 import PostCard from "../../Components/PostCard";
 import { getPaginatedPosts } from "../../Firebase/firebaseFireStore";
-import { HomeStackScreens, ThemeColoursPrimary } from "../../Constants/UI";
-import { setPosts } from "../../Redux/Slices/postsSlices";
+import { ThemeColoursPrimary } from "../../Constants/UI";
 import { useDispatch, useSelector } from "react-redux";
-import store, { RootState } from "../../Redux/store";
+import { RootState } from "../../Redux/store";
 import { MasonryFlashList } from "@shopify/flash-list";
 import FadeInWrapper from "../../Components/FadeInWrapper";
 import Loader from "../../Components/Loader";
-import { getUserProfileDetails } from "../../Firebase/FirebaseUsers";
 import { fetchUserDetailOnPosts } from "../../Util/Services";
+import { FlatList } from "react-native-gesture-handler";
 
 const Contents = (props: any) => {
   const { content, navigation, showSearchBar, searchText, onScroll } = props;
@@ -31,7 +30,6 @@ const Contents = (props: any) => {
         otherUsers,
         dispatch
       );
-      // store.dispatch(setPosts(postsWithUserDetails));
       setDisplayPosts(postsWithUserDetails);
       setLastVisible(fetchedPosts.lastVisible);
       setDisplayList(true);
@@ -66,11 +64,6 @@ const Contents = (props: any) => {
     fetchInitialPosts();
   }, [content]);
 
-  // Change the display of posts based on if search bar is active
-  // useEffect(() => {
-  //   setDisplayPosts(posts);
-  // }, [posts]);
-
   const onReachedEnd = () => {
     if (lastVisible) {
       setBottomLoader(true);
@@ -78,10 +71,13 @@ const Contents = (props: any) => {
     }
   };
 
-  const renderItem = ({ item }: any) => (
-    <View style={styles.cardContainer}>
-      <PostCard postData={item} navigation={navigation} />
-    </View>
+  const renderItem = useCallback(
+    ({ item }: any) => (
+      <View style={styles.cardContainer}>
+        <PostCard postData={item} navigation={navigation} />
+      </View>
+    ),
+    [navigation]
   );
 
   const renderBottomLoader = () =>
@@ -97,7 +93,7 @@ const Contents = (props: any) => {
         data={displayPosts}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
-        estimatedItemSize={150} // Estimated size for optimal performance
+        estimatedItemSize={200} // Estimated size for optimal performance
         numColumns={2} // Setting 2 columns for masonry layout
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.flashListContainer}
@@ -111,7 +107,7 @@ const Contents = (props: any) => {
             colors={[ThemeColoursPrimary.LogoColour]} // Optional: Refresh spinner color
           />
         }
-        onEndReachedThreshold={0.2}
+        onEndReachedThreshold={0.01}
         onEndReached={onReachedEnd}
       />
     </FadeInWrapper>

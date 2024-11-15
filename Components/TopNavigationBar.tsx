@@ -40,9 +40,19 @@ const TopNavigationBar = (props: any) => {
   );
   const dropdownHeight = useSharedValue(0);
 
-  dropdownHeight.value = withTiming(isDropDownMenuVisible ? 30 : 0, {
-    duration: 300,
-  }); // Adjust height as needed
+  //> Hooks
+  useEffect(() => {
+    if (showSearchBar && inputRef?.current) {
+      inputRef.current?.focus();
+    }
+    translateY.value = withTiming(showSearchBar ? 0 : -16, { duration: 300 });
+  }, [showSearchBar]);
+
+  useEffect(() => {
+    dropdownHeight.value = withTiming(isDropDownMenuVisible ? 30 : 0, {
+      duration: 300,
+    });
+  }, [isDropDownMenuVisible]);
 
   const handlePress = (id: number, index: number) => {
     setButtonStates((prevStates) =>
@@ -63,33 +73,32 @@ const TopNavigationBar = (props: any) => {
       { duration: 100 }
     );
   };
-  const animatedStyleSearchBar = useAnimatedStyle(() => ({
-    transform: [{ translateY: translateY.value }],
-  }));
 
-  const animatedMenuStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(dropdownHeight.value, [0, 30], [0, 1], "clamp"),
-    height: dropdownHeight.value,
+  const animatedStyleSearchBar = useAnimatedStyle(() => {
+    return { transform: [{ translateY: translateY.value }] };
+  });
+
+  const animatedMenuStyle = useAnimatedStyle(() => {
+    const opacity = interpolate(dropdownHeight.value, [0, 30], [0, 1], "clamp");
+    return {
+      opacity,
+      height: dropdownHeight.value,
+      backgroundColor: ThemeColoursPrimary.PrimaryColour,
+    };
+  });
+
+  const menuStyle = {
     zIndex: isDropDownMenuVisible ? 0 : -10,
-    backgroundColor: ThemeColoursPrimary.PrimaryColour,
     marginBottom: isDropDownMenuVisible ? 4 : 0,
-  }));
+  };
 
-  const animatedUnderlineStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(dropdownHeight.value, [0, 30], [0, 1], "clamp"),
-    transform: [{ translateX: underlinePosition.value }],
-  }));
-
-  //> Hooks
-  useEffect(() => {
-    translateY.value = withTiming(showSearchBar ? 0 : -16, { duration: 300 });
-  }, [showSearchBar]);
-
-  useEffect(() => {
-    if (showSearchBar && inputRef?.current) {
-      inputRef.current?.focus();
-    }
-  }, [showSearchBar]);
+  const animatedUnderlineStyle = useAnimatedStyle(() => {
+    const opacity = interpolate(dropdownHeight.value, [0, 30], [0, 1], "clamp");
+    return {
+      opacity,
+      transform: [{ translateX: underlinePosition.value }],
+    };
+  });
 
   return (
     <View>
@@ -145,7 +154,7 @@ const TopNavigationBar = (props: any) => {
       </View>
 
       {!showSearchBar && (
-        <Animated.View style={animatedMenuStyle}>
+        <Animated.View style={[animatedMenuStyle, menuStyle]}>
           <View style={styles.buttonContainer}>
             {buttonStates.map((button, index) => (
               <TouchableOpacity

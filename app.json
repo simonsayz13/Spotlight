@@ -33,6 +33,7 @@
         }
       ],
       "expo-font"
-    ]
+    ],
+    "newArchEnabled": true
   }
 }

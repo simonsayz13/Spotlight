@@ -6,6 +6,8 @@ import {
   StyleSheet,
   Alert,
   Pressable,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -23,12 +25,11 @@ import {
   AuthErrorCode,
   FireBaseAuthErrorMessages,
 } from "../../Constants/errorMessages";
-// import { Link } from "expo-router";
 
 const SignIn = ({ navigation }: any) => {
   const [form, setForm] = useState({
-    email: "",
-    password: "",
+    email: "test@gmail.com",
+    password: "123456",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -57,43 +58,51 @@ const SignIn = ({ navigation }: any) => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView>
-        <View style={styles.container}>
-          <Image
-            source={images.trademark}
-            resizeMode="cover"
-            style={styles.logo}
-          />
-          <Text style={styles.titleText}>Log in to Spotlight</Text>
-          <FormField
-            title="Email"
-            value={form.email}
-            handleChangeText={(e) => setForm({ ...form, email: e })}
-            otherStyles={styles.formFieldMargin}
-            keyboardType="email-address"
-          />
-          <FormField
-            title="Password"
-            value={form.password}
-            handleChangeText={(e) => setForm({ ...form, password: e })}
-            otherStyles={styles.formFieldMargin}
-            autoComplete="off"
-          />
-          <CustomButton
-            title="Sign In"
-            handlePress={handleLogin}
-            containerStyles={styles.buttonMargin}
-            isLoading={isSubmitting}
-          />
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>Don't have an account?</Text>
-            <Pressable onPress={handlePressSignup}>
-              <Text style={styles.signUpLink}>Sign Up</Text>
-            </Pressable>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.safeArea}
+      >
+        <ScrollView>
+          <View style={styles.container}>
+            <Image
+              source={images.trademark}
+              resizeMode="cover"
+              style={styles.logo}
+            />
+            <Text style={styles.titleText}>Log in to Spotlight</Text>
+            <FormField
+              title="Email"
+              value={form.email}
+              handleChangeText={(e) => setForm({ ...form, email: e })}
+              otherStyles={styles.formFieldMargin}
+              keyboardType="email-address"
+              placeholder={""}
+            />
+            <FormField
+              title="Password"
+              value={form.password}
+              handleChangeText={(e) => setForm({ ...form, password: e })}
+              otherStyles={styles.formFieldMargin}
+              autoComplete="off"
+              placeholder={""}
+            />
+            <CustomButton
+              title="Sign In"
+              handlePress={handleLogin}
+              containerStyles={styles.buttonMargin}
+              isLoading={isSubmitting}
+              textStyles={""}
+            />
+            <View style={styles.footer}>
+              <Text style={styles.footerText}>Don't have an account?</Text>
+              <Pressable onPress={handlePressSignup}>
+                <Text style={styles.signUpLink}>Sign Up</Text>
+              </Pressable>
+            </View>
           </View>
-        </View>
-        <ActivityLoader indicator={isSubmitting} text={"Logging in"} />
-      </ScrollView>
+          <ActivityLoader indicator={isSubmitting} text={"Logging in"} />
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
