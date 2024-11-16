@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { StyleSheet, Alert, RefreshControl, View, Text } from "react-native";
+import { StyleSheet, Alert, RefreshControl, View } from "react-native";
 import PostCard from "../../Components/PostCard";
 import { getPaginatedPosts } from "../../Firebase/firebaseFireStore";
 import { ThemeColoursPrimary } from "../../Constants/UI";
@@ -9,12 +9,10 @@ import { MasonryFlashList } from "@shopify/flash-list";
 import FadeInWrapper from "../../Components/FadeInWrapper";
 import Loader from "../../Components/Loader";
 import { fetchUserDetailOnPosts } from "../../Util/Services";
-import { FlatList } from "react-native-gesture-handler";
 
 const Contents = (props: any) => {
-  const { content, navigation, showSearchBar, searchText, onScroll } = props;
+  const { content, navigation, onScroll } = props;
   const [refreshing, setRefreshing] = useState(false);
-  const { posts } = useSelector((state: RootState) => state.posts);
   const otherUsers = useSelector((state: RootState) => state.otherUsers);
   const [displayPosts, setDisplayPosts] = useState<Array<any>>([]);
   const [displayList, setDisplayList] = useState<boolean>(false);
@@ -73,7 +71,7 @@ const Contents = (props: any) => {
 
   const renderItem = useCallback(
     ({ item }: any) => (
-      <View style={styles.cardContainer}>
+      <View style={styles.cardContainer} key={item.id}>
         <PostCard postData={item} navigation={navigation} />
       </View>
     ),

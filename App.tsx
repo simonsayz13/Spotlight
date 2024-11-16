@@ -57,7 +57,7 @@ const MainApp = () => {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         <NavigationContainer theme={DefaultTheme}>
-          <StatusBar barStyle={"default"} />
+          <StatusBar barStyle="dark-content" />
           <DrawerNavigation />
         </NavigationContainer>
       </SafeAreaProvider>
