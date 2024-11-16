@@ -1,19 +1,13 @@
 import React from "react";
-import {
-  Linking,
-  Pressable,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Linking, Pressable, StyleSheet, Text, View } from "react-native";
 import { Image } from "expo-image";
 import { ThemeColoursPrimary } from "../../Constants/UI";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import images from "../../Constants/images";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 const AboutUs = (props: any) => {
   const { navigation } = props;
-
+  const insets = useSafeAreaInsets();
   const handleBackButtonPress = () => {
     navigation.toggleDrawer();
     // navigation.navigate(MainStacks.HomeStack, { screen: "Home" });
@@ -26,7 +20,7 @@ const AboutUs = (props: any) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.topContainer}>
         <Pressable onPress={handleBackButtonPress} style={styles.backButton}>
           <Ionicons
@@ -92,7 +86,7 @@ const AboutUs = (props: any) => {
           <Text style={styles.footerLink}>Terms of Service</Text>
         </Pressable>
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 

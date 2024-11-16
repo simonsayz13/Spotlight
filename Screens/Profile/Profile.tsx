@@ -5,7 +5,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   Platform,
-  SafeAreaView,
   Alert,
   Animated,
   Pressable,
@@ -31,7 +30,9 @@ import {
 import { MasonryFlashList } from "@shopify/flash-list";
 import ProfilePicture from "../../Components/ProfilePicture";
 import ImageModal from "../../Components/ImageModal";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 const Profile = ({ navigation }: any) => {
+  const insets = useSafeAreaInsets();
   const [buttonStates, setButtonStates] = useState(userContentSelectorButtons);
   const {
     userId,
@@ -168,7 +169,7 @@ const Profile = ({ navigation }: any) => {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <ImageModal
         imageUri={profilePicUrl}
         isGalleryVisible={isGalleryVisible}
@@ -277,7 +278,7 @@ const Profile = ({ navigation }: any) => {
           contentContainerStyle={styles.flashListContainer}
         />
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 

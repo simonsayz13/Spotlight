@@ -3,7 +3,6 @@ import {
   StyleSheet,
   View,
   Text,
-  SafeAreaView,
   TouchableOpacity,
   Dimensions,
   TextInput,
@@ -59,7 +58,6 @@ const EditPost = ({ navigation, route }: any) => {
   const [tags, setTags] = useState<Array<any>>(processedTags);
   const [saving, setSaving] = useState<boolean>(false);
   const bottomDrawerRef = useRef<any>(null);
-
   const goBack = () => {
     resetStates();
     navigation.goBack();
@@ -197,7 +195,7 @@ const EditPost = ({ navigation, route }: any) => {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={[styles.container]}>
       <View style={styles.topBarContainer}>
         <ActivityLoader indicator={saving} text={"Saving..."} />
         <TouchableOpacity onPressIn={goBack} style={styles.closeButton}>
@@ -298,7 +296,7 @@ const EditPost = ({ navigation, route }: any) => {
       >
         <TagSelection handleSetTags={handleSetTags} />
       </BottomDrawer>
-    </SafeAreaView>
+    </View>
   );
 };
 

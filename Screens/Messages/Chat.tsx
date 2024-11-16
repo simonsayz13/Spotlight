@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   TextInput,
-  SafeAreaView,
   KeyboardAvoidingView,
   TouchableOpacity,
   Platform,
@@ -29,6 +28,7 @@ import Message from "../../Components/Message";
 import { clusterMessages } from "../../Util/utility";
 import { FlashList } from "@shopify/flash-list";
 import ProfilePicture from "../../Components/ProfilePicture";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const Chat = ({ route, navigation }: any) => {
   const { userId: currentUserId } = useSelector(
@@ -43,6 +43,7 @@ const Chat = ({ route, navigation }: any) => {
   const isFocused = useIsFocused();
   const messages = useSelector(selectMessagesByChatRoomId(chatRoomId));
   const dispatch = useDispatch();
+  const insets = useSafeAreaInsets();
   const goBack = () => {
     navigation.goBack();
   };
@@ -96,7 +97,12 @@ const Chat = ({ route, navigation }: any) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        { paddingTop: insets.top, paddingBottom: insets.bottom },
+      ]}
+    >
       <KeyboardAvoidingView
         style={styles.KeyboardAvoidingView}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -167,7 +173,7 @@ const Chat = ({ route, navigation }: any) => {
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 };
 

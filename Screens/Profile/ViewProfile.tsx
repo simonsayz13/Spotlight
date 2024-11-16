@@ -5,7 +5,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   Platform,
-  SafeAreaView,
   Alert,
   Animated,
   Pressable,
@@ -33,6 +32,7 @@ import { MasonryFlashList } from "@shopify/flash-list";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import ProfilePicture from "../../Components/ProfilePicture";
 import ImageModal from "../../Components/ImageModal";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 const ViewProfile = ({ navigation, route }: any) => {
   const { userId: appUserId, userFollowings: appUserFollowings } = useSelector(
     (state: RootState) => {
@@ -54,7 +54,7 @@ const ViewProfile = ({ navigation, route }: any) => {
   const [ldgSuccUserDetails, setLdgSuccUserDetails] = useState(false);
   const [isGalleryVisible, setIsGalleryVisible] = useState(false);
   let heightAnim = useRef(new Animated.Value(200)).current;
-
+  const insets = useSafeAreaInsets();
   useEffect(() => {
     if (ldgSuccUserDetails) {
       Animated.timing(heightAnim, {
@@ -208,7 +208,12 @@ const ViewProfile = ({ navigation, route }: any) => {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        { paddingTop: insets.top, paddingBottom: insets.bottom },
+      ]}
+    >
       <ImageModal
         imageUri={profilePicUrl}
         isGalleryVisible={isGalleryVisible}
@@ -346,7 +351,7 @@ const ViewProfile = ({ navigation, route }: any) => {
           contentContainerStyle={styles.flashListContainer}
         />
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 

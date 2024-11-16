@@ -2,10 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   StyleSheet,
-  SafeAreaView,
   KeyboardAvoidingView,
   Platform,
-  Text,
   TouchableOpacity,
   // Animated,
 } from "react-native";
@@ -22,7 +20,7 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
 } from "react-native-reanimated";
-
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 const Post = ({ navigation, route }: any) => {
   const { postData } = route.params;
   const postInteractionBarRef = useRef<any>(null);
@@ -39,7 +37,7 @@ const Post = ({ navigation, route }: any) => {
   const overlayAnimatedStyle = useAnimatedStyle(() => ({
     opacity: overlayOpacity.value,
   }));
-
+  const insets = useSafeAreaInsets();
   const openKeyboard = () => {
     if (postInteractionBarRef.current)
       postInteractionBarRef.current.showKeyboard();
@@ -69,7 +67,12 @@ const Post = ({ navigation, route }: any) => {
   }, [isOptionsDrawer, isShareDrawer, isCommentActive]);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        { paddingTop: insets.top, paddingBottom: insets.bottom },
+      ]}
+    >
       <TopNavigationBarPost
         navigation={navigation}
         postData={postData}
@@ -139,7 +142,7 @@ const Post = ({ navigation, route }: any) => {
         )}
         <ActivityLoader indicator={isLoading} text="Deleting" />
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 };
 

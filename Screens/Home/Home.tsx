@@ -1,7 +1,6 @@
 import {
   StyleSheet,
   View,
-  SafeAreaView,
   NativeSyntheticEvent,
   TextInputChangeEventData,
   Keyboard,
@@ -16,6 +15,7 @@ import { RootState } from "../../Redux/store";
 import PostSearchView from "../../Components/PostSearchView";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUserDetailOnPosts } from "../../Util/Services";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const HomeScreen = ({ navigation }: any) => {
   const [content, setContent] = useState("Explore");
@@ -26,6 +26,7 @@ const HomeScreen = ({ navigation }: any) => {
   const otherUsers = useSelector((state: RootState) => state.otherUsers);
   const lastScrollY = useRef(0);
   const dispatch = useDispatch();
+  const insets = useSafeAreaInsets();
   const changeContent = useCallback((content: string) => {
     setContent(content);
   }, []);
@@ -93,7 +94,7 @@ const HomeScreen = ({ navigation }: any) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.mainContent}>
         <TopNavigationBar
           searchText={searchText}
@@ -124,7 +125,7 @@ const HomeScreen = ({ navigation }: any) => {
           />
         </View>
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 

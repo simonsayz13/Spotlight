@@ -14,6 +14,9 @@ import { conversationListener } from "./Firebase/FirebaseChat";
 import { LogBox, StatusBar } from "react-native";
 import React from "react";
 import DrawerNavigation from "./Navigation/DrawerNavigation";
+import { enableScreens } from "react-native-screens";
+
+enableScreens();
 
 LogBox.ignoreLogs(["@firebase/firestore: Firestore"]);
 

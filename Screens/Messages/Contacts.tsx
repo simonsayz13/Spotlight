@@ -1,5 +1,4 @@
 import {
-  SafeAreaView,
   StyleSheet,
   Text,
   View,
@@ -26,6 +25,7 @@ import { UserDetails } from "../../type/Messenger";
 import ActivityLoader from "../../Components/ActivityLoader";
 import ProfilePicture from "../../Components/ProfilePicture";
 import { getUserProfileDetails } from "../../Firebase/FirebaseUsers";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const { width: windowWidth, height: windowHeight } = Dimensions.get("window");
 
@@ -47,6 +47,7 @@ const Contacts = ({ navigation }: any) => {
   const [isDropdownVisible, setIsDropdownVisible] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true); // Add loading state
   const textInputRef = useRef<TextInput>(null);
+  const insets = useSafeAreaInsets();
   const dispatch = useDispatch();
 
   const clearSearch = () => {
@@ -127,7 +128,7 @@ const Contacts = ({ navigation }: any) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.searchBarContainer}>
         <View style={styles.searchBar}>
           <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -244,7 +245,7 @@ const Contacts = ({ navigation }: any) => {
           </ScrollView>
         )
       )}
-    </SafeAreaView>
+    </View>
   );
 };
 

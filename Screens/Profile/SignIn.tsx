@@ -10,7 +10,7 @@ import {
   Platform,
 } from "react-native";
 import React, { useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { images } from "../../Constants";
 import FormField from "../../Components/FormField";
 import CustomButton from "../../Components/CustomButton";
@@ -27,8 +27,9 @@ import {
 } from "../../Constants/errorMessages";
 
 const SignIn = ({ navigation }: any) => {
+  const insets = useSafeAreaInsets();
   const [form, setForm] = useState({
-    email: "test@gmail.com",
+    email: "simon@gmail.com",
     password: "123456",
   });
 
@@ -57,7 +58,12 @@ const SignIn = ({ navigation }: any) => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <View
+      style={[
+        styles.safeArea,
+        { paddingTop: insets.top, paddingBottom: insets.bottom },
+      ]}
+    >
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.safeArea}
@@ -76,7 +82,6 @@ const SignIn = ({ navigation }: any) => {
               handleChangeText={(e) => setForm({ ...form, email: e })}
               otherStyles={styles.formFieldMargin}
               keyboardType="email-address"
-              placeholder={""}
             />
             <FormField
               title="Password"
@@ -84,14 +89,12 @@ const SignIn = ({ navigation }: any) => {
               handleChangeText={(e) => setForm({ ...form, password: e })}
               otherStyles={styles.formFieldMargin}
               autoComplete="off"
-              placeholder={""}
             />
             <CustomButton
               title="Sign In"
               handlePress={handleLogin}
               containerStyles={styles.buttonMargin}
               isLoading={isSubmitting}
-              textStyles={""}
             />
             <View style={styles.footer}>
               <Text style={styles.footerText}>Don't have an account?</Text>
@@ -103,7 +106,7 @@ const SignIn = ({ navigation }: any) => {
           <ActivityLoader indicator={isSubmitting} text={"Logging in"} />
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 };
 

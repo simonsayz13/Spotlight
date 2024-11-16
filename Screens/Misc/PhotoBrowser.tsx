@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import {
-  SafeAreaView,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -10,23 +9,23 @@ import {
   Dimensions,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import {
-  MiscStackScreens,
-  PostStackScreens,
-  ThemeColoursPrimary,
-} from "../../Constants/UI";
+import { PostStackScreens, ThemeColoursPrimary } from "../../Constants/UI";
 import * as MediaLibrary from "expo-media-library";
 import { Image } from "expo-image";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 const { width } = Dimensions.get("window");
 const PhotoBrowser = ({ navigation, route }: any) => {
   const [photos, setPhotos] = useState<string[]>([]);
   const imageSize = width / 3;
+  const insets = useSafeAreaInsets();
+
   const goBack = () => {
     navigation.goBack();
   };
 
   const loadPhotos = async () => {
     const { status } = await MediaLibrary.requestPermissionsAsync();
+
     if (status !== "granted") {
       Alert.alert("Permission to access camera roll is required!");
       return;
@@ -66,7 +65,7 @@ const PhotoBrowser = ({ navigation, route }: any) => {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.topBarContainer}>
         <TouchableOpacity onPressIn={goBack} style={styles.backButton}>
           <Ionicons
@@ -84,7 +83,7 @@ const PhotoBrowser = ({ navigation, route }: any) => {
         renderItem={renderPhoto}
         numColumns={3}
       />
-    </SafeAreaView>
+    </View>
   );
 };
 

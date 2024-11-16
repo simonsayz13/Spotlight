@@ -107,6 +107,7 @@ const styles = StyleSheet.create({
     elevation: 10, // For Android shadow
     zIndex: 100,
     overflow: "hidden", // Add this line
+    width: "100%",
   },
   panIndicator: {
     alignSelf: "center",

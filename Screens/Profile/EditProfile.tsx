@@ -4,7 +4,6 @@ import {
   TouchableOpacity,
   View,
   Text,
-  SafeAreaView,
   Platform,
   ScrollView,
   KeyboardAvoidingView,
@@ -26,6 +25,7 @@ import { uploadProfilePicture } from "../../Firebase/firebaseStorage";
 import ActivityLoader from "../../Components/ActivityLoader";
 import ProfilePicture from "../../Components/ProfilePicture";
 import EditProfileItem from "../../Components/EditProfileItem";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 const EditProfile = ({ navigation }: any) => {
   const {
     userId,
@@ -37,6 +37,7 @@ const EditProfile = ({ navigation }: any) => {
     userLocation,
   } = useSelector((state: RootState) => state.user);
   const [uploading, setUploading] = useState(false);
+  const insets = useSafeAreaInsets();
 
   const goToPhotoBrowser = () => {
     pickImage();
@@ -91,7 +92,7 @@ const EditProfile = ({ navigation }: any) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "height" : "padding"}
@@ -174,7 +175,7 @@ const EditProfile = ({ navigation }: any) => {
         {/* loading modal for uploading picture */}
         <ActivityLoader indicator={uploading} text={"Uploading..."} />
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 };
 

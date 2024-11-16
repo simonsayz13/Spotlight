@@ -153,7 +153,7 @@ const TopNavigationBar = (props: any) => {
         </TouchableOpacity>
       </View>
 
-      {!showSearchBar && (
+      {/* {!showSearchBar && (
         <Animated.View style={[animatedMenuStyle, menuStyle]}>
           <View style={styles.buttonContainer}>
             {buttonStates.map((button, index) => (
@@ -180,7 +180,7 @@ const TopNavigationBar = (props: any) => {
             style={[styles.customUnderline, animatedUnderlineStyle]}
           />
         </Animated.View>
-      )}
+      )} */}
     </View>
   );
 };
