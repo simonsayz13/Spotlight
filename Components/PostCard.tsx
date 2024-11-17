@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Pressable,
-} from "react-native";
+import { View, Text, StyleSheet, Pressable, Image } from "react-native";
 
 import AntDesign from "@expo/vector-icons/AntDesign";
 import {
@@ -13,7 +7,7 @@ import {
   ImageType,
   ThemeColoursPrimary,
 } from "../Constants/UI";
-import { Image } from "expo-image";
+// import { Image } from "expo-image";
 import { useSelector } from "react-redux";
 import { RootState } from "../Redux/store";
 import NoPhotoPlaceHolder from "./NoPhotoPlaceHolder";
@@ -59,8 +53,7 @@ const PostCard = React.memo(({ postData, navigation }: any) => {
           source={{
             uri: imageUrl,
           }}
-          contentFit="cover"
-          cachePolicy="memory-disk"
+          resizeMode="cover"
         />
       ) : (
         <NoPhotoPlaceHolder title={title} description={description} />

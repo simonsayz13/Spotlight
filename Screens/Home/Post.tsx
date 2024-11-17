@@ -1,11 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   View,
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
   TouchableOpacity,
-  // Animated,
 } from "react-native";
 import TopNavigationBarPost from "../../Components/TopNavigationBarPost";
 import PostInteractionBar from "../../Components/PostInteractionBar";
