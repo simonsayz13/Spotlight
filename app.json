@@ -37,8 +37,7 @@
           "recordAudioAndroid": true
         }
       ],
-      "expo-font",
-      "react-native-blasted-image"
+      "expo-font"
     ],
     "newArchEnabled": true,
     "extra": {

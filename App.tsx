@@ -12,20 +12,7 @@ import SplashScreen from "./Screens/Home/SplashScreen";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { conversationListener } from "./Firebase/FirebaseChat";
 import { LogBox, StatusBar } from "react-native";
-import React from "react";
 import DrawerNavigation from "./Navigation/DrawerNavigation";
-import { enableScreens } from "react-native-screens";
-import Constants from "expo-constants";
-
-if (Constants.executionEnvironment === "standalone") {
-  console.log("This is a standalone development build.");
-} else if (Constants.executionEnvironment === "storeClient") {
-  console.log("This is running in Expo Go.");
-} else {
-  console.log("This is running in a simulator or bare workflow.");
-}
-
-enableScreens();
 
 LogBox.ignoreLogs(["@firebase/firestore: Firestore"]);
 
