@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import TopNavigationBar from "../../Components/TopNavigationBar";
 import Contents from "./Contents";
-import { useCallback, useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ThemeColoursPrimary } from "../../Constants/UI";
 import { getPostsBySearch } from "../../Firebase/firebaseFireStore";
 import { RootState } from "../../Redux/store";
@@ -16,9 +16,10 @@ import PostSearchView from "../../Components/PostSearchView";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUserDetailOnPosts } from "../../Util/Services";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import DropdownMenu from "../../Components/DropdownMenu";
 
 const HomeScreen = ({ navigation }: any) => {
-  const [content, setContent] = useState("Explore");
+  const [content, setContent] = useState("Discover");
   const [searchText, setSearchText] = useState("");
   const [showSearchBar, setShowSearchBar] = useState(false);
   const [isDropDownMenuVisible, setIsDropDownMenuVisible] = useState(true);
@@ -27,9 +28,6 @@ const HomeScreen = ({ navigation }: any) => {
   const lastScrollY = useRef(0);
   const dispatch = useDispatch();
   const insets = useSafeAreaInsets();
-  const changeContent = useCallback((content: string) => {
-    setContent(content);
-  }, []);
 
   const handleSearchBarChange = (
     evt: NativeSyntheticEvent<TextInputChangeEventData>
@@ -85,6 +83,9 @@ const HomeScreen = ({ navigation }: any) => {
 
   const handleScroll = (event: any) => {
     const offsetY = event.nativeEvent.contentOffset.y;
+    if (offsetY < 0) {
+      return;
+    }
     if (lastScrollY.current - offsetY > 20) {
       setIsDropDownMenuVisible(true);
     } else if (offsetY - lastScrollY.current > 20) {
@@ -99,7 +100,6 @@ const HomeScreen = ({ navigation }: any) => {
         <TopNavigationBar
           searchText={searchText}
           showSearchBar={showSearchBar}
-          setContent={changeContent}
           handleSearchBarChange={handleSearchBarChange}
           handlePressSearchBtn={handlePressSearchBtn}
           handlePressMenuBtn={handlePressMenuBtn}
@@ -109,20 +109,25 @@ const HomeScreen = ({ navigation }: any) => {
         />
 
         <View style={styles.contentWrapper}>
-          <PostSearchView
-            visible={showSearchBar}
-            postData={searchPostResult}
-            searchText={searchText}
-            navigation={navigation}
+          <DropdownMenu
+            isDropDownMenuVisible={isDropDownMenuVisible}
+            setContent={setContent}
           />
-
-          <Contents
-            content={content}
-            navigation={navigation}
-            searchText={searchText}
-            showSearchBar={showSearchBar}
-            onScroll={handleScroll}
-          />
+          <View style={{ flex: 1, paddingTop: isDropDownMenuVisible ? 36 : 0 }}>
+            <PostSearchView
+              visible={showSearchBar}
+              postData={searchPostResult}
+              searchText={searchText}
+              navigation={navigation}
+            />
+            <Contents
+              content={content}
+              navigation={navigation}
+              searchText={searchText}
+              showSearchBar={showSearchBar}
+              onScroll={handleScroll}
+            />
+          </View>
         </View>
       </View>
     </View>
@@ -136,6 +141,7 @@ const styles = StyleSheet.create({
   },
   contentWrapper: {
     flex: 1,
+    position: "relative",
   },
   content: {
     flex: 1,

@@ -178,8 +178,8 @@ const Map = ({ navigation }: any) => {
         style={styles.container}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        <ActivityLoader indicator={isRefreshing} text={"Refreshing..."} />
-        <ActivityLoader indicator={gotLocation} text={"Locating..."} />
+        {/* <ActivityLoader indicator={isRefreshing} text={"Refreshing..."} /> */}
+        {/* <ActivityLoader indicator={gotLocation} text={"Locating..."} /> */}
         {currentCoordinate && (
           <MapView
             ref={mapRef}

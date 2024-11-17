@@ -519,3 +519,31 @@ export const getLocationPosts = async () => {
     return [];
   }
 };
+
+export const getPostsByUserIds = async (userIds: Array<string>) => {
+  try {
+    // Ensure userIds is valid
+    if (!Array.isArray(userIds) || userIds.length === 0) {
+      throw new Error("Invalid or empty userIds array.");
+    }
+
+    // Get the Firestore collection reference
+    const postsCollection = collection(db, FireStoreCollections.Posts);
+
+    // Use query to fetch posts for user IDs
+    const postsQuery = query(postsCollection, where("user_id", "in", userIds));
+
+    // Execute the query
+    const querySnapshot = await getDocs(postsQuery);
+
+    // Extract and return data
+    const posts = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    return posts;
+  } catch (error) {
+    throw error;
+  }
+};

@@ -1,5 +1,12 @@
 import React from "react";
-import { StyleSheet, View, Text, Pressable, Image } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Text,
+  Pressable,
+  Image,
+  Platform,
+} from "react-native";
 import { Image as ExpoImage } from "expo-image";
 import {
   ImageType,
@@ -21,9 +28,9 @@ const ProfilePicture = React.memo(
     const ProfilePictureView = () => (
       <>
         {uri ? (
-          type === ImageType.PostCard ? (
+          type === ImageType.PostCard && Platform.OS === "ios" ? (
             <Image
-              source={{ uri }}
+              source={{ uri, cache: "force-cache" }}
               style={{ width: size, height: size, borderRadius: size / 2 }}
             />
           ) : (
