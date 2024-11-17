@@ -1,8 +1,6 @@
 import {
   StyleSheet,
   View,
-  Text,
-  SafeAreaView,
   NativeSyntheticEvent,
   TextInputChangeEventData,
   Keyboard,
@@ -11,28 +9,24 @@ import {
 import TopNavigationBar from "../../Components/TopNavigationBar";
 import Contents from "./Contents";
 import { useCallback, useState, useEffect, useRef } from "react";
-import DrawerNavigationBar from "../../Components/DrawerNavigationBar";
 import { ThemeColoursPrimary } from "../../Constants/UI";
 import { getPostsBySearch } from "../../Firebase/firebaseFireStore";
-import { setPosts } from "../../Redux/Slices/postsSlices";
-import store from "../../Redux/store";
-import { delay } from "../../Util/utility";
-
-const DrawerMenu = () => {
-  return (
-    <View style={styles.drawerContent}>
-      <Text style={styles.drawerText}>Discover Friends</Text>
-      <Text style={styles.drawerText}>Creator Center</Text>
-    </View>
-  );
-};
+import { RootState } from "../../Redux/store";
+import PostSearchView from "../../Components/PostSearchView";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchUserDetailOnPosts } from "../../Util/Services";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const HomeScreen = ({ navigation }: any) => {
   const [content, setContent] = useState("Explore");
   const [searchText, setSearchText] = useState("");
   const [showSearchBar, setShowSearchBar] = useState(false);
   const [isDropDownMenuVisible, setIsDropDownMenuVisible] = useState(true);
-  let lastScrollY = 0;
+  const [searchPostResult, setSearchPostResult] = useState<Array<any>>([]);
+  const otherUsers = useSelector((state: RootState) => state.otherUsers);
+  const lastScrollY = useRef(0);
+  const dispatch = useDispatch();
+  const insets = useSafeAreaInsets();
   const changeContent = useCallback((content: string) => {
     setContent(content);
   }, []);
@@ -45,12 +39,17 @@ const HomeScreen = ({ navigation }: any) => {
 
   const fetchPostsBySearch = async (searchText: string = "") => {
     try {
-      const data = await getPostsBySearch(searchText);
-      setShowSearchBar(false);
-      await delay(200); // Delay to ensure pst dsiplay can only happen after searchText is reset
-      store.dispatch(setPosts(data));
+      const fetchedPost = await getPostsBySearch(searchText);
+      const postsWithUserDetails = await fetchUserDetailOnPosts(
+        fetchedPost,
+        otherUsers,
+        dispatch
+      );
+      postsWithUserDetails.length === 0
+        ? setSearchPostResult(["notFound"])
+        : setSearchPostResult(postsWithUserDetails);
     } catch (error) {
-      Alert.alert("Error", "Error fetching posts");
+      Alert.alert("Oops", "Could not fetch any posts");
     }
   };
 
@@ -61,17 +60,21 @@ const HomeScreen = ({ navigation }: any) => {
   };
 
   const handlePressSearchBtn = () => {
-    showSearchBar ? fetchNewItem() : setShowSearchBar((prev: boolean) => !prev);
+    showSearchBar ? fetchNewItem() : setShowSearchBar(true);
     setIsDropDownMenuVisible(false);
   };
 
-  const handlePressMenuBtn = (cb: any) => {
-    showSearchBar ? setShowSearchBar((prev: boolean) => !prev) : cb();
+  const handlePressMenuBtn = () => {
+    showSearchBar
+      ? setShowSearchBar((prev: boolean) => !prev)
+      : navigation.toggleDrawer();
+    setSearchPostResult([]);
     setIsDropDownMenuVisible(true);
   };
 
   const handlePressInClearBtn = () => {
     setSearchText(""); // Reset the searchText state
+    setSearchPostResult([]);
   };
 
   useEffect(() => {
@@ -82,44 +85,47 @@ const HomeScreen = ({ navigation }: any) => {
 
   const handleScroll = (event: any) => {
     const offsetY = event.nativeEvent.contentOffset.y;
-    if (offsetY < lastScrollY && offsetY <= 2) {
+    if (lastScrollY.current - offsetY > 20) {
       setIsDropDownMenuVisible(true);
-    } else if (offsetY > lastScrollY && offsetY > 10) {
+    } else if (offsetY - lastScrollY.current > 20) {
       setIsDropDownMenuVisible(false);
-    } else {
-      setIsDropDownMenuVisible(true);
     }
-    lastScrollY = offsetY;
+    lastScrollY.current = offsetY;
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <DrawerNavigationBar drawerContent={DrawerMenu}>
-        {({ openDrawer }: any) => (
-          <View style={styles.mainContent}>
-            <TopNavigationBar
-              searchText={searchText}
-              showSearchBar={showSearchBar}
-              setContent={changeContent}
-              handleSearchBarChange={handleSearchBarChange}
-              handlePressSearchBtn={handlePressSearchBtn}
-              handlePressMenuBtn={() => handlePressMenuBtn(openDrawer)}
-              handlePressInClearBtn={handlePressInClearBtn}
-              isDropDownMenuVisible={isDropDownMenuVisible}
-            />
-            <View style={styles.contentWrapper}>
-              <Contents
-                content={content}
-                navigation={navigation}
-                searchText={searchText}
-                showSearchBar={showSearchBar}
-                onScroll={handleScroll}
-              />
-            </View>
-          </View>
-        )}
-      </DrawerNavigationBar>
-    </SafeAreaView>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
+      <View style={styles.mainContent}>
+        <TopNavigationBar
+          searchText={searchText}
+          showSearchBar={showSearchBar}
+          setContent={changeContent}
+          handleSearchBarChange={handleSearchBarChange}
+          handlePressSearchBtn={handlePressSearchBtn}
+          handlePressMenuBtn={handlePressMenuBtn}
+          handlePressInClearBtn={handlePressInClearBtn}
+          isDropDownMenuVisible={isDropDownMenuVisible}
+          navigation={navigation}
+        />
+
+        <View style={styles.contentWrapper}>
+          <PostSearchView
+            visible={showSearchBar}
+            postData={searchPostResult}
+            searchText={searchText}
+            navigation={navigation}
+          />
+
+          <Contents
+            content={content}
+            navigation={navigation}
+            searchText={searchText}
+            showSearchBar={showSearchBar}
+            onScroll={handleScroll}
+          />
+        </View>
+      </View>
+    </View>
   );
 };
 
@@ -153,6 +159,7 @@ const styles = StyleSheet.create({
   mainContent: {
     flex: 1,
     justifyContent: "center",
+    backgroundColor: ThemeColoursPrimary.LightGreyBackground,
   },
 });
 

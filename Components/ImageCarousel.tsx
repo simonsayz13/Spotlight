@@ -77,7 +77,7 @@ const ImageCarousel = ({ images }: any) => {
               height: calculatedHeight,
             }}
             contentFit="contain"
-            cachePolicy="disk"
+            cachePolicy="memory-disk"
           />
         </View>
       </TapGestureHandler>

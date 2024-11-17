@@ -1,11 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   Platform,
-  SafeAreaView,
   Alert,
   Animated,
   Pressable,
@@ -33,6 +32,7 @@ import { MasonryFlashList } from "@shopify/flash-list";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import ProfilePicture from "../../Components/ProfilePicture";
 import ImageModal from "../../Components/ImageModal";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 const ViewProfile = ({ navigation, route }: any) => {
   const { userId: appUserId, userFollowings: appUserFollowings } = useSelector(
     (state: RootState) => {
@@ -48,13 +48,13 @@ const ViewProfile = ({ navigation, route }: any) => {
   const [bio, setBio] = useState("");
   const [gender, setGender] = useState("");
   const [followers, setFollowers] = useState([]);
-  const [followings, setfollowings] = useState([]);
+  const [followings, setFollowings] = useState([]);
   const [isFollowed, setIsFollowed] = useState(false);
   const [ldgUserDetails, setLdgUserDetails] = useState(false);
   const [ldgSuccUserDetails, setLdgSuccUserDetails] = useState(false);
   const [isGalleryVisible, setIsGalleryVisible] = useState(false);
   let heightAnim = useRef(new Animated.Value(200)).current;
-
+  const insets = useSafeAreaInsets();
   useEffect(() => {
     if (ldgSuccUserDetails) {
       Animated.timing(heightAnim, {
@@ -122,11 +122,11 @@ const ViewProfile = ({ navigation, route }: any) => {
       setBio(biography);
       setGender(gender);
       setFollowers(followers);
-      setfollowings(followings);
+      setFollowings(followings);
       setProfileUserId(user_id);
       setLdgUserDetails(false);
       setLdgSuccUserDetails(true);
-      followers?.find((followerId) => followerId === appUserId) &&
+      followers?.find((followerId: string) => followerId === appUserId) &&
         setIsFollowed(true);
     });
   }, [userId]);
@@ -208,7 +208,12 @@ const ViewProfile = ({ navigation, route }: any) => {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        { paddingTop: insets.top, paddingBottom: insets.bottom },
+      ]}
+    >
       <ImageModal
         imageUri={profilePicUrl}
         isGalleryVisible={isGalleryVisible}
@@ -346,7 +351,7 @@ const ViewProfile = ({ navigation, route }: any) => {
           contentContainerStyle={styles.flashListContainer}
         />
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 

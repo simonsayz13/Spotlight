@@ -15,6 +15,7 @@ import { firestoreDB } from "./FirebaseApp";
 import { setMessages } from "../Redux/Slices/chatSlices";
 import { sortConversationsByLastMessage } from "../Util/utility";
 import { SetStateAction } from "react";
+import { setConversations } from "../Redux/Slices/conversationSlice";
 
 const db = firestoreDB;
 
@@ -77,7 +78,6 @@ export const sendMessage = async (
       read: false,
       postId,
     };
-    console.log(newMessage);
 
     // Add the new message document to the messages subcollection
     const newMessageRef = doc(messagesCollectionRef); // Generate a unique document reference
@@ -118,26 +118,30 @@ export const messageListener = (chatId: string, dispatch: any) => {
 
 export const conversationListener = (
   currentUserId: string,
-  setConversations: SetStateAction<any>
+  dispatch: any
+  // setConversations: SetStateAction<any>
 ) => {
+  if (!currentUserId) return;
   const conversationsRef = collection(db, FireStoreCollections.Chats);
   const q = query(
     conversationsRef,
     where("participants", "array-contains", currentUserId)
   );
   const subscribeConversations = onSnapshot(q, (querySnapshot) => {
-    const chatsList = querySnapshot.docs.map((doc) => ({
+    const conversationList = querySnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
-    setConversations(sortConversationsByLastMessage(chatsList));
+    dispatch(
+      setConversations(sortConversationsByLastMessage(conversationList))
+    );
   });
 
   // Cleanup on component unmount
   return () => subscribeConversations();
 };
 
-export const getUserConversations = async (userId: string) => {
+export const getUserConversations = async (userId: string, dispatch: any) => {
   // Reference to the conversations collection
   const conversationsRef = collection(db, FireStoreCollections.Chats);
 
@@ -154,7 +158,7 @@ export const getUserConversations = async (userId: string) => {
       id: doc.id,
       ...doc.data(),
     }));
-
+    dispatch(conversations);
     return conversations;
   } catch (error) {
     console.error("Error retrieving conversations: ", error);

@@ -7,10 +7,13 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { CameraView as ExpoCamera, useCameraPermissions } from "expo-camera";
-import { CameraType, FlashMode } from "expo-camera/legacy";
-import { useRef, useState } from "react";
-import React from "react";
+import {
+  CameraView as ExpoCamera,
+  useCameraPermissions,
+  CameraType,
+  FlashMode,
+} from "expo-camera";
+import React, { useRef, useState } from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {
   PostStackScreens,
@@ -20,8 +23,8 @@ import {
 import { StatusBar } from "expo-status-bar";
 const { width: windowWidth, height: windowHeight } = Dimensions.get("window");
 const Camera = ({ navigation }: any) => {
-  const [facing, setFacing] = useState<CameraType>(CameraType.back);
-  const [flash, setFlash] = useState<FlashMode>(FlashMode.off);
+  const [facing, setFacing] = useState<CameraType>("back");
+  const [flash, setFlash] = useState<FlashMode>("off");
   const [permission, requestPermission] = useCameraPermissions();
   const [isCameraReady, setIsCameraReady] = useState(false);
   const cameraRef = useRef<ExpoCamera>(null);
@@ -52,14 +55,10 @@ const Camera = ({ navigation }: any) => {
   }
 
   const toggleCameraFacing = () => {
-    setFacing((current) =>
-      current === CameraType.front ? CameraType.back : CameraType.front
-    );
+    setFacing((current) => (current === "front" ? "back" : "front"));
   };
   const toggleFlash = () => {
-    setFlash((current) =>
-      current === FlashMode.off ? FlashMode.on : FlashMode.off
-    );
+    setFlash((current) => (current === "off" ? "on" : "off"));
   };
 
   const toggleCapture = async () => {

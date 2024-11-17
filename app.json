@@ -18,7 +18,12 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "com.project1337.spotlight"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -33,6 +38,12 @@
         }
       ],
       "expo-font"
-    ]
+    ],
+    "newArchEnabled": true,
+    "extra": {
+      "eas": {
+        "projectId": "ad31a95f-0e00-41fb-a3da-a2fe4283af51"
+      }
+    }
   }
 }

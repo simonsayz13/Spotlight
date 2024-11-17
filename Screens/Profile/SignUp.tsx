@@ -8,7 +8,7 @@ import {
   Pressable,
 } from "react-native";
 import React, { useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { images } from "../../Constants";
 import FormField from "../../Components/FormField";
 import CustomButton from "../../Components/CustomButton";
@@ -22,6 +22,7 @@ import {
 import { createUserProfile } from "../../Firebase/firebaseFireStore";
 
 const SignUp = ({ navigation }: any) => {
+  const insets = useSafeAreaInsets();
   const [form, setForm] = useState({
     username: "",
     email: "",
@@ -64,7 +65,12 @@ const SignUp = ({ navigation }: any) => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <View
+      style={[
+        styles.safeArea,
+        { paddingTop: insets.top, paddingBottom: insets.bottom },
+      ]}
+    >
       <ScrollView>
         <View style={styles.container}>
           <Image
@@ -108,7 +114,7 @@ const SignUp = ({ navigation }: any) => {
         </View>
         <ActivityLoader indicator={isSubmitting} text={"Logging in"} />
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 

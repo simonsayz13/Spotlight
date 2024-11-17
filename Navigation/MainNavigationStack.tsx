@@ -24,22 +24,21 @@ import LoginSignInStackScreen from "./Stacks/LoginSignInStack";
 import { RootState } from "../Redux/store";
 import FollowStackScreen from "./Stacks/FollowStack";
 import EditPost from "../Screens/Post/EditPost";
-import ImageGallery from "../Screens/Post/ImageGallery";
 const MainStack = createNativeStackNavigator();
-
 const MainNavigationStack = () => {
   const userId = useSelector((state: RootState) => state.user.userId);
   const initialRouteName = userId ? MainStacks.MainTab : MainStacks.Login;
   return (
     <MainStack.Navigator
-      screenOptions={{ headerShown: false }}
+      screenOptions={{
+        headerShown: false,
+      }}
       initialRouteName={initialRouteName}
     >
       <MainStack.Screen
         name={MainStacks.Login}
         component={LoginSignInStackScreen}
       />
-
       <MainStack.Screen name={MainStacks.MainTab} component={TabNavigation} />
       <MainStack.Screen
         name={HomeStackScreens.Post}

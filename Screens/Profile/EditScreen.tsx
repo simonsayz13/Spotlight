@@ -4,7 +4,6 @@ import {
   TouchableOpacity,
   View,
   Text,
-  SafeAreaView,
   Platform,
   TextInput,
   Alert,
@@ -14,7 +13,6 @@ import {
   EditProfileType,
   EditProfileTypeMap,
   Gender,
-  ThemeColours,
   ThemeColoursPrimary,
 } from "../../Constants/UI";
 import { updateProfileField } from "../../Firebase/firebaseFireStore";
@@ -28,6 +26,7 @@ import {
 } from "../../Redux/Slices/userSlice";
 import { useSelector } from "react-redux";
 import AntDesign from "@expo/vector-icons/AntDesign";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const EditScreen = ({ navigation, route }: any) => {
   const { userId, userAge, userBio, userLocation }: any = useSelector(
@@ -35,6 +34,7 @@ const EditScreen = ({ navigation, route }: any) => {
   );
   const { itemName, itemData } = route.params;
   const [fieldValue, setFieldValue] = useState(itemData);
+  const insets = useSafeAreaInsets();
 
   const goBack = () => {
     navigation.goBack();
@@ -180,7 +180,7 @@ const EditScreen = ({ navigation, route }: any) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.topBarContainer}>
         <TouchableOpacity onPressIn={goBack} style={styles.backButton}>
           <Ionicons
@@ -200,7 +200,7 @@ const EditScreen = ({ navigation, route }: any) => {
         </TouchableOpacity>
       </View>
       <View style={styles.bodyContainer}>{editContent(itemName)}</View>
-    </SafeAreaView>
+    </View>
   );
 };
 

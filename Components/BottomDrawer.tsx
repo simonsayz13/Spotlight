@@ -4,15 +4,14 @@ import React, {
   useImperativeHandle,
   useRef,
 } from "react";
-import {
-  Animated,
-  Dimensions,
-  Easing,
-  PanResponder,
-  StyleSheet,
-  View,
-} from "react-native";
+import { Dimensions, PanResponder, StyleSheet, View } from "react-native";
 import { ThemeColoursPrimary } from "../Constants/UI";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  Easing,
+} from "react-native-reanimated";
 
 const { height: windowHeight } = Dimensions.get("window");
 
@@ -28,7 +27,7 @@ const BottomDrawer = forwardRef(
     { heightPercentage, isPannable, isAbsolute, children }: ComponentProps,
     ref
   ) => {
-    const slideAnim = useRef(new Animated.Value(windowHeight)).current;
+    const slideAnim = useSharedValue(windowHeight); // Use Reanimated shared value
 
     const modalPanResponder = useRef(
       PanResponder.create({
@@ -38,7 +37,7 @@ const BottomDrawer = forwardRef(
           // Allow movement only downwards (dy > 0), and stop at original position (translateY 0)
           if (dy > 0) {
             // slideAnim.setValue(dy);
-            slideAnim.setValue(dy);
+            slideAnim.value = dy;
           }
         },
         onPanResponderRelease: (_, gestureState) => {
@@ -55,21 +54,17 @@ const BottomDrawer = forwardRef(
     ).current;
 
     const showDrawer = () => {
-      Animated.timing(slideAnim, {
-        toValue: 0, // Final position
-        duration: 300, // Adjust the duration for a smooth transition
-        easing: Easing.out(Easing.exp), // Optional: Adjust easing for smoothness
-        useNativeDriver: true,
-      }).start();
+      slideAnim.value = withTiming(0, {
+        duration: 300,
+        easing: Easing.out(Easing.exp),
+      });
     };
 
     const hideDrawer = () => {
-      Animated.timing(slideAnim, {
-        toValue: windowHeight, // Offscreen position
-        duration: 300, // Adjust the duration for a smooth transition
-        easing: Easing.in(Easing.exp), // Optional: Adjust easing for smoothness
-        useNativeDriver: true,
-      }).start();
+      slideAnim.value = withTiming(windowHeight, {
+        duration: 300,
+        easing: Easing.in(Easing.exp),
+      });
     };
 
     useImperativeHandle(ref, () => ({
@@ -77,12 +72,16 @@ const BottomDrawer = forwardRef(
       showDrawer,
     }));
 
+    const animatedStyle = useAnimatedStyle(() => ({
+      transform: [{ translateY: slideAnim.value }],
+    }));
+
     return (
       <Animated.View
         style={[
           styles.modalContainer,
+          animatedStyle,
           {
-            transform: [{ translateY: slideAnim }],
             height: windowHeight * heightPercentage,
           },
           isAbsolute && { position: "absolute" },
@@ -105,13 +104,10 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 14,
     borderTopRightRadius: 14,
     paddingVertical: 6,
-    // paddingHorizontal: 8,
     elevation: 10, // For Android shadow
-    // shadowColor: ThemeColoursPrimary.SecondaryColour,
-    // shadowOffset: { width: 0, height: -1 },
-    // shadowOpacity: 0.2,
-    // shadowRadius: 2,
     zIndex: 100,
+    overflow: "hidden", // Add this line
+    width: "100%",
   },
   panIndicator: {
     alignSelf: "center",

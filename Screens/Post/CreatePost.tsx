@@ -3,7 +3,6 @@ import {
   StyleSheet,
   View,
   Text,
-  SafeAreaView,
   TouchableOpacity,
   Dimensions,
   TextInput,
@@ -15,11 +14,9 @@ import {
   KeyboardAvoidingView,
 } from "react-native";
 import {
-  HomeStackScreens,
   MiscStackScreens,
   NavigationTabs,
   PostStackScreens,
-  ProfileStackScreens,
   ThemeColoursPrimary,
 } from "../../Constants/UI";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -37,6 +34,7 @@ import BottomDrawer from "../../Components/BottomDrawer";
 import TagSelection from "../../Components/TagSelection";
 import PostOptionsMenuBar from "../../Components/PostOptionsMenuBar";
 import { ScrollView } from "react-native-gesture-handler";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const { width, height } = Dimensions.get("window");
 
@@ -52,6 +50,7 @@ const CreatePost = ({ navigation, route }: any) => {
   const [photoArray, setPhotoArray] = useState<Array<string>>([]);
   const [tags, setTags] = useState<Array<any>>([]);
   const bottomDrawerRef = useRef<any>(null);
+  const insets = useSafeAreaInsets();
   const goBack = () => {
     resetStates();
     navigation.goBack();
@@ -193,7 +192,7 @@ const CreatePost = ({ navigation, route }: any) => {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.topBarContainer}>
         <ActivityLoader indicator={posting} text={"Posting..."} />
         <TouchableOpacity onPressIn={goBack} style={styles.closeButton}>
@@ -295,7 +294,7 @@ const CreatePost = ({ navigation, route }: any) => {
       >
         <TagSelection handleSetTags={handleSetTags} />
       </BottomDrawer>
-    </SafeAreaView>
+    </View>
   );
 };
 

@@ -1,22 +1,20 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { StyleSheet, Alert, RefreshControl, View, Text } from "react-native";
+import { StyleSheet, Alert, RefreshControl, View } from "react-native";
 import PostCard from "../../Components/PostCard";
 import { getPaginatedPosts } from "../../Firebase/firebaseFireStore";
-import { HomeStackScreens, ThemeColoursPrimary } from "../../Constants/UI";
-import { setPosts } from "../../Redux/Slices/postsSlices";
+import { ThemeColoursPrimary } from "../../Constants/UI";
 import { useDispatch, useSelector } from "react-redux";
-import store, { RootState } from "../../Redux/store";
+import { RootState } from "../../Redux/store";
 import { MasonryFlashList } from "@shopify/flash-list";
 import FadeInWrapper from "../../Components/FadeInWrapper";
 import Loader from "../../Components/Loader";
-import { getUserProfileDetails } from "../../Firebase/FirebaseUsers";
+import { fetchUserDetailOnPosts } from "../../Util/Services";
 
 const Contents = (props: any) => {
-  const { content, navigation, showSearchBar, searchText, onScroll } = props;
+  const { content, navigation, onScroll } = props;
   const [refreshing, setRefreshing] = useState(false);
-  const { posts } = useSelector((state: RootState) => state.posts);
   const otherUsers = useSelector((state: RootState) => state.otherUsers);
-  const [filteredPosts, setFilteredPosts] = useState<Array<any>>([]);
+  const [displayPosts, setDisplayPosts] = useState<Array<any>>([]);
   const [displayList, setDisplayList] = useState<boolean>(false);
   const [bottomLoader, setBottomLoader] = useState<boolean>(false);
   const [lastVisible, setLastVisible] = useState<any>(null);
@@ -25,34 +23,18 @@ const Contents = (props: any) => {
   const fetchInitialPosts = async () => {
     try {
       const fetchedPosts: any = await getPaginatedPosts();
-      setLastVisible(fetchedPosts.lastVisible);
       const postsWithUserDetails = await fetchUserDetailOnPosts(
-        fetchedPosts.posts
+        fetchedPosts.posts,
+        otherUsers,
+        dispatch
       );
-      setFilteredPosts(postsWithUserDetails);
-      store.dispatch(setPosts(postsWithUserDetails));
+      setDisplayPosts(postsWithUserDetails);
+      setLastVisible(fetchedPosts.lastVisible);
       setDisplayList(true);
       setRefreshing(false);
     } catch (error) {
-      Alert.alert("Error", "Error fetching posts");
+      Alert.alert("Oops", "Could not fetch any posts");
     }
-  };
-
-  const fetchUserDetailOnPosts = async (fetchedPosts: any) => {
-    return await Promise.all(
-      fetchedPosts.map(async (post: any) => {
-        let userDetails: any = await getUserProfileDetails(
-          post.user_id,
-          otherUsers,
-          dispatch
-        );
-        return {
-          ...post,
-          userDisplayName: userDetails.displayName,
-          userProfilePic: userDetails.profilePictureUrl,
-        };
-      })
-    );
   };
 
   // Refresh the contents page
@@ -67,16 +49,12 @@ const Contents = (props: any) => {
       ? setLastVisible(null)
       : setLastVisible(fetchedPosts.lastVisible);
     const postsWithUserDetails = await fetchUserDetailOnPosts(
-      fetchedPosts.posts
+      fetchedPosts.posts,
+      otherUsers,
+      dispatch
     );
-    setFilteredPosts((prevPosts) => [...prevPosts, ...postsWithUserDetails]);
+    setDisplayPosts((prevPosts) => [...prevPosts, ...postsWithUserDetails]);
     setBottomLoader(false);
-  };
-
-  const openPost = (postData: any) => {
-    navigation.navigate(HomeStackScreens.Post, {
-      postData: postData,
-    });
   };
 
   // Hook for loading data
@@ -84,30 +62,20 @@ const Contents = (props: any) => {
     fetchInitialPosts();
   }, [content]);
 
-  // Change the display of posts based on if search bar is active
-  useEffect(() => {
-    if (showSearchBar) {
-      setFilteredPosts([]);
-    } else {
-      setFilteredPosts(posts);
+  const onReachedEnd = () => {
+    if (lastVisible) {
+      setBottomLoader(true);
+      loadMorePosts();
     }
-  }, [showSearchBar]);
+  };
 
-  // Filter the posts whose title contain the search text
-  useEffect(() => {
-    if (searchText === "") {
-      return setFilteredPosts([]);
-    }
-    const filtered = posts.filter((post: any) =>
-      post?.title?.toLowerCase().includes(searchText.toLowerCase())
-    );
-    setFilteredPosts(filtered);
-  }, [searchText]);
-
-  const renderItem = ({ item }: any) => (
-    <View style={styles.cardContainer}>
-      <PostCard postData={item} openPost={openPost} navigation={navigation} />
-    </View>
+  const renderItem = useCallback(
+    ({ item }: any) => (
+      <View style={styles.cardContainer} key={item.id}>
+        <PostCard postData={item} navigation={navigation} />
+      </View>
+    ),
+    [navigation]
   );
 
   const renderBottomLoader = () =>
@@ -117,18 +85,11 @@ const Contents = (props: any) => {
       </View>
     );
 
-  const onReachedEnd = () => {
-    if (lastVisible) {
-      setBottomLoader(true);
-      loadMorePosts();
-    }
-  };
-
   return displayList ? (
     <FadeInWrapper delay={1500}>
       <MasonryFlashList
-        data={filteredPosts}
-        keyExtractor={(post: any) => post.id}
+        data={displayPosts}
+        keyExtractor={(item) => item.id}
         renderItem={renderItem}
         estimatedItemSize={200} // Estimated size for optimal performance
         numColumns={2} // Setting 2 columns for masonry layout
@@ -144,7 +105,7 @@ const Contents = (props: any) => {
             colors={[ThemeColoursPrimary.LogoColour]} // Optional: Refresh spinner color
           />
         }
-        onEndReachedThreshold={0.2}
+        onEndReachedThreshold={0.01}
         onEndReached={onReachedEnd}
       />
     </FadeInWrapper>

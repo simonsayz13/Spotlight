@@ -1,27 +1,17 @@
 import React, { useCallback, useState } from "react";
-import {
-  View,
-  StyleSheet,
-  SafeAreaView,
-  KeyboardAvoidingView,
-  Platform,
-  Text,
-  Alert,
-  FlatList,
-  ScrollView,
-} from "react-native";
+import { View, StyleSheet, Alert, ScrollView } from "react-native";
 
 import { ThemeColoursPrimary } from "../../Constants/UI";
-import TopNavigationBarFollows from "../../Components/TopNavigationBarFollows";
 import { useFocusEffect } from "@react-navigation/native";
 import { getUserDetails } from "../../Firebase/firebaseFireStore";
 import FollowerRow from "../../Components/FollowerRow";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const FollowerList = ({ navigation, route }: any) => {
-  const { followers, followings, displayName } = route.params;
+  const { followings } = route.params;
   const [ldgFollowers, setLdgFollowers] = useState(false);
   const [followerList, setFollowerList] = useState([]);
-
+  const insets = useSafeAreaInsets();
   useFocusEffect(
     useCallback(() => {
       const fetchFollowers = async () => {
@@ -49,13 +39,13 @@ const FollowerList = ({ navigation, route }: any) => {
     }, [followings]) // Include dependencies like userId if they change
   );
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <ScrollView style={styles.listContainer}>
         {followerList?.map((follower) => (
           <FollowerRow followerObj={follower} />
         ))}
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 

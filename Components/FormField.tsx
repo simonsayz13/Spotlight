@@ -17,7 +17,7 @@ const FormField = ({
   handleChangeText,
   otherStyles,
   ...props
-}) => {
+}: any) => {
   const [isFocused, setIsFocused] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 

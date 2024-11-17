@@ -65,7 +65,7 @@ const PostOptions = ({
   return (
     <BottomDrawer
       ref={postSettingDrawer}
-      heightPercentage={0.17}
+      heightPercentage={0.18}
       isPannable={false}
     >
       <View style={styles.topContainer}>

@@ -1,11 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   Platform,
-  SafeAreaView,
   Alert,
   Animated,
   Pressable,
@@ -17,12 +16,10 @@ import {
   Gender,
   HomeStackScreens,
   ImageType,
-  MainStacks,
   ProfileStackScreens,
   ThemeColoursPrimary,
   userContentSelectorButtons,
 } from "../../Constants/UI";
-import { logOut } from "../../Firebase/firebaseAuth";
 import PostCard from "../../Components/PostCard";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -31,10 +28,11 @@ import {
   getPostsByUserId,
 } from "../../Firebase/firebaseFireStore";
 import { MasonryFlashList } from "@shopify/flash-list";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import ProfilePicture from "../../Components/ProfilePicture";
 import ImageModal from "../../Components/ImageModal";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 const Profile = ({ navigation }: any) => {
+  const insets = useSafeAreaInsets();
   const [buttonStates, setButtonStates] = useState(userContentSelectorButtons);
   const {
     userId,
@@ -138,11 +136,6 @@ const Profile = ({ navigation }: any) => {
     );
   };
 
-  const handleLogout = () => {
-    logOut();
-    navigation.replace(MainStacks.Login);
-  };
-
   const handleEdit = () => {
     navigation.navigate(ProfileStackScreens.EditProfile);
   };
@@ -176,7 +169,7 @@ const Profile = ({ navigation }: any) => {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <ImageModal
         imageUri={profilePicUrl}
         isGalleryVisible={isGalleryVisible}
@@ -252,13 +245,6 @@ const Profile = ({ navigation }: any) => {
                 color={ThemeColoursPrimary.PrimaryColour}
               />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={handleLogout}>
-              <MaterialIcons
-                name="logout"
-                size={20}
-                color={ThemeColoursPrimary.PrimaryColour}
-              />
-            </TouchableOpacity>
           </View>
         </View>
       </Animated.View>
@@ -292,7 +278,7 @@ const Profile = ({ navigation }: any) => {
           contentContainerStyle={styles.flashListContainer}
         />
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 

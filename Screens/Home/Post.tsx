@@ -1,13 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   View,
   StyleSheet,
-  SafeAreaView,
   KeyboardAvoidingView,
   Platform,
-  Text,
   TouchableOpacity,
-  Animated,
 } from "react-native";
 import TopNavigationBarPost from "../../Components/TopNavigationBarPost";
 import PostInteractionBar from "../../Components/PostInteractionBar";
@@ -17,7 +14,12 @@ import PostOptions from "../../Components/PostOptions";
 import ActivityLoader from "../../Components/ActivityLoader";
 import SharePost from "../../Components/SharePost";
 import MessageModal from "../../Components/MessageModal";
-
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+} from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 const Post = ({ navigation, route }: any) => {
   const { postData } = route.params;
   const postInteractionBarRef = useRef<any>(null);
@@ -26,48 +28,50 @@ const Post = ({ navigation, route }: any) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isOptionsDrawer, setIsOptionsDrawer] = useState(false);
   const [isShareDrawer, setIsShareDrawer] = useState(false);
+  const [isCommentActive, setIsCommentActive] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const overlayOpacity = useRef(new Animated.Value(0)).current;
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [modalMessage, setModalMessage] = useState<string | null>(null);
-
+  const overlayOpacity = useSharedValue(0); // Replace with a shared value
+  const overlayAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: overlayOpacity.value,
+  }));
+  const insets = useSafeAreaInsets();
   const openKeyboard = () => {
-    if (postInteractionBarRef.current) {
+    if (postInteractionBarRef.current)
       postInteractionBarRef.current.showKeyboard();
-    }
   };
 
   const showSettingDrawer = () => {
     setIsDrawerOpen(true);
-    overlayOpacity.setValue(0);
-    Animated.timing(overlayOpacity, {
-      toValue: 1,
-      duration: 300,
-      useNativeDriver: true,
-    }).start();
+    overlayOpacity.value = withTiming(1, { duration: 300 });
   };
 
   const hideSettingDrawer = () => {
+    if (postInteractionBarRef.current)
+      postInteractionBarRef.current.handleKeyboardDidHide();
     setIsDrawerOpen(false);
     setIsOptionsDrawer(false);
     setIsShareDrawer(false);
-    Animated.timing(overlayOpacity, {
-      toValue: 0,
-      duration: 300,
-      useNativeDriver: true,
-    }).start();
+    setIsCommentActive(false);
+    overlayOpacity.value = withTiming(0, { duration: 300 });
   };
 
   useEffect(() => {
-    if (isOptionsDrawer || isShareDrawer) {
+    if (isOptionsDrawer || isShareDrawer || isCommentActive) {
       showSettingDrawer();
     } else {
       hideSettingDrawer();
     }
-  }, [isOptionsDrawer, isShareDrawer]);
+  }, [isOptionsDrawer, isShareDrawer, isCommentActive]);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        { paddingTop: insets.top, paddingBottom: insets.bottom },
+      ]}
+    >
       <TopNavigationBarPost
         navigation={navigation}
         postData={postData}
@@ -76,7 +80,7 @@ const Post = ({ navigation, route }: any) => {
       />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
-        style={styles.container}
+        style={{ flex: 1, overflow: "hidden" }}
       >
         <MainPost
           postData={postData}
@@ -84,18 +88,6 @@ const Post = ({ navigation, route }: any) => {
           openKeyboard={openKeyboard}
           setReplyingTo={setReplyingTo}
         />
-
-        {!isDrawerOpen && (
-          <View style={[styles.bottomView, { height: bottomHeight }]}>
-            <PostInteractionBar
-              ref={postInteractionBarRef}
-              postData={postData}
-              replyingTo={replyingTo}
-              setReplyingTo={setReplyingTo}
-              setBottomHeight={setBottomHeight}
-            />
-          </View>
-        )}
 
         <MessageModal
           message={modalMessage} // Adjust this message as needed
@@ -105,7 +97,7 @@ const Post = ({ navigation, route }: any) => {
 
         {isDrawerOpen && (
           <Animated.View
-            style={[styles.overlay, { opacity: overlayOpacity }]}
+            style={[styles.overlay, overlayAnimatedStyle]}
             pointerEvents="auto"
           >
             <TouchableOpacity
@@ -116,6 +108,19 @@ const Post = ({ navigation, route }: any) => {
           </Animated.View>
         )}
 
+        {!isOptionsDrawer && !isShareDrawer && (
+          <View style={[styles.bottomView, { height: bottomHeight }]}>
+            <PostInteractionBar
+              ref={postInteractionBarRef}
+              postData={postData}
+              replyingTo={replyingTo}
+              setReplyingTo={setReplyingTo}
+              setBottomHeight={setBottomHeight}
+              setIsCommentActive={setIsCommentActive}
+            />
+          </View>
+        )}
+
         {isOptionsDrawer && (
           <PostOptions
             setIsDrawerOpen={setIsOptionsDrawer}
@@ -124,7 +129,6 @@ const Post = ({ navigation, route }: any) => {
             postData={postData}
           />
         )}
-
         {isShareDrawer && (
           <SharePost
             setIsDrawerOpen={setIsShareDrawer}
@@ -132,11 +136,12 @@ const Post = ({ navigation, route }: any) => {
             postData={postData}
             setModalVisible={setModalVisible}
             setModalMessage={setModalMessage}
+            isShareDrawer={isShareDrawer}
           />
         )}
         <ActivityLoader indicator={isLoading} text="Deleting" />
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -152,7 +157,7 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     backgroundColor: "rgba(0, 0, 0, 0.5)", // Adjust opacity as needed
-    zIndex: 1,
+    zIndex: 0,
   },
   overlayTouchable: {
     flex: 1,
