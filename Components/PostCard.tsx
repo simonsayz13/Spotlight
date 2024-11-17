@@ -1,5 +1,12 @@
 import React from "react";
-import { View, Text, StyleSheet, Pressable, Image } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  Image,
+  Platform,
+} from "react-native";
 
 import AntDesign from "@expo/vector-icons/AntDesign";
 import {
@@ -12,6 +19,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../Redux/store";
 import NoPhotoPlaceHolder from "./NoPhotoPlaceHolder";
 import ProfilePicture from "./ProfilePicture";
+import { Image as ExpoImage } from "expo-image";
 
 const PostCard = React.memo(({ postData, navigation }: any) => {
   const { userDisplayName: appUserDisplayName, userLiked } = useSelector(
@@ -48,13 +56,24 @@ const PostCard = React.memo(({ postData, navigation }: any) => {
       }}
     >
       {imageUrl ? (
-        <Image
-          style={[styles.image, { height: imageHeight }]} // Dynamic height
-          source={{
-            uri: imageUrl,
-          }}
-          resizeMode="cover"
-        />
+        Platform.OS === "android" ? (
+          <ExpoImage
+            style={[styles.image, { height: imageHeight }]} // Dynamic height
+            source={{
+              uri: imageUrl,
+            }}
+            contentFit="cover"
+          />
+        ) : (
+          <Image
+            style={[styles.image, { height: imageHeight }]} // Dynamic height
+            source={{
+              uri: imageUrl,
+              cache: "force-cache",
+            }}
+            resizeMode="cover"
+          />
+        )
       ) : (
         <NoPhotoPlaceHolder title={title} description={description} />
       )}

@@ -1,6 +1,5 @@
 import {
   View,
-  Text,
   TouchableOpacity,
   StyleSheet,
   TextInput,
@@ -13,7 +12,6 @@ import { ThemeColoursPrimary, TopNavigationHomeButtons } from "../Constants/UI";
 import { Image } from "expo-image";
 import { images } from "../Constants";
 import Animated, {
-  interpolate,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
@@ -26,18 +24,14 @@ const TopNavigationBar = (props: any) => {
     searchText,
     showSearchBar,
     handleSearchBarChange,
-    setContent,
     handlePressSearchBtn,
     handlePressMenuBtn,
     handlePressInClearBtn,
     isDropDownMenuVisible,
   } = props;
   const inputRef = useRef<TextInput>(null);
-  const [buttonStates, setButtonStates] = useState(TopNavigationHomeButtons);
   const translateY = useSharedValue(-50);
-  const underlinePosition = useSharedValue(
-    width / buttonStates.length + (width / buttonStates.length - width / 4) / 2
-  );
+
   const dropdownHeight = useSharedValue(0);
 
   //> Hooks
@@ -54,50 +48,8 @@ const TopNavigationBar = (props: any) => {
     });
   }, [isDropDownMenuVisible]);
 
-  const handlePress = (id: number, index: number) => {
-    setButtonStates((prevStates) =>
-      prevStates.map((button) =>
-        button.id === id
-          ? button.clicked
-            ? button
-            : { ...button, clicked: true }
-          : { ...button, clicked: false }
-      )
-    );
-    const clickedScreen = buttonStates.find((item) => id == item.id)?.label;
-    setContent(clickedScreen);
-    // // Animate underline to the new tab
-    underlinePosition.value = withTiming(
-      index * (width / buttonStates.length) +
-        (width / buttonStates.length - width / 4) / 2,
-      { duration: 100 }
-    );
-  };
-
   const animatedStyleSearchBar = useAnimatedStyle(() => {
     return { transform: [{ translateY: translateY.value }] };
-  });
-
-  const animatedMenuStyle = useAnimatedStyle(() => {
-    const opacity = interpolate(dropdownHeight.value, [0, 30], [0, 1], "clamp");
-    return {
-      opacity,
-      height: dropdownHeight.value,
-      backgroundColor: ThemeColoursPrimary.PrimaryColour,
-    };
-  });
-
-  const menuStyle = {
-    zIndex: isDropDownMenuVisible ? 0 : -10,
-    marginBottom: isDropDownMenuVisible ? 4 : 0,
-  };
-
-  const animatedUnderlineStyle = useAnimatedStyle(() => {
-    const opacity = interpolate(dropdownHeight.value, [0, 30], [0, 1], "clamp");
-    return {
-      opacity,
-      transform: [{ translateX: underlinePosition.value }],
-    };
   });
 
   return (
@@ -111,7 +63,7 @@ const TopNavigationBar = (props: any) => {
           />
         </TouchableOpacity>
 
-        <View style={styles.menuContainer}>
+        <View style={styles.middleContainer}>
           {!showSearchBar ? (
             <Image
               source={images.trademark}
@@ -152,35 +104,6 @@ const TopNavigationBar = (props: any) => {
           />
         </TouchableOpacity>
       </View>
-
-      {!showSearchBar && (
-        <Animated.View style={[animatedMenuStyle, menuStyle]}>
-          <View style={styles.buttonContainer}>
-            {buttonStates.map((button, index) => (
-              <TouchableOpacity
-                key={button.id}
-                onPress={() => handlePress(button.id, index)}
-                style={{ width: width / 3 }}
-              >
-                <View style={styles.textWrapper}>
-                  <Text
-                    style={
-                      button.clicked
-                        ? styles.menuButtonClicked
-                        : styles.menuButton
-                    }
-                  >
-                    {button.label}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </View>
-          <Animated.View
-            style={[styles.customUnderline, animatedUnderlineStyle]}
-          />
-        </Animated.View>
-      )}
     </View>
   );
 };
@@ -197,33 +120,10 @@ const styles = StyleSheet.create({
     height: 50,
     zIndex: 100,
   },
-  menuContainer: {
+  middleContainer: {
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-  },
-  menuButton: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#808080",
-  },
-  menuButtonClicked: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: ThemeColoursPrimary.SecondaryColour,
-  },
-  textWrapper: {
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  customUnderline: {
-    position: "absolute",
-    bottom: 2, // Adjust this value to control the gap between the text and underline
-    height: 3,
-    width: width / 4,
-    backgroundColor: ThemeColoursPrimary.LogoColour, // Set the underline color
-    borderRadius: 20,
     justifyContent: "center",
   },
   searchBarWrapper: {
@@ -245,13 +145,6 @@ const styles = StyleSheet.create({
   logo: {
     width: 200,
     height: 50,
-  },
-  buttonContainer: {
-    position: "absolute",
-    bottom: 3,
-    flexDirection: "row",
-    paddingVertical: 4,
-    zIndex: 0,
   },
 });
 
