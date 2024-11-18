@@ -520,29 +520,40 @@ export const getLocationPosts = async () => {
   }
 };
 
-export const getPostsByUserIds = async (userIds: Array<string>) => {
+export const getPostsByUserIds = async (
+  userIds: Array<string>,
+  lastVisible?: any
+) => {
   try {
     // Ensure userIds is valid
     if (!Array.isArray(userIds) || userIds.length === 0) {
-      throw new Error("Invalid or empty userIds array.");
+      return [];
     }
 
     // Get the Firestore collection reference
     const postsCollection = collection(db, FireStoreCollections.Posts);
 
     // Use query to fetch posts for user IDs
-    const postsQuery = query(postsCollection, where("user_id", "in", userIds));
+    const postsQuery = lastVisible
+      ? query(
+          postsCollection,
+          startAfter(lastVisible),
+          where("user_id", "in", userIds)
+        )
+      : query(postsCollection, where("user_id", "in", userIds), limit(10));
 
     // Execute the query
-    const querySnapshot = await getDocs(postsQuery);
+    const snapshot = await getDocs(postsQuery);
 
     // Extract and return data
-    const posts = querySnapshot.docs.map((doc) => ({
+    const posts = snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
 
-    return posts;
+    const newLastVisible = snapshot.docs[snapshot.docs.length - 1];
+    if (!newLastVisible) throw Error;
+    return { posts, lastVisible: newLastVisible };
   } catch (error) {
     throw error;
   }

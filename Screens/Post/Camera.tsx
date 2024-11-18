@@ -102,7 +102,7 @@ const Camera = ({ navigation }: any) => {
       <View style={styles.bottomButtonsContainer}>
         <TouchableOpacity onPress={toggleFlash}>
           <Ionicons
-            name={flash === FlashMode.off ? "flash-off" : "flash"}
+            name={flash === "off" ? "flash-off" : "flash"}
             size={28}
             color={ThemeColoursPrimary.PrimaryColour}
           />
