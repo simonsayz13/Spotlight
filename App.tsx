@@ -19,18 +19,10 @@ LogBox.ignoreLogs(["@firebase/firestore: Firestore"]);
 const Stack = createStackNavigator();
 
 const MainApp = () => {
-  const [isLoading, setIsLoading] = useState(true);
   const { userId: currentUserId } = useSelector(
     (state: RootState) => state.user
   );
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1500);
-    return () => clearTimeout(timer);
-  }, []);
 
   useEffect(() => {
     const subscribe = conversationListener(currentUserId!, dispatch);
@@ -45,7 +37,7 @@ const MainApp = () => {
     Shrikhand_400Regular,
   });
 
-  if (!fontsLoaded || isLoading) {
+  if (!fontsLoaded) {
     return <SplashScreen />;
   }
 
