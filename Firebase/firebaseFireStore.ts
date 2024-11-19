@@ -537,8 +537,8 @@ export const getPostsByUserIds = async (
     const postsQuery = lastVisible
       ? query(
           postsCollection,
-          startAfter(lastVisible),
-          where("user_id", "in", userIds)
+          where("user_id", "in", userIds),
+          startAfter(lastVisible)
         )
       : query(postsCollection, where("user_id", "in", userIds), limit(10));
 
@@ -550,7 +550,9 @@ export const getPostsByUserIds = async (
       id: doc.id,
       ...doc.data(),
     }));
-
+    if (snapshot.docs.length === 0) {
+      return { posts: [], lastVisible: null };
+    }
     const newLastVisible = snapshot.docs[snapshot.docs.length - 1];
     if (!newLastVisible) throw Error;
     return { posts, lastVisible: newLastVisible };

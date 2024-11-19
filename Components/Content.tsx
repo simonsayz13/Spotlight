@@ -38,9 +38,10 @@ const Content = (props: any) => {
       setDisplayPosts(postsWithUserDetails);
       setLastVisible(fetchedPosts.lastVisible);
       setDisplayList(true);
-      setRefreshing(false);
     } catch (error) {
       Alert.alert("Oops", "Could not fetch any posts");
+    } finally {
+      setRefreshing(false);
     }
   };
 
@@ -49,7 +50,6 @@ const Content = (props: any) => {
       content === "following"
         ? await getPostsByUserIds(userFollowings, lastVisible)
         : await getPaginatedPosts(lastVisible);
-
     fetchedPosts.posts.length < 10
       ? setLastVisible(null)
       : setLastVisible(fetchedPosts.lastVisible);
@@ -70,14 +70,18 @@ const Content = (props: any) => {
   // Refresh the contents page
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    fetchInitialPosts();
+    setTimeout(() => {
+      fetchInitialPosts();
+    }, 1000);
   }, []);
 
   const onReachedEnd = () => {
+    console.log(lastVisible);
     if (lastVisible) {
       setBottomLoader(true);
       loadMorePosts();
     } else {
+      console.log("setFalse");
       setBottomLoader(false);
     }
   };
@@ -94,7 +98,7 @@ const Content = (props: any) => {
   const renderBottomLoader = () =>
     bottomLoader && (
       <View style={styles.bottomLoaderContainer}>
-        <Loader size="small" color={ThemeColoursPrimary.LogoColour} />
+        <Loader size={"small"} />
       </View>
     );
 
@@ -123,7 +127,7 @@ const Content = (props: any) => {
       />
     </FadeInWrapper>
   ) : (
-    <Loader size="small" color={ThemeColoursPrimary.LogoColour} />
+    <Loader size={"medium"} />
   );
 };
 
