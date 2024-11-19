@@ -1,57 +1,65 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { RootState } from "../store";
+interface PostState {
+  posts: { [id: number]: any }; // Posts stored as objects with IDs as keys
+  isAppInitilized: boolean;
+}
+
+const initialState: PostState = {
+  posts: {}, // Initialize posts as an empty object
+  isAppInitilized: false,
+};
 
 export const postsSlice = createSlice({
   name: "post",
-  initialState: {
-    posts: [],
-    isAppInitilized: false,
-  },
+  initialState,
   reducers: {
-    setPosts: (state, action) => {
-      state.posts = action.payload;
+    appendPosts: (state, action: PayloadAction<any[]>) => {
+      // Add only unique posts
+      const newPosts = action.payload;
+      newPosts.forEach((post: any) => {
+        if (!state.posts[post.id]) {
+          state.posts[post.id] = post;
+        }
+      });
     },
     incrementLikes: (state, action) => {
       const { postId } = action.payload;
-      const post = state.posts.find((post: any) => post.id === postId);
-      if (post) {
-        //@ts-ignore
-        post.likes += 1;
+      if (state.posts[postId]) {
+        state.posts[postId].likes += 1;
       }
     },
     decrementLikes: (state, action) => {
       const { postId } = action.payload;
-      const post = state.posts.find((post: any) => post.id === postId);
-      if (post) {
-        //@ts-ignore
-        post.likes -= 1;
+      if (state.posts[postId]) {
+        state.posts[postId].likes -= 1;
       }
     },
     incrementFavourites: (state, action) => {
       const { postId } = action.payload;
-      const post = state.posts.find((post: any) => post.id === postId);
-      if (post) {
-        //@ts-ignore
-        post.favourites += 1;
+      if (state.posts[postId]) {
+        state.posts[postId].favourites += 1;
       }
     },
     decrementFavourites: (state, action) => {
       const { postId } = action.payload;
-      const post: any = state.posts.find((post: any) => post.id === postId);
-      if (post) {
-        post.favourites -= 1;
+      if (state.posts[postId]) {
+        state.posts[postId].favourites -= 1;
       }
     },
     addComment: (state, action) => {
       const { postId, comment } = action.payload;
-      const post: any = state.posts.find((post: any) => post.id === postId);
+      const post = state.posts[postId];
       if (post) {
         post.comments.push(comment);
       }
     },
     updateCommentLikes: (state, action) => {
       const { postId, commentId, likes } = action.payload;
-      const post: any = state.posts.find((post: any) => post.id === postId);
-      if (post) {
+      // Access the post by ID
+      const post = state.posts[postId];
+      if (post && post.comments) {
+        // Find the comment and update its likes
         const comment = post.comments.find(
           (comment: any) => comment.commentId === commentId
         );
@@ -66,8 +74,12 @@ export const postsSlice = createSlice({
   },
 });
 
+export const selectPostById = (state: RootState, postId: number) => {
+  return state.posts.posts[postId] || null; // Return the post or null if not found
+};
+
 export const {
-  setPosts,
+  appendPosts,
   incrementLikes,
   decrementLikes,
   incrementFavourites,

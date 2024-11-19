@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Alert, RefreshControl, StyleSheet, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../Redux/store";
@@ -12,6 +12,7 @@ import FadeInWrapper from "./FadeInWrapper";
 import { MasonryFlashList } from "@shopify/flash-list";
 import { ThemeColoursPrimary } from "../Constants/UI";
 import Loader from "./Loader";
+import { appendPosts } from "../Redux/Slices/postsSlices";
 
 const Content = (props: any) => {
   const { navigation, onScroll, content } = props;
@@ -30,11 +31,13 @@ const Content = (props: any) => {
         content === "following"
           ? await getPostsByUserIds(userFollowings)
           : await getPaginatedPosts();
+
       const postsWithUserDetails = await fetchUserDetailOnPosts(
         fetchedPosts.posts,
         otherUsers,
         dispatch
       );
+      dispatch(appendPosts(postsWithUserDetails));
       setDisplayPosts(postsWithUserDetails);
       setLastVisible(fetchedPosts.lastVisible);
       setDisplayList(true);
@@ -46,20 +49,28 @@ const Content = (props: any) => {
   };
 
   const loadMorePosts = async () => {
-    const fetchedPosts: any =
-      content === "following"
-        ? await getPostsByUserIds(userFollowings, lastVisible)
-        : await getPaginatedPosts(lastVisible);
-    fetchedPosts.posts.length < 10
-      ? setLastVisible(null)
-      : setLastVisible(fetchedPosts.lastVisible);
-    const postsWithUserDetails = await fetchUserDetailOnPosts(
-      fetchedPosts.posts,
-      otherUsers,
-      dispatch
-    );
-    setDisplayPosts((prevPosts) => [...prevPosts, ...postsWithUserDetails]);
-    setBottomLoader(false);
+    try {
+      const fetchedPosts: any =
+        content === "following"
+          ? await getPostsByUserIds(userFollowings, lastVisible)
+          : await getPaginatedPosts(lastVisible);
+
+      dispatch(appendPosts(fetchedPosts.posts));
+      fetchedPosts.posts.length < 10
+        ? setLastVisible(null)
+        : setLastVisible(fetchedPosts.lastVisible);
+      const postsWithUserDetails = await fetchUserDetailOnPosts(
+        fetchedPosts.posts,
+        otherUsers,
+        dispatch
+      );
+      setDisplayPosts((prevPosts) => [...prevPosts, ...postsWithUserDetails]);
+      setDisplayList(true);
+    } catch (error) {
+      Alert.alert("Oops", "Could not fetch any posts");
+    } finally {
+      setBottomLoader(false);
+    }
   };
 
   // Hook for loading data
@@ -76,12 +87,10 @@ const Content = (props: any) => {
   }, []);
 
   const onReachedEnd = () => {
-    console.log(lastVisible);
     if (lastVisible) {
       setBottomLoader(true);
       loadMorePosts();
     } else {
-      console.log("setFalse");
       setBottomLoader(false);
     }
   };
@@ -89,7 +98,7 @@ const Content = (props: any) => {
   const renderItem = useCallback(
     ({ item }: any) => (
       <View style={styles.cardContainer} key={item.id}>
-        <PostCard postData={item} navigation={navigation} />
+        <PostCard postId={item.id} navigation={navigation} />
       </View>
     ),
     [navigation]

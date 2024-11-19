@@ -9,7 +9,7 @@ import {
   Animated,
   Pressable,
 } from "react-native";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../Redux/store";
 import {
   FollowStackScreens,
@@ -31,9 +31,8 @@ import { MasonryFlashList } from "@shopify/flash-list";
 import ProfilePicture from "../../Components/ProfilePicture";
 import ImageModal from "../../Components/ImageModal";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { appendPosts } from "../../Redux/Slices/postsSlices";
 const Profile = ({ navigation }: any) => {
-  const insets = useSafeAreaInsets();
-  const [buttonStates, setButtonStates] = useState(userContentSelectorButtons);
   const {
     userId,
     userBio,
@@ -42,6 +41,8 @@ const Profile = ({ navigation }: any) => {
     return state.user;
   });
 
+  const insets = useSafeAreaInsets();
+  const [buttonStates, setButtonStates] = useState(userContentSelectorButtons);
   const [postsData, setPostsData] = useState<Array<any>>([]);
   const [displayName, setDisplayName] = useState("");
   const [profilePicUrl, setProfilePicUrl] = useState("");
@@ -51,6 +52,7 @@ const Profile = ({ navigation }: any) => {
   const [ldgUserDetails, setLdgUserDetails] = useState(false);
   const [ldgSuccUserDetails, setLdgSuccUserDetails] = useState(false);
   const [isGalleryVisible, setIsGalleryVisible] = useState(false);
+  const dispatch = useDispatch();
   let heightAnim = useRef(new Animated.Value(200)).current;
 
   useEffect(() => {
@@ -87,6 +89,7 @@ const Profile = ({ navigation }: any) => {
         })
       );
       setPostsData(postsWithUserDetails);
+      dispatch(appendPosts(postsWithUserDetails));
     } catch (error) {
       Alert.alert("Error", "Error fetching posts");
     }
@@ -164,7 +167,7 @@ const Profile = ({ navigation }: any) => {
 
   const renderItem = ({ item }: any) => (
     <View style={styles.cardContainer}>
-      <PostCard postData={item} openPost={openPost} navigation={navigation} />
+      <PostCard postId={item.id} openPost={openPost} navigation={navigation} />
     </View>
   );
 

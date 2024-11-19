@@ -9,7 +9,7 @@ import {
   Animated,
   Pressable,
 } from "react-native";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../Redux/store";
 import {
   FollowStackScreens,
@@ -33,6 +33,7 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import ProfilePicture from "../../Components/ProfilePicture";
 import ImageModal from "../../Components/ImageModal";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { appendPosts } from "../../Redux/Slices/postsSlices";
 const ViewProfile = ({ navigation, route }: any) => {
   const { userId: appUserId, userFollowings: appUserFollowings } = useSelector(
     (state: RootState) => {
@@ -55,6 +56,7 @@ const ViewProfile = ({ navigation, route }: any) => {
   const [isGalleryVisible, setIsGalleryVisible] = useState(false);
   let heightAnim = useRef(new Animated.Value(200)).current;
   const insets = useSafeAreaInsets();
+  const dispatch = useDispatch();
   useEffect(() => {
     if (ldgSuccUserDetails) {
       Animated.timing(heightAnim, {
@@ -89,6 +91,7 @@ const ViewProfile = ({ navigation, route }: any) => {
         })
       );
       setPostsData(postsWithUserDetails);
+      dispatch(appendPosts(postsWithUserDetails));
     } catch (error) {
       Alert.alert("Error", "Error fetching posts");
     }
@@ -203,7 +206,7 @@ const ViewProfile = ({ navigation, route }: any) => {
 
   const renderItem = ({ item }: any) => (
     <View style={styles.cardContainer}>
-      <PostCard postData={item} openPost={openPost} navigation={navigation} />
+      <PostCard postId={item.id} openPost={openPost} navigation={navigation} />
     </View>
   );
 
