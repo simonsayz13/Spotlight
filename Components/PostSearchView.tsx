@@ -48,7 +48,7 @@ const PostSearchView = (props: any) => {
               keyExtractor={(item: any) => item.id}
               renderItem={({ item }: any) => (
                 <View style={styles.cardContainer}>
-                  <PostCard postData={item} navigation={navigation} />
+                  <PostCard postId={item.id} navigation={navigation} />
                 </View>
               )}
               estimatedItemSize={200} // Estimated size for optimal performance

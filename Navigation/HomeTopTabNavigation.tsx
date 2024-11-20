@@ -25,6 +25,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import PostSearchView from "../Components/PostSearchView";
+import { appendPosts } from "../Redux/Slices/postsSlices";
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -58,6 +59,7 @@ const HomeTopTabNavigation = ({ navigation }: any) => {
         otherUsers,
         dispatch
       );
+      dispatch(appendPosts(postsWithUserDetails));
       postsWithUserDetails.length === 0
         ? setSearchPostResult(["notFound"])
         : setSearchPostResult(postsWithUserDetails);
@@ -95,10 +97,6 @@ const HomeTopTabNavigation = ({ navigation }: any) => {
       setSearchText("");
     }
   }, [showSearchBar]);
-
-  useEffect(() => {
-    console.log(activeTab);
-  }, [setActiveTab]);
 
   const handleScroll = (event: any) => {
     const offsetY = event.nativeEvent.contentOffset.y;

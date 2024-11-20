@@ -55,7 +55,6 @@ const Content = (props: any) => {
           ? await getPostsByUserIds(userFollowings, lastVisible)
           : await getPaginatedPosts(lastVisible);
 
-      dispatch(appendPosts(fetchedPosts.posts));
       fetchedPosts.posts.length < 10
         ? setLastVisible(null)
         : setLastVisible(fetchedPosts.lastVisible);
@@ -64,6 +63,7 @@ const Content = (props: any) => {
         otherUsers,
         dispatch
       );
+      dispatch(appendPosts(postsWithUserDetails));
       setDisplayPosts((prevPosts) => [...prevPosts, ...postsWithUserDetails]);
       setDisplayList(true);
     } catch (error) {

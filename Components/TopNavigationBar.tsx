@@ -28,10 +28,12 @@ const TopNavigationBar = (props: any) => {
 
   //> Hooks
   useEffect(() => {
-    if (showSearchBar && inputRef?.current) {
-      inputRef.current?.focus();
-    }
     translateY.value = withTiming(showSearchBar ? 0 : -16, { duration: 300 });
+    if (showSearchBar) {
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 0);
+    }
   }, [showSearchBar]);
 
   useEffect(() => {

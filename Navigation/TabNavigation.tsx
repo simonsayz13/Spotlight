@@ -4,7 +4,7 @@ import {
   TouchableOpacity,
   Dimensions,
   Platform,
-  KeyboardAvoidingView,
+  View,
 } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import HomeStack from "./Stacks/HomeStack";
@@ -18,17 +18,14 @@ import {
 } from "../Constants/UI";
 import MessagingStackScreen from "./Stacks/MessagingStack";
 import Feather from "@expo/vector-icons/Feather";
+import { CreatePost } from "../Screens/Post/CreatePost";
 
 const Tab = createBottomTabNavigator();
 const { width, height } = Dimensions.get("window");
 
 const TabNavigation = ({ navigation }: any) => {
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === "ios" ? undefined : "height"}
-      keyboardVerticalOffset={Platform.OS === "android" ? -60 : 0}
-    >
+    <View style={{ flex: 1 }}>
       {/* Main Tab Navigator */}
       <Tab.Navigator
         initialRouteName={NavigationTabs.Home}
@@ -82,7 +79,26 @@ const TabNavigation = ({ navigation }: any) => {
                 color={ThemeColoursPrimary.SecondaryColour}
               />
             ),
-            tabBarItemStyle: { marginRight: 30 }, // Adjust this to control the space
+          }}
+        />
+
+        <Tab.Screen
+          name={NavigationTabs.CreatePost}
+          component={CreatePost}
+          options={{
+            tabBarButton: (props) => (
+              <TouchableOpacity
+                style={styles.customPostButton}
+                onPress={() => navigation.navigate(PostStackScreens.CreatePost)} // Navigate to your Post screen
+                activeOpacity={1}
+              >
+                <Feather
+                  name="plus"
+                  size={44}
+                  color={ThemeColoursPrimary.LogoColour}
+                />
+              </TouchableOpacity>
+            ),
           }}
         />
         <Tab.Screen
@@ -96,7 +112,6 @@ const TabNavigation = ({ navigation }: any) => {
                 color={ThemeColoursPrimary.SecondaryColour}
               />
             ),
-            tabBarItemStyle: { marginLeft: 30 },
           }}
         />
         <Tab.Screen
@@ -113,24 +128,13 @@ const TabNavigation = ({ navigation }: any) => {
           }}
         />
       </Tab.Navigator>
-
-      {/* Custom Floating Post Button */}
-      <TouchableOpacity
-        style={styles.customPostButton}
-        onPress={() => navigation.navigate(PostStackScreens.CreatePost)} // Navigate to your Post screen
-        activeOpacity={1}
-      >
-        <Feather name="plus" size={44} color={ThemeColoursPrimary.LogoColour} />
-      </TouchableOpacity>
-    </KeyboardAvoidingView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   customPostButton: {
-    position: "absolute",
-    bottom: Platform.OS === "ios" ? 30 : 2, // Adjust position for different platforms
-    left: width / 2 - 28, // Center the button horizontally
+    bottom: 8,
     backgroundColor: ThemeColoursPrimary.PrimaryColour,
     borderRadius: 35,
     width: 56,
@@ -142,6 +146,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 2,
     elevation: 4, // Android shadow
+    zIndex: 10,
   },
 });
 
