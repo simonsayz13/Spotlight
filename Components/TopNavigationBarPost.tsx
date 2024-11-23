@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   StyleSheet,
   TouchableOpacity,
   Text,
   Pressable,
+  Alert,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {
@@ -18,6 +19,7 @@ import ProfilePicture from "./ProfilePicture";
 import { RootState } from "../Redux/store";
 import Feather from "@expo/vector-icons/Feather";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
+import { addFollower, removeFollower } from "../Firebase/firebaseFireStore";
 const TopNavigationBarPost = ({
   navigation,
   postData,
@@ -25,9 +27,16 @@ const TopNavigationBarPost = ({
   onPressSharePost,
 }: any) => {
   const { userDisplayName, userProfilePic, user_id: userId } = postData;
-  const { userId: appUserId } = useSelector((state: RootState) => {
-    return state.user;
-  });
+  const { userId: appUserId, userFollowings } = useSelector(
+    (state: RootState) => {
+      return state.user;
+    }
+  );
+  const [isFollowed, setIsFollowed] = useState<boolean>(
+    Boolean(
+      userFollowings?.find((followingId: string) => followingId === userId)
+    )
+  );
 
   const goToProfile = () => {
     userId === appUserId
@@ -43,6 +52,24 @@ const TopNavigationBarPost = ({
 
   const onShareClicked = () => {
     onPressSharePost(true);
+  };
+
+  const handlePressFollowBtn = async () => {
+    try {
+      await addFollower(userId, appUserId!);
+      setIsFollowed(true);
+    } catch (error) {
+      Alert.alert("Error", `${error}`);
+    }
+  };
+
+  const handlePressUnfollowBtn = async () => {
+    try {
+      await removeFollower(userId, appUserId!);
+      setIsFollowed(false);
+    } catch (error) {
+      Alert.alert("Error", `${error}`);
+    }
   };
 
   return (
@@ -71,9 +98,22 @@ const TopNavigationBarPost = ({
 
       {userId !== appUserId ? (
         <View style={styles.followShareWrapper}>
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>Follow</Text>
-          </TouchableOpacity>
+          {isFollowed ? (
+            <TouchableOpacity
+              style={styles.button}
+              onPressIn={handlePressUnfollowBtn}
+            >
+              <Text style={styles.buttonText}>Following</Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              style={styles.button}
+              onPressIn={handlePressFollowBtn}
+            >
+              <Text style={styles.buttonText}>Follow</Text>
+            </TouchableOpacity>
+          )}
+
           <Pressable onPressIn={onShareClicked}>
             <EvilIcons name="share-apple" size={44} color="black" />
           </Pressable>

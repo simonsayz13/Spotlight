@@ -22,7 +22,7 @@ const SharePostMessage = memo(
     return (
       <View>
         <View style={[styles.postCardContainer, marginStyle]}>
-          <PostCard postData={postData} openPost={openPost} />
+          <PostCard postId={postData.id} openPost={openPost} />
         </View>
         {message.text !== "" && (
           <View
@@ -84,6 +84,7 @@ const Message = React.memo(
       const userDetails: any = await getUserDetails(post.user_id); // Assuming user_id is available in post
       setPostData({
         ...post,
+        id: postId,
         userDisplayName: userDetails.display_name,
         userProfilePic: userDetails.profile_picture_url,
       });

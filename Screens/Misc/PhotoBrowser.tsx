@@ -12,12 +12,10 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { PostStackScreens, ThemeColoursPrimary } from "../../Constants/UI";
 import * as MediaLibrary from "expo-media-library";
 import { Image } from "expo-image";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 const { width } = Dimensions.get("window");
 const PhotoBrowser = ({ navigation, route }: any) => {
   const [photos, setPhotos] = useState<string[]>([]);
   const imageSize = width / 3;
-  const insets = useSafeAreaInsets();
 
   const goBack = () => {
     navigation.goBack();
@@ -65,7 +63,7 @@ const PhotoBrowser = ({ navigation, route }: any) => {
   );
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View style={[styles.container]}>
       <View style={styles.topBarContainer}>
         <TouchableOpacity onPressIn={goBack} style={styles.backButton}>
           <Ionicons

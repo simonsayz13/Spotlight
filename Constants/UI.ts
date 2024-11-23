@@ -100,6 +100,7 @@ export enum NavigationTabs {
   Messages = "Messages",
   Home = "Home",
   Map = "Map",
+  CreatePost = "createpost",
 }
 
 export enum MessagingStackScreens {

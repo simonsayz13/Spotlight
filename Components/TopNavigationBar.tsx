@@ -1,14 +1,8 @@
-import {
-  View,
-  TouchableOpacity,
-  StyleSheet,
-  TextInput,
-  Dimensions,
-} from "react-native";
+import { View, TouchableOpacity, StyleSheet, TextInput } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useState, useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { ThemeColoursPrimary, TopNavigationHomeButtons } from "../Constants/UI";
+import { ThemeColoursPrimary } from "../Constants/UI";
 import { Image } from "expo-image";
 import { images } from "../Constants";
 import Animated, {
@@ -16,8 +10,6 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
-
-const { width } = Dimensions.get("window");
 
 const TopNavigationBar = (props: any) => {
   const {
@@ -36,10 +28,12 @@ const TopNavigationBar = (props: any) => {
 
   //> Hooks
   useEffect(() => {
-    if (showSearchBar && inputRef?.current) {
-      inputRef.current?.focus();
-    }
     translateY.value = withTiming(showSearchBar ? 0 : -16, { duration: 300 });
+    if (showSearchBar) {
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 0);
+    }
   }, [showSearchBar]);
 
   useEffect(() => {

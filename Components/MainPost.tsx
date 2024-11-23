@@ -55,6 +55,7 @@ const MainPost = ({
     // Start rendering from the top-level comments (where parentCommentId is null)
     return renderCommentThread(null, true); // Pass 'true' to indicate top-level comments
   };
+
   return (
     <ScrollView
       contentContainerStyle={styles.scrollView}

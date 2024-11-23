@@ -20,27 +20,23 @@ import { RootState } from "../Redux/store";
 import NoPhotoPlaceHolder from "./NoPhotoPlaceHolder";
 import ProfilePicture from "./ProfilePicture";
 import { Image as ExpoImage } from "expo-image";
+import { selectPostById } from "../Redux/Slices/postsSlices";
 
-const PostCard = React.memo(({ postData, navigation }: any) => {
+const PostCard = ({ postId, navigation }: any) => {
   const { userDisplayName: appUserDisplayName, userLiked } = useSelector(
     (state: RootState) => state.user
   );
-  const {
-    title,
-    likes,
-    id: postId,
-    userProfilePic,
-    description,
-    userDisplayName,
-  } = postData;
+  const postData =
+    useSelector((state) => selectPostById(state, postId)) || null;
+  const { title, likes, userProfilePic, description, userDisplayName, media } =
+    postData;
 
   const imageUrl = postData.media[0]?.media_url;
 
   //@ts-ignore
   const liked = userLiked.includes(postId);
 
-  const imageHeight =
-    (postData.media[0]?.height / postData.media[0]?.width) * 130;
+  const imageHeight = (media[0]?.height / media[0]?.width) * 130;
 
   const openPost = (postData: any) => {
     navigation.navigate(HomeStackScreens.Post, {
@@ -56,6 +52,7 @@ const PostCard = React.memo(({ postData, navigation }: any) => {
       }}
     >
       {imageUrl ? (
+        // <View style={[styles.image, { height: imageHeight }]}></View>
         Platform.OS === "android" ? (
           <ExpoImage
             style={[styles.image, { height: imageHeight }]} // Dynamic height
@@ -103,7 +100,7 @@ const PostCard = React.memo(({ postData, navigation }: any) => {
       </View>
     </Pressable>
   );
-});
+};
 
 const styles = StyleSheet.create({
   card: {

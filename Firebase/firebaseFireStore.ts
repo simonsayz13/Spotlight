@@ -183,18 +183,17 @@ export const getPaginatedPosts = async (lastVisible?: any) => {
     const q = lastVisible
       ? query(
           postsCollection,
-          orderBy("timeStamp", "desc"),
+          where("isPrivate", "==", false),
           startAfter(lastVisible),
           limit(10)
         )
-      : query(postsCollection, orderBy("timeStamp", "desc"), limit(10));
+      : query(postsCollection, where("isPrivate", "==", false), limit(10));
 
     const snapshot = await getDocs(q);
     const posts = snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
-
     const newLastVisible = snapshot.docs[snapshot.docs.length - 1];
     if (!newLastVisible) throw Error;
     return { posts, lastVisible: newLastVisible };
@@ -520,29 +519,49 @@ export const getLocationPosts = async () => {
   }
 };
 
-export const getPostsByUserIds = async (userIds: Array<string>) => {
+export const getPostsByUserIds = async (
+  userIds: Array<string>,
+  lastVisible?: any
+) => {
   try {
     // Ensure userIds is valid
     if (!Array.isArray(userIds) || userIds.length === 0) {
-      throw new Error("Invalid or empty userIds array.");
+      return [];
     }
 
     // Get the Firestore collection reference
     const postsCollection = collection(db, FireStoreCollections.Posts);
 
     // Use query to fetch posts for user IDs
-    const postsQuery = query(postsCollection, where("user_id", "in", userIds));
+    const postsQuery = lastVisible
+      ? query(
+          postsCollection,
+          where("user_id", "in", userIds),
+          where("isPrivate", "==", false),
+          startAfter(lastVisible),
+          limit(10)
+        )
+      : query(
+          postsCollection,
+          where("user_id", "in", userIds),
+          where("isPrivate", "==", false),
+          limit(10)
+        );
 
     // Execute the query
-    const querySnapshot = await getDocs(postsQuery);
+    const snapshot = await getDocs(postsQuery);
 
     // Extract and return data
-    const posts = querySnapshot.docs.map((doc) => ({
+    const posts = snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
-
-    return posts;
+    if (snapshot.docs.length === 0) {
+      return { posts: [], lastVisible: null };
+    }
+    const newLastVisible = snapshot.docs[snapshot.docs.length - 1];
+    if (!newLastVisible) throw Error;
+    return { posts, lastVisible: newLastVisible };
   } catch (error) {
     throw error;
   }

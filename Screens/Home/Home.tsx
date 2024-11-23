@@ -107,7 +107,6 @@ const HomeScreen = ({ navigation }: any) => {
           isDropDownMenuVisible={isDropDownMenuVisible}
           navigation={navigation}
         />
-
         <View style={styles.contentWrapper}>
           <DropdownMenu
             isDropDownMenuVisible={isDropDownMenuVisible}
