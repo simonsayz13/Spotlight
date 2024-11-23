@@ -78,23 +78,11 @@ const Post = ({ navigation, route }: any) => {
         onPressPostSetting={setIsOptionsDrawer}
         onPressSharePost={setIsShareDrawer}
       />
+
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={{ flex: 1, overflow: "hidden" }}
       >
-        <MainPost
-          postData={postData}
-          navigation={navigation}
-          openKeyboard={openKeyboard}
-          setReplyingTo={setReplyingTo}
-        />
-
-        <MessageModal
-          message={modalMessage} // Adjust this message as needed
-          visible={modalVisible}
-          setModalVisible={setModalVisible}
-        />
-
         {isDrawerOpen && (
           <Animated.View
             style={[styles.overlay, overlayAnimatedStyle]}
@@ -107,6 +95,18 @@ const Post = ({ navigation, route }: any) => {
             />
           </Animated.View>
         )}
+        <MainPost
+          postData={postData}
+          navigation={navigation}
+          openKeyboard={openKeyboard}
+          setReplyingTo={setReplyingTo}
+        />
+
+        <MessageModal
+          message={modalMessage} // Adjust this message as needed
+          visible={modalVisible}
+          setModalVisible={setModalVisible}
+        />
 
         {!isOptionsDrawer && !isShareDrawer && (
           <View style={[styles.bottomView, { height: bottomHeight }]}>
@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     backgroundColor: "rgba(0, 0, 0, 0.5)", // Adjust opacity as needed
-    zIndex: 0,
+    zIndex: 1,
   },
   overlayTouchable: {
     flex: 1,

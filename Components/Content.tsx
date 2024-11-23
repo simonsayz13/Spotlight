@@ -19,9 +19,9 @@ const Content = (props: any) => {
   const { navigation, onScroll, content } = props;
   const [refreshing, setRefreshing] = useState(false);
   const otherUsers = useSelector((state: RootState) => state.otherUsers);
-  const userFollowings = useSelector((state: RootState) => {
-    return state.user.userFollowings;
-  });
+  const userFollowings = useSelector(
+    (state: RootState) => state.user.userFollowings
+  );
   const [displayPosts, setDisplayPosts] = useState<Array<any>>([]);
   const [displayList, setDisplayList] = useState<boolean>(false);
   const [bottomLoader, setBottomLoader] = useState<boolean>(false);
@@ -124,19 +124,17 @@ const Content = (props: any) => {
     );
 
   return displayList ? (
-    // <FlatList data={displayPosts} renderItem={renderItem} />
     <FadeInWrapper delay={1500}>
       <MasonryFlashList
         data={displayPosts}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
-        estimatedItemSize={200} // Estimated size for optimal performance
-        numColumns={2} // Setting 2 columns for masonry layout
+        estimatedItemSize={300}
+        numColumns={2}
         showsVerticalScrollIndicator={true}
         contentContainerStyle={styles.flashListContainer}
         onScroll={onScroll}
         ListFooterComponent={renderBottomLoader}
-        scrollEventThrottle={30}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -146,6 +144,7 @@ const Content = (props: any) => {
         }
         onEndReachedThreshold={0.000001}
         onEndReached={onReachedEnd}
+        scrollEventThrottle={16}
       />
     </FadeInWrapper>
   ) : (

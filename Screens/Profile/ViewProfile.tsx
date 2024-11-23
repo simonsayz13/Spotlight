@@ -434,7 +434,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: -4 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
-    backgroundColor: ThemeColoursPrimary.PrimaryColour,
+    backgroundColor: ThemeColoursPrimary.LightGreyBackground,
   },
   contentContainerSelectorBar: {
     height: 34,
@@ -446,6 +446,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderBottomWidth: 0.4,
     borderBottomColor: ThemeColoursPrimary.GreyColour,
+    backgroundColor: ThemeColoursPrimary.PrimaryColour,
   },
   menuButton: {
     fontSize: 16,
