@@ -6,8 +6,8 @@ import {
   TouchableOpacity,
   Platform,
   Alert,
-  Animated,
   Pressable,
+  RefreshControl,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../Redux/store";
@@ -21,7 +21,6 @@ import {
   userContentSelectorButtons,
 } from "../../Constants/UI";
 import PostCard from "../../Components/PostCard";
-import AntDesign from "@expo/vector-icons/AntDesign";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {
   getUserDetails,
@@ -32,15 +31,23 @@ import ProfilePicture from "../../Components/ProfilePicture";
 import ImageModal from "../../Components/ImageModal";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { appendPosts } from "../../Redux/Slices/postsSlices";
+import {
+  getTotalLikesForUserPosts,
+  getTotalNumberOfPosts,
+} from "../../Firebase/FirebaseUsers";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
+import { ScrollView } from "react-native-gesture-handler";
 const Profile = ({ navigation }: any) => {
   const {
     userId,
     userBio,
     userFollowings: followings,
-  } = useSelector((state: RootState) => {
-    return state.user;
-  });
-
+  } = useSelector((state: RootState) => state.user);
   const insets = useSafeAreaInsets();
   const [buttonStates, setButtonStates] = useState(userContentSelectorButtons);
   const [postsData, setPostsData] = useState<Array<any>>([]);
@@ -52,28 +59,28 @@ const Profile = ({ navigation }: any) => {
   const [ldgUserDetails, setLdgUserDetails] = useState(false);
   const [ldgSuccUserDetails, setLdgSuccUserDetails] = useState(false);
   const [isGalleryVisible, setIsGalleryVisible] = useState(false);
+  const [userLikesCount, setUserLikesCount] = useState(0);
+  const [postsCount, setPostsCount] = useState(0);
   const dispatch = useDispatch();
-  let heightAnim = useRef(new Animated.Value(200)).current;
-
+  const heightAnim = useSharedValue(200);
+  const [refreshing, setRefreshing] = useState(false);
   useEffect(() => {
     if (ldgSuccUserDetails) {
-      Animated.timing(heightAnim, {
-        toValue: 250,
-        duration: 200,
-        useNativeDriver: false,
-      }).start();
+      heightAnim.value = withTiming(250, { duration: 200 });
     }
   }, [ldgSuccUserDetails]);
 
   useEffect(() => {
     if (ldgUserDetails) {
-      Animated.timing(heightAnim, {
-        toValue: 216,
-        duration: 200,
-        useNativeDriver: false,
-      }).start();
+      heightAnim.value = withTiming(216, { duration: 200 });
     }
   }, [ldgUserDetails]);
+
+  const animatedStyleHeight = useAnimatedStyle(() => {
+    return {
+      height: heightAnim.value,
+    };
+  });
 
   const fetchPosts = async () => {
     try {
@@ -99,24 +106,17 @@ const Profile = ({ navigation }: any) => {
     setLdgUserDetails(true);
     setLdgSuccUserDetails(false);
     try {
-      return await getUserDetails(userId!);
-    } catch (error) {
-      setLdgUserDetails(false);
-      Alert.alert("Error", `${error}`);
-    }
-  };
-
-  useEffect(() => {
-    fetchPosts();
-    fetchUser().then((data: any) => {
+      const likesCount = await getTotalLikesForUserPosts(userId!);
+      const postsCount = await getTotalNumberOfPosts(userId!);
       const {
         profile_picture_url,
         display_name,
         biography,
         gender,
         followers,
-      } = data;
-
+      }: any = await getUserDetails(userId!);
+      setPostsCount(postsCount);
+      setUserLikesCount(likesCount);
       setDisplayName(display_name);
       setProfilePicUrl(profile_picture_url);
       setBio(biography);
@@ -124,7 +124,17 @@ const Profile = ({ navigation }: any) => {
       setFollowers(followers);
       setLdgUserDetails(false);
       setLdgSuccUserDetails(true);
-    });
+    } catch (error) {
+      setLdgUserDetails(false);
+      Alert.alert("Error", `${error}`);
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPosts();
+    fetchUser();
   }, []);
 
   const handlePress = (id: number) => {
@@ -164,12 +174,31 @@ const Profile = ({ navigation }: any) => {
       },
     });
   };
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchUser();
+  };
 
   const renderItem = ({ item }: any) => (
     <View style={styles.cardContainer}>
       <PostCard postId={item.id} openPost={openPost} navigation={navigation} />
     </View>
   );
+  const [isAtBottom, setIsAtBottom] = useState(false);
+
+  const handleScroll = (event) => {
+    const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
+
+    const threshold = 10; // Adjust threshold as needed
+    const isBottomReached =
+      contentOffset.y + layoutMeasurement.height >=
+      contentSize.height - threshold;
+
+    // Update state only if the value has actually changed
+    if (isAtBottom !== isBottomReached) {
+      setIsAtBottom(isBottomReached);
+    }
+  };
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
@@ -179,108 +208,132 @@ const Profile = ({ navigation }: any) => {
         setIsGalleryVisible={setIsGalleryVisible}
       />
 
-      <Animated.View style={(styles.profileContainer, { height: heightAnim })}>
-        <View style={styles.profileDetails}>
-          <ProfilePicture
-            uri={profilePicUrl}
-            userDisplayName={displayName}
-            type={ImageType.Profile}
-            onPressFunc={setIsGalleryVisible}
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={[ThemeColoursPrimary.LogoColour]} // Optional: Refresh spinner color
           />
-          <View
-            style={{
-              flexDirection: "row",
-              gap: 4,
-              alignItems: "center",
-              marginBottom: 2,
-            }}
-          >
-            <Text style={styles.userNameFont}>
-              {ldgUserDetails ? "-" : displayName}
-            </Text>
-            {!ldgUserDetails && gender === Gender.Male && (
-              <Ionicons name="male" size={20} color="#4bb9f3" />
-            )}
-            {!ldgUserDetails && gender === Gender.Female && (
-              <Ionicons name="female" size={20} color="#f268df" />
+        }
+        onScroll={handleScroll}
+        bounces={!isAtBottom} // Disable bounce when at the bottom
+        scrollEventThrottle={16}
+      >
+        <Animated.View style={(styles.profileContainer, animatedStyleHeight)}>
+          <View style={styles.profileDetails}>
+            <View style={styles.profileAndActionContainer}>
+              <ProfilePicture
+                uri={profilePicUrl}
+                userDisplayName={displayName}
+                type={ImageType.Profile}
+                onPressFunc={setIsGalleryVisible}
+              />
+              <View style={styles.actionContainer}>
+                <TouchableOpacity onPress={handleEdit}>
+                  <FontAwesome5
+                    name="user-edit"
+                    size={24}
+                    color={ThemeColoursPrimary.SecondaryColour}
+                  />
+                </TouchableOpacity>
+              </View>
+            </View>
+            <View
+              style={{
+                flexDirection: "row",
+                gap: 4,
+                alignItems: "center",
+                marginBottom: 2,
+              }}
+            >
+              <Text style={styles.userNameFont}>
+                {ldgUserDetails ? "-" : displayName}
+              </Text>
+              {!ldgUserDetails && gender === Gender.Male && (
+                <Ionicons name="male" size={20} color="#4bb9f3" />
+              )}
+              {!ldgUserDetails && gender === Gender.Female && (
+                <Ionicons name="female" size={20} color="#f268df" />
+              )}
+            </View>
+            <Text style={styles.metaDataFont}>IP Address: United Kingdom</Text>
+          </View>
+          <View style={styles.description}>
+            {!ldgUserDetails && (
+              <Text style={styles.descriptionText} numberOfLines={2}>
+                {bio ?? "Add a bio in edit profile"}
+              </Text>
             )}
           </View>
-          <Text style={styles.metaDataFont}>IP Address: United Kingdom</Text>
-        </View>
-        <View style={styles.description}>
-          {!ldgUserDetails && (
-            <Text style={styles.descriptionText} numberOfLines={2}>
-              {bio ?? "Add a bio in edit profile"}
-            </Text>
-          )}
-        </View>
-        <View style={styles.userStatsContainer}>
-          <Pressable
-            style={styles.statsView}
-            onPress={() => openFollowerScreen(0)}
-          >
-            <Text style={styles.statsCount}>
-              {ldgUserDetails ? "-" : followings?.length}
-            </Text>
-            <Text style={styles.statsFont}>Following</Text>
-          </Pressable>
-          <Pressable
-            style={styles.statsView}
-            onPress={() => openFollowerScreen(1)}
-          >
+          <View style={styles.userStatsContainer}>
             <View style={styles.statsView}>
               <Text style={styles.statsCount}>
-                {ldgUserDetails ? "-" : followers?.length}
+                {ldgUserDetails ? "-" : postsCount}
               </Text>
-              <Text style={styles.statsFont}>Followers</Text>
+              <Text style={styles.statsFont}>Posts</Text>
             </View>
-          </Pressable>
-          <View style={styles.statsView}>
-            <Text style={styles.statsCount}>666</Text>
-            <Text style={styles.statsFont}>Likes & Favs</Text>
-          </View>
-
-          <View style={styles.interactionContainer}>
-            <TouchableOpacity style={styles.button} onPress={handleEdit}>
-              <AntDesign
-                name="edit"
-                size={19}
-                color={ThemeColoursPrimary.PrimaryColour}
-              />
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Animated.View>
-      {/* Posts */}
-      <View style={styles.userContentContainer}>
-        <View style={styles.contentContainerSelectorBar}>
-          {buttonStates.map((button: any) => (
-            <TouchableOpacity
-              key={button.id}
-              onPress={() => handlePress(button.id)}
+            <View style={styles.statsView}>
+              <Text style={styles.statsCount}>
+                {ldgUserDetails ? "-" : userLikesCount}
+              </Text>
+              <Text style={styles.statsFont}>Likes</Text>
+            </View>
+            <Pressable
+              style={styles.statsView}
+              onPress={() => openFollowerScreen(0)}
             >
-              {button.clicked ? (
-                <View style={styles.textWrapper}>
-                  <Text style={styles.menuButtonClicked}>{button.label}</Text>
-                  <View style={styles.customUnderline} />
-                </View>
-              ) : (
-                <Text style={styles.menuButton}>{button.label}</Text>
-              )}
-            </TouchableOpacity>
-          ))}
-        </View>
+              <Text style={styles.statsCount}>
+                {ldgUserDetails ? "-" : followings?.length}
+              </Text>
+              <Text style={styles.statsFont}>Following</Text>
+            </Pressable>
+            <Pressable
+              style={styles.statsView}
+              onPress={() => openFollowerScreen(1)}
+            >
+              <View style={styles.statsView}>
+                <Text style={styles.statsCount}>
+                  {ldgUserDetails ? "-" : followers?.length}
+                </Text>
+                <Text style={styles.statsFont}>Followers</Text>
+              </View>
+            </Pressable>
+          </View>
+        </Animated.View>
+        {/* Posts */}
+        <View style={styles.userContentContainer}>
+          <View style={styles.contentContainerSelectorBar}>
+            {buttonStates.map((button: any) => (
+              <TouchableOpacity
+                key={button.id}
+                onPress={() => handlePress(button.id)}
+              >
+                {button.clicked ? (
+                  <View style={styles.textWrapper}>
+                    <Text style={styles.menuButtonClicked}>{button.label}</Text>
+                    <View style={styles.customUnderline} />
+                  </View>
+                ) : (
+                  <Text style={styles.menuButton}>{button.label}</Text>
+                )}
+              </TouchableOpacity>
+            ))}
+          </View>
 
-        <MasonryFlashList
-          data={postsData}
-          keyExtractor={(post) => post.id}
-          renderItem={renderItem}
-          estimatedItemSize={200} // Estimated size for optimal performance
-          numColumns={2} // Setting 2 columns for masonry layout
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.flashListContainer}
-        />
-      </View>
+          <MasonryFlashList
+            data={postsData}
+            keyExtractor={(post) => post.id}
+            renderItem={renderItem}
+            estimatedItemSize={200} // Estimated size for optimal performance
+            numColumns={2} // Setting 2 columns for masonry layout
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.flashListContainer}
+            scrollEnabled={false}
+          />
+        </View>
+      </ScrollView>
     </View>
   );
 };
@@ -310,7 +363,6 @@ const styles = StyleSheet.create({
   description: {
     marginHorizontal: 8,
     gap: 6,
-    marginBottom: 12,
   },
   descriptionTitle: {
     color: ThemeColoursPrimary.SecondaryColour,
@@ -320,10 +372,11 @@ const styles = StyleSheet.create({
   descriptionText: {
     color: ThemeColoursPrimary.SecondaryColour,
     fontSize: 16,
-    lineHeight: 24, // Typically 1.5 times the fontSize
+    lineHeight: 24,
     minHeight: 48,
   },
   userStatsContainer: {
+    flex: 1,
     flexDirection: "row",
     marginHorizontal: 8,
     alignItems: "center",
@@ -335,6 +388,7 @@ const styles = StyleSheet.create({
   statsCount: {
     color: ThemeColoursPrimary.SecondaryColour,
     fontWeight: "bold",
+    fontSize: 24,
   },
   statsFont: {
     color: ThemeColoursPrimary.SecondaryColour,
@@ -407,10 +461,15 @@ const styles = StyleSheet.create({
     marginHorizontal: 2, // Horizontal gap between the cards
     marginVertical: 4,
   },
-  interactionContainer: {
+  profileAndActionContainer: {
     flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
+    justifyContent: "center",
+    width: "100%",
+  },
+  actionContainer: {
+    position: "absolute",
+    top: 0,
+    right: 0,
   },
 });
 

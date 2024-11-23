@@ -1,4 +1,11 @@
-import { doc, getDoc } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
 import { firestoreDB } from "./FirebaseApp";
 import { FireStoreCollections } from "../Constants/dbReference";
 import {
@@ -45,5 +52,34 @@ export const getUserProfileDetails = async (
     }
   } catch (error) {
     return null;
+  }
+};
+
+export const getTotalLikesForUserPosts = async (userId: string) => {
+  try {
+    const postsRef = collection(db, FireStoreCollections.Posts); // Reference to the posts collection
+    const postsQuery = query(postsRef, where("user_id", "==", userId)); // Query posts by userId
+    const postsSnapshot = await getDocs(postsQuery); // Fetch matching posts
+    let totalLikes = 0;
+    postsSnapshot.forEach((doc) => {
+      const postData = doc.data();
+      totalLikes += postData.likes || 0;
+    });
+    return totalLikes;
+  } catch (error) {
+    console.error("Error fetching posts:", error);
+    return 0; // Handle errors gracefully
+  }
+};
+
+export const getTotalNumberOfPosts = async (userId: string) => {
+  try {
+    const postsRef = collection(db, FireStoreCollections.Posts);
+    const postsQuery = query(postsRef, where("user_id", "==", userId));
+    const postsSnapshot = await getDocs(postsQuery);
+    return postsSnapshot.size;
+  } catch (error) {
+    console.error("Error fetching posts:", error);
+    return 0; // Handle errors gracefully
   }
 };
