@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Alert, RefreshControl, StyleSheet, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../Redux/store";
@@ -13,25 +13,30 @@ import { MasonryFlashList } from "@shopify/flash-list";
 import { ThemeColoursPrimary } from "../Constants/UI";
 import Loader from "./Loader";
 import { appendPosts } from "../Redux/Slices/postsSlices";
+import { useFocusEffect } from "@react-navigation/native";
 
 const Content = (props: any) => {
   const { navigation, onScroll, content } = props;
   const [refreshing, setRefreshing] = useState(false);
   const otherUsers = useSelector((state: RootState) => state.otherUsers);
-  const { userFollowings } = useSelector((state: RootState) => state.user);
+  const userFollowings = useSelector((state: RootState) => {
+    return state.user.userFollowings;
+  });
   const [displayPosts, setDisplayPosts] = useState<Array<any>>([]);
   const [displayList, setDisplayList] = useState<boolean>(false);
   const [bottomLoader, setBottomLoader] = useState<boolean>(false);
   const [lastVisible, setLastVisible] = useState<any>(null);
+  const [isFetched, setIsFetched] = useState(false);
+
   const dispatch = useDispatch();
 
   const fetchInitialPosts = async () => {
     try {
+      setDisplayPosts([]);
       const fetchedPosts: any =
         content === "following"
           ? await getPostsByUserIds(userFollowings)
           : await getPaginatedPosts();
-
       const postsWithUserDetails = await fetchUserDetailOnPosts(
         fetchedPosts.posts,
         otherUsers,
@@ -73,12 +78,19 @@ const Content = (props: any) => {
     }
   };
 
-  // Hook for loading data
-  useEffect(() => {
-    fetchInitialPosts();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      if (!isFetched) {
+        fetchInitialPosts();
+        setIsFetched(true);
+      }
+    }, [isFetched, fetchInitialPosts])
+  );
 
-  // Refresh the contents page
+  useEffect(() => {
+    if (content === "following") fetchInitialPosts();
+  }, [userFollowings]);
+
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     setTimeout(() => {
@@ -97,7 +109,7 @@ const Content = (props: any) => {
 
   const renderItem = useCallback(
     ({ item }: any) => (
-      <View style={styles.cardContainer} key={item.id}>
+      <View style={styles.cardContainer}>
         <PostCard postId={item.id} navigation={navigation} />
       </View>
     ),
@@ -112,6 +124,7 @@ const Content = (props: any) => {
     );
 
   return displayList ? (
+    // <FlatList data={displayPosts} renderItem={renderItem} />
     <FadeInWrapper delay={1500}>
       <MasonryFlashList
         data={displayPosts}
@@ -119,7 +132,7 @@ const Content = (props: any) => {
         renderItem={renderItem}
         estimatedItemSize={200} // Estimated size for optimal performance
         numColumns={2} // Setting 2 columns for masonry layout
-        showsVerticalScrollIndicator={false}
+        showsVerticalScrollIndicator={true}
         contentContainerStyle={styles.flashListContainer}
         onScroll={onScroll}
         ListFooterComponent={renderBottomLoader}

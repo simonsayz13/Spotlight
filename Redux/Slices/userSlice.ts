@@ -31,6 +31,8 @@ export const userSlice = createSlice({
       state.userLocation = null;
       state.userFavourites = [];
       state.userLiked = [];
+      state.userFollowers = [];
+      state.userFollowings = [];
     },
 
     updateDisplayName: (state, action) => {

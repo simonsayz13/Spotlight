@@ -183,18 +183,17 @@ export const getPaginatedPosts = async (lastVisible?: any) => {
     const q = lastVisible
       ? query(
           postsCollection,
-          orderBy("timeStamp", "desc"),
+          where("isPrivate", "==", false),
           startAfter(lastVisible),
           limit(10)
         )
-      : query(postsCollection, orderBy("timeStamp", "desc"), limit(10));
+      : query(postsCollection, where("isPrivate", "==", false), limit(10));
 
     const snapshot = await getDocs(q);
     const posts = snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
-
     const newLastVisible = snapshot.docs[snapshot.docs.length - 1];
     if (!newLastVisible) throw Error;
     return { posts, lastVisible: newLastVisible };
@@ -538,9 +537,16 @@ export const getPostsByUserIds = async (
       ? query(
           postsCollection,
           where("user_id", "in", userIds),
-          startAfter(lastVisible)
+          where("isPrivate", "==", false),
+          startAfter(lastVisible),
+          limit(10)
         )
-      : query(postsCollection, where("user_id", "in", userIds), limit(10));
+      : query(
+          postsCollection,
+          where("user_id", "in", userIds),
+          where("isPrivate", "==", false),
+          limit(10)
+        );
 
     // Execute the query
     const snapshot = await getDocs(postsQuery);
