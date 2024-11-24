@@ -174,6 +174,7 @@ const Profile = ({ navigation }: any) => {
       },
     });
   };
+
   const onRefresh = () => {
     setRefreshing(true);
     fetchUser();
@@ -184,21 +185,6 @@ const Profile = ({ navigation }: any) => {
       <PostCard postId={item.id} openPost={openPost} navigation={navigation} />
     </View>
   );
-  const [isAtBottom, setIsAtBottom] = useState(false);
-
-  const handleScroll = (event) => {
-    const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
-
-    const threshold = 10; // Adjust threshold as needed
-    const isBottomReached =
-      contentOffset.y + layoutMeasurement.height >=
-      contentSize.height - threshold;
-
-    // Update state only if the value has actually changed
-    if (isAtBottom !== isBottomReached) {
-      setIsAtBottom(isBottomReached);
-    }
-  };
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
@@ -217,8 +203,6 @@ const Profile = ({ navigation }: any) => {
             colors={[ThemeColoursPrimary.LogoColour]} // Optional: Refresh spinner color
           />
         }
-        onScroll={handleScroll}
-        bounces={!isAtBottom} // Disable bounce when at the bottom
         scrollEventThrottle={16}
       >
         <Animated.View style={(styles.profileContainer, animatedStyleHeight)}>
@@ -260,9 +244,9 @@ const Profile = ({ navigation }: any) => {
             </View>
             <Text style={styles.metaDataFont}>IP Address: United Kingdom</Text>
           </View>
-          <View style={styles.description}>
+          <View style={styles.bio}>
             {!ldgUserDetails && (
-              <Text style={styles.descriptionText} numberOfLines={2}>
+              <Text style={styles.bioText} numberOfLines={2}>
                 {bio ?? "Add a bio in edit profile"}
               </Text>
             )}
@@ -360,16 +344,11 @@ const styles = StyleSheet.create({
     color: ThemeColoursPrimary.SecondaryColour,
     opacity: 0.6,
   },
-  description: {
+  bio: {
     marginHorizontal: 8,
     gap: 6,
   },
-  descriptionTitle: {
-    color: ThemeColoursPrimary.SecondaryColour,
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  descriptionText: {
+  bioText: {
     color: ThemeColoursPrimary.SecondaryColour,
     fontSize: 16,
     lineHeight: 24,
@@ -412,10 +391,9 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 14,
     borderTopRightRadius: 14,
     elevation: 5, // For Android shadow
-    shadowOffset: { width: 0, height: -1 },
-    shadowOpacity: 0.2,
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.05,
     shadowRadius: 2,
-
     backgroundColor: ThemeColoursPrimary.LightGreyBackground,
   },
   contentContainerSelectorBar: {

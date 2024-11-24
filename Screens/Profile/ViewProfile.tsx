@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -6,8 +6,9 @@ import {
   TouchableOpacity,
   Platform,
   Alert,
-  Animated,
   Pressable,
+  ScrollView,
+  RefreshControl,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../Redux/store";
@@ -34,11 +35,18 @@ import ProfilePicture from "../../Components/ProfilePicture";
 import ImageModal from "../../Components/ImageModal";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { appendPosts } from "../../Redux/Slices/postsSlices";
+import {
+  getTotalLikesForUserPosts,
+  getTotalNumberOfPosts,
+} from "../../Firebase/FirebaseUsers";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 const ViewProfile = ({ navigation, route }: any) => {
   const { userId: appUserId, userFollowings: appUserFollowings } = useSelector(
-    (state: RootState) => {
-      return state.user;
-    }
+    (state: RootState) => state.user
   );
   const [buttonStates, setButtonStates] = useState(guestContentSelectorButtons);
   const userId = route?.params?.userId;
@@ -54,28 +62,30 @@ const ViewProfile = ({ navigation, route }: any) => {
   const [ldgUserDetails, setLdgUserDetails] = useState(false);
   const [ldgSuccUserDetails, setLdgSuccUserDetails] = useState(false);
   const [isGalleryVisible, setIsGalleryVisible] = useState(false);
-  let heightAnim = useRef(new Animated.Value(200)).current;
+  const [userLikesCount, setUserLikesCount] = useState(0);
+  const [postsCount, setPostsCount] = useState(0);
+  const [refreshing, setRefreshing] = useState(false);
+  const heightAnim = useSharedValue(200);
   const insets = useSafeAreaInsets();
   const dispatch = useDispatch();
+
   useEffect(() => {
     if (ldgSuccUserDetails) {
-      Animated.timing(heightAnim, {
-        toValue: 250,
-        duration: 200,
-        useNativeDriver: false,
-      }).start();
+      heightAnim.value = withTiming(250, { duration: 200 });
     }
   }, [ldgSuccUserDetails]);
 
   useEffect(() => {
     if (ldgUserDetails) {
-      Animated.timing(heightAnim, {
-        toValue: 216,
-        duration: 200,
-        useNativeDriver: false,
-      }).start();
+      heightAnim.value = withTiming(216, { duration: 200 });
     }
   }, [ldgUserDetails]);
+
+  const animatedStyleHeight = useAnimatedStyle(() => {
+    return {
+      height: heightAnim.value,
+    };
+  });
 
   const fetchPosts = async () => {
     try {
@@ -101,16 +111,8 @@ const ViewProfile = ({ navigation, route }: any) => {
     setLdgUserDetails(true);
     setLdgSuccUserDetails(false);
     try {
-      return await getUserDetails(userId);
-    } catch (error) {
-      setLdgUserDetails(false);
-      Alert.alert("Error", `${error}`);
-    }
-  };
-
-  useEffect(() => {
-    fetchPosts();
-    fetchUser().then((data: any) => {
+      const likesCount = await getTotalLikesForUserPosts(userId!);
+      const postsCount = await getTotalNumberOfPosts(userId!);
       const {
         user_id,
         profile_picture_url,
@@ -118,8 +120,9 @@ const ViewProfile = ({ navigation, route }: any) => {
         biography,
         gender,
         followers,
-        followings,
-      } = data;
+      }: any = await getUserDetails(userId!);
+      setPostsCount(postsCount);
+      setUserLikesCount(likesCount);
       setDisplayName(display_name);
       setProfilePicUrl(profile_picture_url);
       setBio(biography);
@@ -127,11 +130,21 @@ const ViewProfile = ({ navigation, route }: any) => {
       setFollowers(followers);
       setFollowings(followings);
       setProfileUserId(user_id);
-      setLdgUserDetails(false);
-      setLdgSuccUserDetails(true);
       followers?.find((followerId: string) => followerId === appUserId) &&
         setIsFollowed(true);
-    });
+      setLdgUserDetails(false);
+      setLdgSuccUserDetails(true);
+    } catch (error) {
+      setLdgUserDetails(false);
+      Alert.alert("Error", `${error}`);
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPosts();
+    fetchUser();
   }, [userId]);
 
   const handlePress = (id: number) => {
@@ -204,6 +217,11 @@ const ViewProfile = ({ navigation, route }: any) => {
     });
   };
 
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchUser();
+  };
+
   const renderItem = ({ item }: any) => (
     <View style={styles.cardContainer}>
       <PostCard postId={item.id} openPost={openPost} navigation={navigation} />
@@ -211,149 +229,161 @@ const ViewProfile = ({ navigation, route }: any) => {
   );
 
   return (
-    <View
-      style={[
-        styles.container,
-        { paddingTop: insets.top, paddingBottom: insets.bottom },
-      ]}
-    >
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <ImageModal
         imageUri={profilePicUrl}
         isGalleryVisible={isGalleryVisible}
         setIsGalleryVisible={setIsGalleryVisible}
       />
-
-      <Animated.View style={(styles.profileContainer, { height: heightAnim })}>
-        <View style={styles.profileDetails}>
-          <View style={styles.profilePicBackButtonContainer}>
-            <Pressable
-              onPress={handleBackButtonPress}
-              style={styles.backButton}
-            >
-              <Ionicons
-                name="chevron-back"
-                size={32}
-                color={ThemeColoursPrimary.SecondaryColour}
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={[ThemeColoursPrimary.LogoColour]} // Optional: Refresh spinner color
+          />
+        }
+      >
+        <Animated.View style={animatedStyleHeight}>
+          <View style={styles.profileDetails}>
+            <View style={styles.profilePicBackButtonContainer}>
+              <Pressable
+                onPress={handleBackButtonPress}
+                style={styles.backButton}
+              >
+                <Ionicons
+                  name="chevron-back"
+                  size={32}
+                  color={ThemeColoursPrimary.SecondaryColour}
+                />
+              </Pressable>
+              <ProfilePicture
+                uri={profilePicUrl}
+                userDisplayName={displayName}
+                type={ImageType.Profile}
+                onPressFunc={setIsGalleryVisible}
               />
+            </View>
+
+            <View
+              style={{
+                flexDirection: "row",
+                gap: 4,
+                alignItems: "center",
+                marginBottom: 2,
+              }}
+            >
+              <Text style={styles.userNameFont}>
+                {ldgUserDetails ? "-" : displayName}
+              </Text>
+              {!ldgUserDetails && gender === Gender.Male && (
+                <Ionicons name="male" size={20} color="#4bb9f3" />
+              )}
+              {!ldgUserDetails && gender === Gender.Female && (
+                <Ionicons name="female" size={20} color="#f268df" />
+              )}
+            </View>
+            <Text style={styles.metaDataFont}>Location: United Kingdom</Text>
+          </View>
+          <View style={styles.bio}>
+            {!ldgUserDetails && (
+              <Text style={styles.bioText}>{bio ?? "No bio available"}</Text>
+            )}
+          </View>
+          <View style={styles.userStatsContainer}>
+            <View style={styles.statsView}>
+              <Text style={styles.statsCount}>
+                {ldgUserDetails ? "-" : postsCount}
+              </Text>
+              <Text style={styles.statsFont}>Posts</Text>
+            </View>
+            <View style={styles.statsView}>
+              <Text style={styles.statsCount}>
+                {ldgUserDetails ? "-" : userLikesCount}
+              </Text>
+              <Text style={styles.statsFont}>Likes</Text>
+            </View>
+
+            <Pressable
+              style={styles.statsView}
+              onPress={() => openFollowerScreen(0)}
+            >
+              <Text style={styles.statsCount}>
+                {ldgUserDetails ? "-" : followings?.length}
+              </Text>
+              <Text style={styles.statsFont}>Following</Text>
             </Pressable>
-            <ProfilePicture
-              uri={profilePicUrl}
-              userDisplayName={displayName}
-              type={ImageType.Profile}
-              onPressFunc={setIsGalleryVisible}
+            <Pressable
+              style={styles.statsView}
+              onPress={() => openFollowerScreen(1)}
+            >
+              <Text style={styles.statsCount}>
+                {ldgUserDetails ? "-" : followers?.length}
+              </Text>
+              <Text style={styles.statsFont}>Followers</Text>
+            </Pressable>
+
+            <View style={styles.interactionContainer}>
+              <TouchableOpacity
+                style={[styles.button, styles.followButton]}
+                onPress={
+                  isFollowed ? handlePressUnfollowBtn : handlePressFollowBtn
+                }
+              >
+                <Text style={styles.buttonText}>
+                  {isFollowed ? "Unfollow" : "Follow"}
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity onPressIn={openChat} style={styles.button}>
+                <AntDesign
+                  name="message1"
+                  size={18}
+                  color={ThemeColoursPrimary.PrimaryColour}
+                />
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Animated.View>
+        {/* Posts */}
+        <View style={styles.userContentContainer}>
+          <View style={styles.contentContainerSelectorBar}>
+            {buttonStates.map((button: any) => (
+              <TouchableOpacity
+                key={button.id}
+                onPress={() => handlePress(button.id)}
+              >
+                {button.clicked ? (
+                  <View style={styles.textWrapper}>
+                    <Text style={styles.menuButtonClicked}>{button.label}</Text>
+                    <View style={styles.customUnderline} />
+                  </View>
+                ) : (
+                  <Text style={styles.menuButton}>{button.label}</Text>
+                )}
+              </TouchableOpacity>
+            ))}
+          </View>
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: ThemeColoursPrimary.LightGreyBackground,
+            }}
+          >
+            <MasonryFlashList
+              data={postsData}
+              keyExtractor={(post) => post.id}
+              renderItem={renderItem}
+              estimatedItemSize={10} // Estimated size for optimal performance
+              numColumns={2} // Setting 2 columns for masonry layout
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={styles.flashListContainer}
+              scrollEnabled={false}
             />
           </View>
-
-          <View
-            style={{
-              flexDirection: "row",
-              gap: 4,
-              alignItems: "center",
-              marginBottom: 2,
-            }}
-          >
-            <Text style={styles.userNameFont}>
-              {ldgUserDetails ? "-" : displayName}
-            </Text>
-            {!ldgUserDetails && gender === Gender.Male && (
-              <Ionicons name="male" size={20} color="#4bb9f3" />
-            )}
-            {!ldgUserDetails && gender === Gender.Female && (
-              <Ionicons name="female" size={20} color="#f268df" />
-            )}
-          </View>
-          <Text style={styles.metaDataFont}>Location: United Kingdom</Text>
         </View>
-        <View style={styles.description}>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <Text style={styles.descriptionTitle}>Bio</Text>
-          </View>
-          {!ldgUserDetails && (
-            <Text style={styles.descriptionText}>
-              {bio ?? "No bio available"}
-            </Text>
-          )}
-        </View>
-        <View style={styles.userStatsContainer}>
-          <Pressable
-            style={styles.statsView}
-            onPress={() => openFollowerScreen(0)}
-          >
-            <Text style={styles.statsCount}>
-              {ldgUserDetails ? "-" : followings?.length}
-            </Text>
-            <Text style={styles.statsFont}>Following</Text>
-          </Pressable>
-          <Pressable
-            style={styles.statsView}
-            onPress={() => openFollowerScreen(1)}
-          >
-            <Text style={styles.statsCount}>
-              {ldgUserDetails ? "-" : followers?.length}
-            </Text>
-            <Text style={styles.statsFont}>Followers</Text>
-          </Pressable>
-          <View style={styles.statsView}>
-            <Text style={styles.statsCount}>666</Text>
-            <Text style={styles.statsFont}>Likes & Favs</Text>
-          </View>
-          <View style={styles.interactionContainer}>
-            <TouchableOpacity
-              style={[styles.button, styles.followButton]}
-              onPress={
-                isFollowed ? handlePressUnfollowBtn : handlePressFollowBtn
-              }
-            >
-              <Text style={styles.buttonText}>
-                {isFollowed ? "Unfollow" : "Follow"}
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity onPressIn={openChat} style={styles.button}>
-              <AntDesign
-                name="message1"
-                size={18}
-                color={ThemeColoursPrimary.PrimaryColour}
-              />
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Animated.View>
-      {/* Posts */}
-      <View style={styles.userContentContainer}>
-        <View style={styles.contentContainerSelectorBar}>
-          {buttonStates.map((button: any) => (
-            <TouchableOpacity
-              key={button.id}
-              onPress={() => handlePress(button.id)}
-            >
-              {button.clicked ? (
-                <View style={styles.textWrapper}>
-                  <Text style={styles.menuButtonClicked}>{button.label}</Text>
-                  <View style={styles.customUnderline} />
-                </View>
-              ) : (
-                <Text style={styles.menuButton}>{button.label}</Text>
-              )}
-            </TouchableOpacity>
-          ))}
-        </View>
-        <MasonryFlashList
-          data={postsData}
-          keyExtractor={(post) => post.id}
-          renderItem={renderItem}
-          estimatedItemSize={10} // Estimated size for optimal performance
-          numColumns={2} // Setting 2 columns for masonry layout
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.flashListContainer}
-        />
-      </View>
+      </ScrollView>
     </View>
   );
 };
@@ -364,7 +394,6 @@ const styles = StyleSheet.create({
     backgroundColor: ThemeColoursPrimary.PrimaryColour,
     paddingTop: Platform.OS === "android" ? 8 : 0,
   },
-  profileContainer: {},
   profileDetails: {
     alignItems: "center",
     marginBottom: 10,
@@ -380,20 +409,19 @@ const styles = StyleSheet.create({
     color: ThemeColoursPrimary.SecondaryColour,
     opacity: 0.6,
   },
-  description: {
+  bio: {
     marginHorizontal: 8,
     gap: 6,
     marginBottom: 12,
   },
-  descriptionTitle: {
+  bioText: {
     color: ThemeColoursPrimary.SecondaryColour,
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  descriptionText: {
-    color: ThemeColoursPrimary.SecondaryColour,
+    fontSize: 16,
+    lineHeight: 24,
+    minHeight: 48,
   },
   userStatsContainer: {
+    flex: 1,
     flexDirection: "row",
     marginHorizontal: 8,
     alignItems: "center",
@@ -405,6 +433,7 @@ const styles = StyleSheet.create({
   statsCount: {
     color: ThemeColoursPrimary.SecondaryColour,
     fontWeight: "bold",
+    fontSize: 24,
   },
   statsFont: {
     color: ThemeColoursPrimary.SecondaryColour,
@@ -426,7 +455,7 @@ const styles = StyleSheet.create({
     color: ThemeColoursPrimary.PrimaryColour,
   },
   userContentContainer: {
-    flex: 1,
+    height: "100%",
     marginTop: 10,
     borderTopLeftRadius: 14,
     borderTopRightRadius: 14,
