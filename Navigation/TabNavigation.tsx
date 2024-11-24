@@ -87,17 +87,21 @@ const TabNavigation = ({ navigation }: any) => {
           component={CreatePost}
           options={{
             tabBarButton: (props) => (
-              <TouchableOpacity
-                style={styles.customPostButton}
-                onPress={() => navigation.navigate(PostStackScreens.CreatePost)} // Navigate to your Post screen
-                activeOpacity={1}
-              >
-                <Feather
-                  name="plus"
-                  size={44}
-                  color={ThemeColoursPrimary.LogoColour}
-                />
-              </TouchableOpacity>
+              <View style={{ alignItems: "center", justifyContent: "center" }}>
+                <TouchableOpacity
+                  style={styles.customPostButton}
+                  onPress={() =>
+                    navigation.navigate(PostStackScreens.CreatePost)
+                  } // Navigate to your Post screen
+                  activeOpacity={1}
+                >
+                  <Feather
+                    name="plus"
+                    size={44}
+                    color={ThemeColoursPrimary.LogoColour}
+                  />
+                </TouchableOpacity>
+              </View>
             ),
           }}
         />
@@ -146,7 +150,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 2,
     elevation: 4, // Android shadow
-    zIndex: 10,
+    // zIndex: 10,
   },
 });
 

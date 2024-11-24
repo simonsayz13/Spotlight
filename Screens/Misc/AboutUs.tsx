@@ -10,7 +10,6 @@ const AboutUs = (props: any) => {
   const insets = useSafeAreaInsets();
   const handleBackButtonPress = () => {
     navigation.toggleDrawer();
-    // navigation.navigate(MainStacks.HomeStack, { screen: "Home" });
   };
 
   const handleEmailPress = () => {
