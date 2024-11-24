@@ -129,6 +129,7 @@ const HomeTopTabNavigation = ({ navigation }: any) => {
 
   const animatedContentStyle = useAnimatedStyle(() => ({
     paddingTop: withTiming(paddingTop.value, { duration: 200 }),
+    backgroundColor: ThemeColoursPrimary.LightGreyBackground,
   }));
 
   return (

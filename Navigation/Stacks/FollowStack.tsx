@@ -5,9 +5,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../Redux/store";
 import FollowerList from "../../Screens/Profile/FollowerList";
 import FollowingList from "../../Screens/Profile/FollowingList";
-import FollowTabsHeader from "../../Components/FollowTabsHeader";
-import { NavigationContainer } from "@react-navigation/native";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet } from "react-native";
 import TopNavigationBarFollows from "../../Components/TopNavigationBarFollows";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -35,12 +33,6 @@ const FollowStackScreen = (props) => {
         type,
         appUserId,
       });
-    } else {
-      // navigation.navigate(FollowStackScreens.FollowingList, {
-      //   followings,
-      //   profileId: userId,
-      //   tabIndex,
-      // });
     }
   };
 

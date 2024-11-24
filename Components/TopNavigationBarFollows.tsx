@@ -1,13 +1,6 @@
-import React, { useEffect, useState } from "react";
 import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
-import { ProfileStackScreens, ThemeColoursPrimary } from "../Constants/UI";
-import { getUserDetails } from "../Firebase/firebaseFireStore";
-import { Image } from "expo-image";
-import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import FollowTabsHeader from "./FollowTabsHeader";
+import { ThemeColoursPrimary } from "../Constants/UI";
 
 const TopNavigationBarPost = ({
   navigation,
@@ -16,39 +9,29 @@ const TopNavigationBarPost = ({
   activeTab,
   handleTabPress,
 }: any) => {
-  const [profilePicUrl, setProfilePicUrl] = useState("");
-
-  const goToProfile = () => {
-    navigation.navigate(ProfileStackScreens.Profile, {
-      guestView: true,
-      opId: userId,
-    });
+  const handleBackButtonPress = () => {
+    navigation.goBack();
   };
 
   return (
     <View style={styles.container}>
-      <View style={styles.leftWrapper}>
-        <TouchableOpacity
-          onPress={() => {
-            navigation.goBack();
-          }}
-        >
-          <Ionicons
-            name="chevron-back"
-            size={32}
-            color={ThemeColoursPrimary.SecondaryColour}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.userWrapper}
-          onPressIn={() => navigation.goBack()}
-        >
-          <Text style={styles.usernameText}>{displayName}</Text>
-        </TouchableOpacity>
-      </View>
-      {/* <View>
-        <FollowTabsHeader activeTab={activeTab} onTabPress={handleTabPress} />
-      </View> */}
+      <TouchableOpacity
+        onPress={handleBackButtonPress}
+        style={styles.placeHolder}
+      >
+        <Ionicons
+          name="chevron-back"
+          size={32}
+          color={ThemeColoursPrimary.SecondaryColour}
+        />
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.userWrapper}
+        onPressIn={() => navigation.goBack()}
+      >
+        <Text style={styles.usernameText}>{displayName}</Text>
+      </TouchableOpacity>
+      <View style={styles.placeHolder} />
     </View>
   );
 };
@@ -59,12 +42,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     backgroundColor: ThemeColoursPrimary.PrimaryColour,
+    flexDirection: "row",
   },
   leftWrapper: {
     width: "100%",
     flexDirection: "row", // Align children in a row
     alignItems: "center", // Vertically center the content
-    justifyContent: "flex-start",
+    justifyContent: "space-between",
     backgroundColor: ThemeColoursPrimary.PrimaryColour,
   },
   textWrapper: {
@@ -79,7 +63,7 @@ const styles = StyleSheet.create({
   usernameText: {
     color: ThemeColoursPrimary.SecondaryColour,
     fontSize: 18,
-    marginLeft: 10,
+    justifyContent: "center",
   },
   followShareWrapper: {
     alignItems: "center",
@@ -91,6 +75,9 @@ const styles = StyleSheet.create({
     width: 40, // Width and height should be the same
     height: 42,
     borderRadius: 50, // Half of the width or height for a perfect circle
+  },
+  placeHolder: {
+    width: 32,
   },
 });
 

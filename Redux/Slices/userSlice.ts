@@ -54,7 +54,10 @@ export const userSlice = createSlice({
       state.userAge = action.payload;
     },
     addToFollowings: (state, action) => {
-      state.userFollowings = [...state.userFollowings, action.payload];
+      const userId = action.payload;
+      if (!state.userFollowings.includes(userId)) {
+        state.userFollowings.push(userId); // Use `push` for direct mutation
+      }
     },
     removeFromFollowings: (state, action) => {
       state.userFollowings = state.userFollowings.filter(

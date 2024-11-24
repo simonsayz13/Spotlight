@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { View, StyleSheet, Alert, ScrollView, Dimensions } from "react-native";
-import { TabView, SceneMap, TabBar } from "react-native-tab-view";
+import { TabView, TabBar } from "react-native-tab-view";
 
 import {
   NavigationTabs,
@@ -88,11 +88,10 @@ const FollowersScreen = (props) => {
   return (
     <View style={styles.container}>
       <ScrollView style={styles.listContainer}>
-        {followerList?.map((profile) => {
+        {followerList?.map((profile: any) => {
           const isFollowed = Boolean(
             appUserFollowings.find((el) => el === profile.user_id)
           );
-
           return (
             <FollowerRow
               key={`followerScreen_followRow_${profileId}_${profile.user_id}`}
@@ -114,6 +113,11 @@ const FollowersScreen = (props) => {
 };
 
 const initialLayout = { width: Dimensions.get("window").width };
+
+type Route = {
+  key: string;
+  title: string;
+};
 
 const FollowerList = ({ navigation, route }: any) => {
   const { followings, followers, profileId, tabIndex, type, appUserId } =
@@ -165,12 +169,12 @@ const FollowerList = ({ navigation, route }: any) => {
     }, [index]) // Include dependencies like userId if they change
   );
 
-  const [routes] = React.useState([
+  const [routes] = useState<Array<Route>>([
     { key: "following", title: "Following" },
     { key: "followers", title: "Followers" },
   ]);
 
-  const renderScene = ({ route }) => {
+  const renderScene = ({ route }: { route: Route }) => {
     switch (route.key) {
       case "followers":
         return (
@@ -198,7 +202,7 @@ const FollowerList = ({ navigation, route }: any) => {
     }
   };
 
-  const renderTabBar = (props) => (
+  const renderTabBar = (props: any) => (
     <TabBar
       {...props}
       indicatorStyle={styles.indicator} // Style the underline indicator
@@ -206,7 +210,6 @@ const FollowerList = ({ navigation, route }: any) => {
       labelStyle={styles.label} // Style the tab text
       activeColor={ThemeColoursPrimary.SecondaryColour} // Active tab text color
       inactiveColor="#888" // Inactive tab text color
-      tabStyle={styles.tab}
     />
   );
 

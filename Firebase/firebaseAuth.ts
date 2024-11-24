@@ -8,7 +8,6 @@ import {
 } from "firebase/auth";
 import { clearUser, createUser, updateUser } from "../Redux/Slices/userSlice";
 import store from "../Redux/store";
-import { LoginStatus } from "../Constants/UI";
 import { getUserDetails } from "./firebaseFireStore";
 
 const auth = getAuth(app);

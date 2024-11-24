@@ -1,13 +1,9 @@
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Image } from "expo-image";
 import React from "react";
 import FollowButton from "./FollowButton";
+import ProfilePicture from "./ProfilePicture";
+import { ImageType } from "../Constants/UI";
 
 const FollowerRow = ({
   followerObj,
@@ -16,16 +12,16 @@ const FollowerRow = ({
   handlePressButton,
   handlePressProfile,
 }) => {
-  const { display_name, profile_picture_url, user_id } = followerObj;
+  const { display_name, profile_picture_url } = followerObj;
 
   return (
     <View style={styles.container}>
       <Pressable style={styles.profileContainer} onPress={handlePressProfile}>
-        {profile_picture_url ? (
-          <Image source={{ uri: profile_picture_url }} style={styles.image} />
-        ) : (
-          <View style={styles.defaultImage} />
-        )}
+        <ProfilePicture
+          type={ImageType.Contacts}
+          uri={profile_picture_url}
+          userDisplayName={display_name}
+        />
         <Text style={styles.displayName}>{display_name}</Text>
       </Pressable>
       <View style={{ flexGrow: 1 }} />
@@ -41,26 +37,13 @@ export default FollowerRow;
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    paddingVertical: 5, // Adds 10 units of padding to the top and bottom
-    paddingHorizontal: 10,
+    paddingVertical: 6, // Adds 10 units of padding to the top and bottom
     alignItems: "center",
   },
   profileContainer: {
     flexDirection: "row",
     alignItems: "center",
-  },
-  image: {
-    marginRight: 10,
-    width: 60,
-    height: 60,
-    borderRadius: 50, // Optional: Make the corners of the image rounded
-  },
-  defaultImage: {
-    marginRight: 10,
-    width: 60,
-    height: 60,
-    borderRadius: 50, // Optional: Make the corners of the image rounded
-    backgroundColor: "#ccc",
+    gap: 10,
   },
   displayName: {
     fontSize: 16,
