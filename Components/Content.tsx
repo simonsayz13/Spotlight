@@ -32,7 +32,7 @@ const Content = (props: any) => {
 
   const fetchInitialPosts = async () => {
     try {
-      setDisplayPosts([]);
+      setDisplayList(false);
       const fetchedPosts: any =
         content === "following"
           ? await getPostsByUserIds(userFollowings)
@@ -148,7 +148,9 @@ const Content = (props: any) => {
       />
     </FadeInWrapper>
   ) : (
-    <Loader size={"medium"} />
+    <View style={{ flex: 1 }}>
+      <Loader size={"medium"} />
+    </View>
   );
 };
 

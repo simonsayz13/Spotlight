@@ -1,7 +1,6 @@
 import React from "react";
 import TabNavigation from "./TabNavigation";
 import {
-  FollowStackScreens,
   HomeStackScreens,
   MainStacks,
   MessagingStackScreens,
