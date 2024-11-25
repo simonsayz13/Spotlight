@@ -37,6 +37,7 @@ export const signUpWithEmail = async (
         });
       })
       .catch((error) => {
+        console.log(error);
         return {
           success: false,
           errorMessage: error.code,

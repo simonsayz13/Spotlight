@@ -90,9 +90,8 @@ const Chat = ({ route, navigation }: any) => {
   };
 
   const goToProfile = () => {
-    navigation.navigate(ProfileStackScreens.Profile, {
-      guestView: true,
-      opId: userId,
+    navigation.navigate(ProfileStackScreens.ViewProfile, {
+      userId,
     });
   };
 
@@ -127,7 +126,7 @@ const Chat = ({ route, navigation }: any) => {
             />
             <View style={styles.usernameActivityContainer}>
               <Text style={styles.userNameText}>{userName}</Text>
-              <Text style={styles.activityStatusText}>Active Today</Text>
+              {/* <Text style={styles.activityStatusText}>Active Today</Text> */}
             </View>
           </TouchableOpacity>
         </View>

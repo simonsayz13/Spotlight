@@ -36,7 +36,6 @@ const TabNavigation = ({ navigation }: any) => {
           tabBarInactiveTintColor: ThemeColoursPrimary.SecondaryColour,
           tabBarLabelStyle: {
             fontWeight: "bold",
-            backgroundColor: ThemeColoursPrimary.PrimaryColour,
           },
           tabBarStyle: {
             backgroundColor: ThemeColoursPrimary.PrimaryColour,
