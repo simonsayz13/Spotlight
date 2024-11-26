@@ -12,7 +12,12 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { images } from "../../Constants";
 import FormField from "../../Components/FormField";
 import CustomButton from "../../Components/CustomButton";
-import { ProfileStackScreens, ThemeColoursPrimary } from "../../Constants/UI";
+import {
+  MainStacks,
+  NavigationTabs,
+  ProfileStackScreens,
+  ThemeColoursPrimary,
+} from "../../Constants/UI";
 import ActivityLoader from "../../Components/ActivityLoader";
 import { signUpWithEmail } from "../../Firebase/firebaseAuth";
 import {
@@ -20,6 +25,7 @@ import {
   FireBaseAuthErrorMessages,
 } from "../../Constants/errorMessages";
 import { createUserProfile } from "../../Firebase/firebaseFireStore";
+import { CommonActions } from "@react-navigation/native";
 
 const SignUp = ({ navigation }: any) => {
   const insets = useSafeAreaInsets();
@@ -33,6 +39,7 @@ const SignUp = ({ navigation }: any) => {
 
   const handleSignUp = async () => {
     setIsSubmitting(true);
+    console.log(form);
     const response = await signUpWithEmail(
       form.email,
       form.username,
@@ -41,7 +48,24 @@ const SignUp = ({ navigation }: any) => {
     setIsSubmitting(false);
 
     if (response.success) {
-      navigation.replace(ProfileStackScreens.Profile);
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [
+            {
+              name: MainStacks.MainTab, // Parent navigator
+              state: {
+                routes: [
+                  {
+                    name: NavigationTabs.Home, // Nested screen
+                  },
+                ],
+              },
+            },
+          ],
+        })
+      );
+
       //@ts-ignore
       await createUserProfile(response.userId, form.username);
     } else {

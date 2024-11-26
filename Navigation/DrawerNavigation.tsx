@@ -13,11 +13,10 @@ const DrawerNavigation = () => {
     <Drawer.Navigator
       screenOptions={{
         headerShown: false,
-        drawerStyle: { backgroundColor: "#fff" },
+        drawerStyle: { backgroundColor: "#fff", width: "70%" },
         drawerActiveTintColor: ThemeColoursPrimary.LogoColour,
         drawerActiveBackgroundColor: "transparent",
         drawerLabelStyle: {
-          marginLeft: -15, // Adjusts label spacing to bring it closer to the icon
           fontSize: 16,
         },
         swipeEdgeWidth: 0,

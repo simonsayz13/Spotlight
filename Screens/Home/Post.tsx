@@ -11,7 +11,6 @@ import PostInteractionBar from "../../Components/PostInteractionBar";
 import MainPost from "../../Components/MainPost";
 import { ThemeColoursPrimary } from "../../Constants/UI";
 import PostOptions from "../../Components/PostOptions";
-import ActivityLoader from "../../Components/ActivityLoader";
 import SharePost from "../../Components/SharePost";
 import MessageModal from "../../Components/MessageModal";
 import Animated, {
@@ -29,7 +28,6 @@ const Post = ({ navigation, route }: any) => {
   const [isOptionsDrawer, setIsOptionsDrawer] = useState(false);
   const [isShareDrawer, setIsShareDrawer] = useState(false);
   const [isCommentActive, setIsCommentActive] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [modalMessage, setModalMessage] = useState<string | null>(null);
   const overlayOpacity = useSharedValue(0); // Replace with a shared value
@@ -125,7 +123,6 @@ const Post = ({ navigation, route }: any) => {
           <PostOptions
             setIsDrawerOpen={setIsOptionsDrawer}
             navigation={navigation}
-            setIsLoading={setIsLoading}
             postData={postData}
           />
         )}
@@ -139,7 +136,6 @@ const Post = ({ navigation, route }: any) => {
             isShareDrawer={isShareDrawer}
           />
         )}
-        <ActivityLoader indicator={isLoading} text="Deleting" />
       </KeyboardAvoidingView>
     </View>
   );

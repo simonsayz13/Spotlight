@@ -1,5 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
-import { Alert, RefreshControl, StyleSheet, View } from "react-native";
+import {
+  Alert,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  View,
+} from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../Redux/store";
 import {
@@ -14,6 +20,7 @@ import { ThemeColoursPrimary } from "../Constants/UI";
 import Loader from "./Loader";
 import { appendPosts } from "../Redux/Slices/postsSlices";
 import { useFocusEffect } from "@react-navigation/native";
+import EmptyContent from "./EmptyContent";
 
 const Content = (props: any) => {
   const { navigation, onScroll, content } = props;
@@ -22,17 +29,16 @@ const Content = (props: any) => {
   const userFollowings = useSelector(
     (state: RootState) => state.user.userFollowings
   );
+  const dispatch = useDispatch();
   const [displayPosts, setDisplayPosts] = useState<Array<any>>([]);
-  const [displayList, setDisplayList] = useState<boolean>(false);
+  const [ldgContentComplete, setLdgContentComplete] = useState<boolean>(false);
   const [bottomLoader, setBottomLoader] = useState<boolean>(false);
   const [lastVisible, setLastVisible] = useState<any>(null);
   const [isFetched, setIsFetched] = useState(false);
 
-  const dispatch = useDispatch();
-
   const fetchInitialPosts = async () => {
     try {
-      setDisplayList(false);
+      setLdgContentComplete(false);
       const fetchedPosts: any =
         content === "following"
           ? await getPostsByUserIds(userFollowings)
@@ -45,10 +51,10 @@ const Content = (props: any) => {
       dispatch(appendPosts(postsWithUserDetails));
       setDisplayPosts(postsWithUserDetails);
       setLastVisible(fetchedPosts.lastVisible);
-      setDisplayList(true);
     } catch (error) {
-      Alert.alert("Oops", "Could not fetch any posts");
+      console.log("initial: could not fetch any posts");
     } finally {
+      setLdgContentComplete(true);
       setRefreshing(false);
     }
   };
@@ -70,17 +76,17 @@ const Content = (props: any) => {
       );
       dispatch(appendPosts(postsWithUserDetails));
       setDisplayPosts((prevPosts) => [...prevPosts, ...postsWithUserDetails]);
-      setDisplayList(true);
     } catch (error) {
-      Alert.alert("Oops", "Could not fetch any posts");
+      console.log("loadmore: ould not fetch any posts");
     } finally {
+      setLdgContentComplete(true);
       setBottomLoader(false);
     }
   };
 
   useFocusEffect(
     useCallback(() => {
-      if (!isFetched) {
+      if (!isFetched && content === "discover") {
         fetchInitialPosts();
         setIsFetched(true);
       }
@@ -88,15 +94,26 @@ const Content = (props: any) => {
   );
 
   useEffect(() => {
-    if (content === "following") fetchInitialPosts();
+    if (content === "following") {
+      if (userFollowings.length > 0) {
+        fetchInitialPosts();
+      } else {
+        setLdgContentComplete(true);
+      }
+    }
   }, [userFollowings]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     setTimeout(() => {
-      fetchInitialPosts();
+      if (userFollowings.length === 0) {
+        setRefreshing(false);
+        setDisplayPosts([]);
+      } else {
+        fetchInitialPosts();
+      }
     }, 1000);
-  }, []);
+  }, [userFollowings]);
 
   const onReachedEnd = () => {
     if (lastVisible) {
@@ -123,18 +140,35 @@ const Content = (props: any) => {
       </View>
     );
 
-  return displayList ? (
-    <FadeInWrapper delay={1500}>
-      <MasonryFlashList
-        data={displayPosts}
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-        estimatedItemSize={300}
-        numColumns={2}
-        showsVerticalScrollIndicator={true}
-        contentContainerStyle={styles.flashListContainer}
-        onScroll={onScroll}
-        ListFooterComponent={renderBottomLoader}
+  return ldgContentComplete ? (
+    displayPosts.length > 0 ? (
+      <FadeInWrapper delay={1500}>
+        <MasonryFlashList
+          data={displayPosts}
+          keyExtractor={(item) => item.id}
+          renderItem={renderItem}
+          estimatedItemSize={300}
+          numColumns={2}
+          showsVerticalScrollIndicator={true}
+          contentContainerStyle={styles.flashListContainer}
+          onScroll={onScroll}
+          ListFooterComponent={renderBottomLoader}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={[ThemeColoursPrimary.LogoColour]} // Optional: Refresh spinner color
+            />
+          }
+          onEndReachedThreshold={0.000001}
+          onEndReached={onReachedEnd}
+          scrollEventThrottle={16}
+        />
+      </FadeInWrapper>
+    ) : (
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ flex: 1 }}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -142,11 +176,10 @@ const Content = (props: any) => {
             colors={[ThemeColoursPrimary.LogoColour]} // Optional: Refresh spinner color
           />
         }
-        onEndReachedThreshold={0.000001}
-        onEndReached={onReachedEnd}
-        scrollEventThrottle={16}
-      />
-    </FadeInWrapper>
+      >
+        <EmptyContent />
+      </ScrollView>
+    )
   ) : (
     <View style={{ flex: 1 }}>
       <Loader size={"medium"} />

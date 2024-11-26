@@ -42,6 +42,8 @@ import Animated, {
 } from "react-native-reanimated";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { ScrollView } from "react-native-gesture-handler";
+import EmptyContent from "../../Components/EmptyContent";
+import Loader from "../../Components/Loader";
 const Profile = ({ navigation }: any) => {
   const {
     userId,
@@ -64,6 +66,8 @@ const Profile = ({ navigation }: any) => {
   const dispatch = useDispatch();
   const heightAnim = useSharedValue(200);
   const [refreshing, setRefreshing] = useState(false);
+  const [ldgContentComplete, setLdgContentComplete] = useState(false);
+
   useEffect(() => {
     if (ldgSuccUserDetails) {
       heightAnim.value = withTiming(250, { duration: 200 });
@@ -99,6 +103,8 @@ const Profile = ({ navigation }: any) => {
       dispatch(appendPosts(postsWithUserDetails));
     } catch (error) {
       Alert.alert("Error", "Error fetching posts");
+    } finally {
+      setLdgContentComplete(true);
     }
   };
 
@@ -177,7 +183,10 @@ const Profile = ({ navigation }: any) => {
 
   const onRefresh = () => {
     setRefreshing(true);
+    setLdgContentComplete(false);
     fetchUser();
+
+    fetchPosts();
   };
 
   const renderItem = ({ item }: any) => (
@@ -187,12 +196,21 @@ const Profile = ({ navigation }: any) => {
   );
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
-      <ImageModal
-        imageUri={profilePicUrl}
-        isGalleryVisible={isGalleryVisible}
-        setIsGalleryVisible={setIsGalleryVisible}
-      />
+    <View
+      style={[
+        styles.container,
+        {
+          paddingTop: Platform.OS === "android" ? insets.top + 10 : insets.top,
+        },
+      ]}
+    >
+      {Boolean(profilePicUrl) && (
+        <ImageModal
+          imageUri={profilePicUrl}
+          isGalleryVisible={isGalleryVisible}
+          setIsGalleryVisible={setIsGalleryVisible}
+        />
+      )}
 
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -229,7 +247,7 @@ const Profile = ({ navigation }: any) => {
                 flexDirection: "row",
                 gap: 4,
                 alignItems: "center",
-                marginBottom: 2,
+                marginVertical: 4,
               }}
             >
               <Text style={styles.userNameFont}>
@@ -306,16 +324,31 @@ const Profile = ({ navigation }: any) => {
             ))}
           </View>
 
-          <MasonryFlashList
-            data={postsData}
-            keyExtractor={(post) => post.id}
-            renderItem={renderItem}
-            estimatedItemSize={200} // Estimated size for optimal performance
-            numColumns={2} // Setting 2 columns for masonry layout
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={styles.flashListContainer}
-            scrollEnabled={false}
-          />
+          {ldgContentComplete ? (
+            postsData.length > 0 ? (
+              <View
+                style={{
+                  flex: 1,
+                  backgroundColor: ThemeColoursPrimary.LightGreyBackground,
+                }}
+              >
+                <MasonryFlashList
+                  data={postsData}
+                  keyExtractor={(post) => post.id}
+                  renderItem={renderItem}
+                  estimatedItemSize={200} // Estimated size for optimal performance
+                  numColumns={2} // Setting 2 columns for masonry layout
+                  showsVerticalScrollIndicator={false}
+                  contentContainerStyle={styles.flashListContainer}
+                  scrollEnabled={false}
+                />
+              </View>
+            ) : (
+              <EmptyContent />
+            )
+          ) : (
+            <Loader size={"medium"} />
+          )}
         </View>
       </ScrollView>
     </View>
@@ -386,15 +419,10 @@ const styles = StyleSheet.create({
     color: ThemeColoursPrimary.PrimaryColour,
   },
   userContentContainer: {
-    flex: 1,
+    height: "100%",
     marginTop: 10,
     borderTopLeftRadius: 14,
     borderTopRightRadius: 14,
-    elevation: 5, // For Android shadow
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    backgroundColor: ThemeColoursPrimary.LightGreyBackground,
   },
   contentContainerSelectorBar: {
     height: 34,
@@ -407,6 +435,10 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.4,
     borderBottomColor: ThemeColoursPrimary.GreyColour,
     backgroundColor: ThemeColoursPrimary.PrimaryColour,
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 5, // For Android shadow
   },
 
   menuButton: {

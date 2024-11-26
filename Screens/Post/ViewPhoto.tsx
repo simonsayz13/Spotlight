@@ -21,7 +21,7 @@ const ViewPhoto = ({ navigation, route }: any) => {
   };
 
   const goNext = () => {
-    navigation.navigate(PostStackScreens.CreatePost, {
+    navigation.popTo(PostStackScreens.CreatePost, {
       photoURI,
     });
   };

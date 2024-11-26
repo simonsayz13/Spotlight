@@ -49,7 +49,7 @@ const PhotoBrowser = ({ navigation, route }: any) => {
         photoURI: uri,
       });
     } else {
-      navigation.navigate(PostStackScreens.CreatePost, { photoURI: uri });
+      navigation.popTo(PostStackScreens.CreatePost, { photoURI: uri });
     }
   };
 

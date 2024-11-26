@@ -14,7 +14,7 @@ import { getPostById, getUserDetails } from "../Firebase/firebaseFireStore";
 const { width: windowWidth } = Dimensions.get("window");
 
 const SharePostMessage = memo(
-  ({ postData, openPost, message, currentUserId }: any) => {
+  ({ postData, message, currentUserId, navigation }: any) => {
     const marginStyle = {
       marginLeft: message.senderId === currentUserId ? 0 : 4,
       marginRight: message.senderId === currentUserId ? 4 : 0,
@@ -22,7 +22,7 @@ const SharePostMessage = memo(
     return (
       <View>
         <View style={[styles.postCardContainer, marginStyle]}>
-          <PostCard postId={postData.id} openPost={openPost} />
+          <PostCard postId={postData.id} navigation={navigation} />
         </View>
         {message.text !== "" && (
           <View
@@ -72,12 +72,6 @@ const Message = React.memo(
     const isHeader = message.type === "header";
     const isTime = message.type === "time";
     const [postData, setPostData] = useState<any>();
-
-    const openPost = (postData: any) => {
-      navigation.navigate(HomeStackScreens.Post, {
-        postData,
-      });
-    };
 
     const retrievePost = async (postId: string) => {
       const post = await getPostById(postId);
@@ -140,9 +134,9 @@ const Message = React.memo(
             {postData ? (
               <SharePostMessage
                 postData={postData}
-                openPost={openPost}
                 message={message}
                 currentUserId={currentUserId}
+                navigation={navigation}
               />
             ) : (
               <Text

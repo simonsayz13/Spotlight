@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet, Pressable, Text } from "react-native";
+import { View, StyleSheet, Pressable, Text, Platform } from "react-native";
 import {
   DrawerContentScrollView,
   DrawerItemList,
@@ -14,11 +14,22 @@ const CustomDrawerContent = (props: any) => {
   const { navigation } = props;
 
   const handleLogout = () => {
-    navigation.closeDrawer();
+    navigation.toggleDrawer();
     navigation.dispatch(
       CommonActions.reset({
         index: 0,
-        routes: [{ name: MainStacks.Login }],
+        routes: [
+          {
+            name: MainStacks.HomeStack, // Parent navigator
+            state: {
+              routes: [
+                {
+                  name: MainStacks.Login, // Nested screen
+                },
+              ],
+            },
+          },
+        ],
       })
     );
     logOut();
@@ -37,7 +48,7 @@ const CustomDrawerContent = (props: any) => {
           <View style={[styles.button, { backgroundColor: "red" }]}>
             <MaterialIcons
               name="logout"
-              size={24}
+              size={20}
               color={ThemeColoursPrimary.PrimaryColour}
             />
           </View>
@@ -52,7 +63,7 @@ const CustomDrawerContent = (props: any) => {
           >
             <Ionicons
               name="settings-sharp"
-              size={24}
+              size={20}
               color={ThemeColoursPrimary.PrimaryColour}
             />
           </Pressable>
@@ -80,7 +91,7 @@ const styles = StyleSheet.create({
   footer: {
     flexDirection: "row",
     width: "100%",
-    padding: 20,
+    paddingVertical: Platform.OS === "android" ? 7 : 14,
     borderTopWidth: 1,
     borderTopColor: "#ddd",
     justifyContent: "center",
@@ -94,12 +105,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   button: {
-    padding: 8,
     borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
-    height: 40,
-    width: 40,
+    height: 32,
+    width: 32,
   },
 });
 

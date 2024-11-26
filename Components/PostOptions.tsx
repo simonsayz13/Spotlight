@@ -9,12 +9,7 @@ import { deletePost } from "../Firebase/firebaseFireStore";
 import { useSelector } from "react-redux";
 import { RootState } from "../Redux/store";
 
-const PostOptions = ({
-  setIsDrawerOpen,
-  navigation,
-  setIsLoading,
-  postData,
-}: any) => {
+const PostOptions = ({ setIsDrawerOpen, navigation, postData }: any) => {
   const { userId: appUserId } = useSelector((state: RootState) => {
     return state.user;
   });
@@ -34,10 +29,8 @@ const PostOptions = ({
   };
 
   const handleDeletePost = async () => {
-    setIsLoading(true);
     hideDrawer();
     await deletePost(postId, appUserId!);
-    setIsLoading(false);
     navigation.goBack();
   };
 

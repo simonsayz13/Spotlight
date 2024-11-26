@@ -44,6 +44,9 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
+import EmptyContent from "../../Components/EmptyContent";
+import Loader from "../../Components/Loader";
+
 const ViewProfile = ({ navigation, route }: any) => {
   const { userId: appUserId, userFollowings: appUserFollowings } = useSelector(
     (state: RootState) => state.user
@@ -68,6 +71,7 @@ const ViewProfile = ({ navigation, route }: any) => {
   const heightAnim = useSharedValue(200);
   const insets = useSafeAreaInsets();
   const dispatch = useDispatch();
+  const [ldgContentComplete, setLdgContentComplete] = useState(false);
 
   useEffect(() => {
     if (ldgSuccUserDetails) {
@@ -104,6 +108,8 @@ const ViewProfile = ({ navigation, route }: any) => {
       dispatch(appendPosts(postsWithUserDetails));
     } catch (error) {
       Alert.alert("Error", "Error fetching posts");
+    } finally {
+      setLdgContentComplete(true);
     }
   };
 
@@ -219,7 +225,9 @@ const ViewProfile = ({ navigation, route }: any) => {
 
   const onRefresh = () => {
     setRefreshing(true);
+    setLdgContentComplete(false);
     fetchUser();
+    fetchPosts();
   };
 
   const renderItem = ({ item }: any) => (
@@ -229,12 +237,21 @@ const ViewProfile = ({ navigation, route }: any) => {
   );
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
-      <ImageModal
-        imageUri={profilePicUrl}
-        isGalleryVisible={isGalleryVisible}
-        setIsGalleryVisible={setIsGalleryVisible}
-      />
+    <View
+      style={[
+        styles.container,
+        {
+          paddingTop: Platform.OS === "android" ? insets.top + 10 : insets.top,
+        },
+      ]}
+    >
+      {Boolean(profilePicUrl) && (
+        <ImageModal
+          imageUri={profilePicUrl}
+          isGalleryVisible={isGalleryVisible}
+          setIsGalleryVisible={setIsGalleryVisible}
+        />
+      )}
       <ScrollView
         showsVerticalScrollIndicator={false}
         refreshControl={
@@ -271,7 +288,7 @@ const ViewProfile = ({ navigation, route }: any) => {
                 flexDirection: "row",
                 gap: 4,
                 alignItems: "center",
-                marginBottom: 2,
+                marginVertical: 4,
               }}
             >
               <Text style={styles.userNameFont}>
@@ -365,23 +382,32 @@ const ViewProfile = ({ navigation, route }: any) => {
               </TouchableOpacity>
             ))}
           </View>
-          <View
-            style={{
-              flex: 1,
-              backgroundColor: ThemeColoursPrimary.LightGreyBackground,
-            }}
-          >
-            <MasonryFlashList
-              data={postsData}
-              keyExtractor={(post) => post.id}
-              renderItem={renderItem}
-              estimatedItemSize={10} // Estimated size for optimal performance
-              numColumns={2} // Setting 2 columns for masonry layout
-              showsVerticalScrollIndicator={false}
-              contentContainerStyle={styles.flashListContainer}
-              scrollEnabled={false}
-            />
-          </View>
+
+          {ldgContentComplete ? (
+            postsData.length > 0 ? (
+              <View
+                style={{
+                  flex: 1,
+                  backgroundColor: ThemeColoursPrimary.LightGreyBackground,
+                }}
+              >
+                <MasonryFlashList
+                  data={postsData}
+                  keyExtractor={(post) => post.id}
+                  renderItem={renderItem}
+                  estimatedItemSize={200} // Estimated size for optimal performance
+                  numColumns={2} // Setting 2 columns for masonry layout
+                  showsVerticalScrollIndicator={false}
+                  contentContainerStyle={styles.flashListContainer}
+                  scrollEnabled={false}
+                />
+              </View>
+            ) : (
+              <EmptyContent />
+            )
+          ) : (
+            <Loader size={"medium"} />
+          )}
         </View>
       </ScrollView>
     </View>
@@ -412,7 +438,6 @@ const styles = StyleSheet.create({
   bio: {
     marginHorizontal: 8,
     gap: 6,
-    marginBottom: 12,
   },
   bioText: {
     color: ThemeColoursPrimary.SecondaryColour,
@@ -459,11 +484,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
     borderTopLeftRadius: 14,
     borderTopRightRadius: 14,
-    elevation: 5, // For Android shadow
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    backgroundColor: ThemeColoursPrimary.LightGreyBackground,
   },
   contentContainerSelectorBar: {
     height: 34,
@@ -476,6 +496,10 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.4,
     borderBottomColor: ThemeColoursPrimary.GreyColour,
     backgroundColor: ThemeColoursPrimary.PrimaryColour,
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 5, // For Android shadow
   },
   menuButton: {
     fontSize: 16,

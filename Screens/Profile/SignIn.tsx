@@ -29,8 +29,8 @@ import {
 const SignIn = ({ navigation }: any) => {
   const insets = useSafeAreaInsets();
   const [form, setForm] = useState({
-    email: "simon@gmail.com",
-    password: "123456",
+    email: "",
+    password: "",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -66,7 +66,7 @@ const SignIn = ({ navigation }: any) => {
     >
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.safeArea}
+        style={{ flex: 1 }}
       >
         <ScrollView>
           <View style={styles.container}>

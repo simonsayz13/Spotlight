@@ -16,7 +16,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { getPostsBySearch } from "../Firebase/firebaseFireStore";
 import { fetchUserDetailOnPosts } from "../Util/Services";
-import DropdownMenu from "../Components/DropdownMenu";
 import Content from "../Components/Content";
 import TopTabBar from "../Components/TopTabBar";
 import Animated, {
@@ -26,17 +25,23 @@ import Animated, {
 } from "react-native-reanimated";
 import PostSearchView from "../Components/PostSearchView";
 import { appendPosts } from "../Redux/Slices/postsSlices";
+import EmptyContent from "../Components/EmptyContent";
 
 const Tab = createMaterialTopTabNavigator();
 
 const PlaceHolderScreen = () => (
-  <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-    <Text style={{ fontSize: 42 }}>TBC</Text>
+  <View
+    style={{
+      flex: 1,
+      paddingTop: 40,
+      backgroundColor: ThemeColoursPrimary.LightGreyBackground,
+    }}
+  >
+    <EmptyContent />
   </View>
 );
 
 const HomeTopTabNavigation = ({ navigation }: any) => {
-  const [activeTab, setActiveTab] = useState("Discover");
   const [searchText, setSearchText] = useState("");
   const [showSearchBar, setShowSearchBar] = useState(false);
   const [isDropDownMenuVisible, setIsDropDownMenuVisible] = useState(true);

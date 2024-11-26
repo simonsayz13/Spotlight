@@ -25,7 +25,6 @@ import { uploadImages } from "../../Firebase/firebaseStorage";
 import { useSelector } from "react-redux";
 import { RootState } from "../../Redux/store";
 import { createPost } from "../../Firebase/firebaseFireStore";
-import ActivityLoader from "../../Components/ActivityLoader";
 import BottomSheet from "../../Components/BottomSheet";
 import { getLocation, getLocationPermission } from "../../Util/LocationService";
 import ImagePreviewCarousel from "../../Components/ImagePreviewCarousel";
@@ -43,7 +42,6 @@ const CreatePost = ({ navigation, route }: any) => {
   const photoURI = route.params?.photoURI;
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
-  const [posting, setPosting] = useState<boolean>(false);
   const [isComment, setIsComment] = useState<boolean>(true);
   const [isLocation, setIsLocation] = useState<boolean>(false);
   const [isPrivate, setIsPrivate] = useState<boolean>(false);
@@ -76,7 +74,6 @@ const CreatePost = ({ navigation, route }: any) => {
     setPhotoArray([]);
     setDescription("");
     setTitle("");
-    setPosting(false);
     setIsComment(false);
     setIsLocation(false);
     setIsPrivate(false);
@@ -87,7 +84,6 @@ const CreatePost = ({ navigation, route }: any) => {
     if (!userId) {
       return Alert.alert("Not Signed in", "Please sign in to make a post");
     }
-    setPosting(true);
     if (isLocation) {
       coordinates = await getLocation();
     }
@@ -111,7 +107,7 @@ const CreatePost = ({ navigation, route }: any) => {
     };
     await createPost(userId, postData);
     resetStates();
-    navigation.navigate(NavigationTabs.Home);
+    navigation.goBack();
   };
 
   const togglePrivateSwitch = () =>
@@ -194,7 +190,6 @@ const CreatePost = ({ navigation, route }: any) => {
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.topBarContainer}>
-        <ActivityLoader indicator={posting} text={"Posting..."} />
         <TouchableOpacity onPressIn={goBack} style={styles.closeButton}>
           <Ionicons
             name="close"

@@ -1,13 +1,6 @@
 import { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  Image,
-  StyleSheet,
-} from "react-native";
-
+import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
+import { TextInput } from "react-native-gesture-handler";
 import { icons } from "../Constants";
 
 const FormField = ({
@@ -24,13 +17,7 @@ const FormField = ({
   return (
     <View style={[styles.container, otherStyles]}>
       <Text style={styles.titleText}>{title}</Text>
-      <View
-        style={[
-          styles.inputContainer,
-          isFocused && styles.focusBorder,
-          isFocused && styles.focusRing,
-        ]}
-      >
+      <View style={[styles.inputContainer, isFocused && styles.focusBorder]}>
         <TextInput
           style={[styles.textInput]}
           placeholderTextColor={styles.placeholderTextColor}
@@ -38,7 +25,9 @@ const FormField = ({
           placeholder={placeholder}
           onChangeText={handleChangeText}
           secureTextEntry={title === "Password" && !showPassword}
-          onFocus={() => setIsFocused(true)}
+          onFocus={() => {
+            setIsFocused(true);
+          }}
           onBlur={() => setIsFocused(false)}
           {...props}
         />
@@ -69,9 +58,9 @@ const styles = StyleSheet.create({
     height: 64,
     marginTop: 10,
     paddingHorizontal: 16,
-    borderRadius: 24,
+    borderRadius: 18,
     borderWidth: 2,
-    borderColor: "#E5E7EB",
+    borderColor: "#d8dce3",
     flexDirection: "row",
     alignItems: "center",
   },
@@ -89,12 +78,6 @@ const styles = StyleSheet.create({
   },
   focusBorder: {
     borderColor: "#3B82F6",
-  },
-  focusRing: {
-    shadowColor: "#BFDBFE",
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 1,
-    shadowRadius: 2,
   },
 });
 
