@@ -1,90 +1,69 @@
-import React, { useEffect, useRef } from "react";
-import {
-  StyleSheet,
-  View,
-  Text,
-  Animated,
-  TouchableOpacity,
-} from "react-native";
-// 32 is a good default number
+import React, { useEffect } from "react";
+import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  interpolate,
+} from "react-native-reanimated";
+
 const Size = 36; // Default size of the speech bubble
 const CollapsedSize = 12; // Collapsed size for the speech bubble
 
 const MapMarker = ({ tag, collapsed }: any) => {
-  // const [collapsed, setCollapsed] = useState<boolean>(false);
-
-  const animatedSize = useRef(new Animated.Value(Size)).current;
-  const animatedOpacity = useRef(new Animated.Value(1)).current;
-  const animatedTranslateX = useRef(new Animated.Value(0)).current;
-  const animatedTranslateY = useRef(new Animated.Value(0)).current;
+  // Shared values for animation states
+  const animatedSize = useSharedValue(Size);
+  const animatedOpacity = useSharedValue(1);
 
   useEffect(() => {
-    // Define the animation when 'collapsed' changes
-    Animated.parallel([
-      Animated.timing(animatedSize, {
-        toValue: collapsed ? CollapsedSize : Size,
-        duration: 300, // Duration for the animation
-        useNativeDriver: false,
-      }),
-      Animated.timing(animatedOpacity, {
-        toValue: collapsed ? 0 : 1,
-        duration: 300,
-        useNativeDriver: false,
-      }),
-      Animated.timing(animatedTranslateX, {
-        // Move right when expanded, left when collapsed
-        toValue: collapsed ? -6 : 12, // 10 units to the right when expanded, -30 units to the left when collapsed
-        duration: 300,
-        useNativeDriver: false,
-      }),
-      Animated.timing(animatedTranslateY, {
-        // Move up when expanded, down when collapsed
-        toValue: collapsed ? 6 : -12, // -10 units up when expanded, 30 units down when collapsed
-        duration: 300,
-        useNativeDriver: false,
-      }),
-    ]).start();
+    // Update shared values when 'collapsed' changes
+    animatedSize.value = withTiming(collapsed ? CollapsedSize : Size, {
+      duration: 300,
+    });
+    animatedOpacity.value = withTiming(collapsed ? 0 : 1, { duration: 300 });
   }, [collapsed]);
-  // onPress={() => setCollapsed(!collapsed)}>
+
+  // Animated styles
+  const bubbleStyle = useAnimatedStyle(() => {
+    return {
+      width: animatedSize.value,
+      height: animatedSize.value,
+      backgroundColor: tag.colour,
+      borderTopLeftRadius: interpolate(
+        animatedSize.value,
+        [CollapsedSize, Size],
+        [CollapsedSize / 2, Size / 2]
+      ),
+      borderTopRightRadius: interpolate(
+        animatedSize.value,
+        [CollapsedSize, Size],
+        [CollapsedSize / 2, Size / 2]
+      ),
+      borderBottomRightRadius: interpolate(
+        animatedSize.value,
+        [CollapsedSize, Size],
+        [CollapsedSize / 2, Size / 2]
+      ),
+      borderBottomLeftRadius: interpolate(
+        animatedSize.value,
+        [CollapsedSize, Size],
+        [CollapsedSize / 2, Size / 2]
+      ),
+    };
+  });
+
+  const textStyle = useAnimatedStyle(() => {
+    return {
+      opacity: animatedOpacity.value,
+      fontSize: animatedSize.value / 2 - 4,
+    };
+  });
+
   return (
     <TouchableOpacity>
       <View style={styles.container}>
-        <Animated.View
-          style={[
-            styles.bubble,
-            {
-              backgroundColor: tag.colour,
-              width: animatedSize,
-              height: animatedSize,
-              borderTopLeftRadius: animatedSize.interpolate({
-                inputRange: [CollapsedSize, Size],
-                outputRange: [CollapsedSize / 2, Size / 2], // Keep round for top-left
-              }),
-              borderTopRightRadius: animatedSize.interpolate({
-                inputRange: [CollapsedSize, Size],
-                outputRange: [CollapsedSize / 2, Size / 2], // Keep round for top-right
-              }),
-              borderBottomRightRadius: animatedSize.interpolate({
-                inputRange: [CollapsedSize, Size],
-                outputRange: [CollapsedSize / 2, Size / 2], // Keep round for bottom-right
-              }),
-              borderBottomLeftRadius: animatedSize.interpolate({
-                inputRange: [CollapsedSize, Size],
-                outputRange: [CollapsedSize / 2, 0],
-              }),
-              transform: [
-                { translateX: animatedTranslateX },
-                { translateY: animatedTranslateY },
-              ],
-            },
-          ]}
-        >
-          <Animated.Text
-            style={[
-              styles.iconContent,
-              { opacity: animatedOpacity, fontSize: Size / 2 - 4 },
-            ]}
-          >
+        <Animated.View style={[styles.bubble, bubbleStyle]}>
+          <Animated.Text style={[styles.iconContent, textStyle]}>
             {tag.icon}
           </Animated.Text>
         </Animated.View>
@@ -104,10 +83,9 @@ const styles = StyleSheet.create({
   bubble: {
     justifyContent: "center",
     alignItems: "center",
-    position: "relative",
+    position: "absolute",
   },
   iconContent: {
-    fontSize: 24, // Size of the text/emoji inside the bubble
     color: "white", // Text color
   },
 });

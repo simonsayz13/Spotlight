@@ -1,58 +1,49 @@
-import React, { useEffect, useRef } from "react";
-import { Animated, TouchableOpacity, Text, StyleSheet } from "react-native";
+import React, { useEffect } from "react";
+import { TouchableOpacity, Text, StyleSheet } from "react-native";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+} from "react-native-reanimated";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
-import { ThemeColoursPrimary } from "../Constants/UI";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { ThemeColoursPrimary } from "../Constants/UI";
 
 const FilterButton = ({
   selectedTag,
   setSelectedTag,
   onFilterButtonPress,
 }: any) => {
-  const animatedWidth = useRef(new Animated.Value(40)).current; // For animation width
-  const opacityAnim = useRef(new Animated.Value(0)).current;
+  const animatedWidth = useSharedValue(40); // For animation width
+  const opacityAnim = useSharedValue(0); // For opacity animation
 
   useEffect(() => {
     if (selectedTag) {
-      Animated.parallel([
-        Animated.timing(opacityAnim, {
-          toValue: 1, // Fully visible
-          duration: 400, // Animation duration
-          useNativeDriver: true,
-        }),
-        Animated.timing(animatedWidth, {
-          toValue: selectedTag.label.length * 12 + 40, // Dynamically calculate width based on label length
-          duration: 300,
-          useNativeDriver: false,
-        }),
-      ]).start();
-    } else {
-      opacityAnim.setValue(0);
-      Animated.timing(opacityAnim, {
-        toValue: 0, // Fully visible
-        duration: 300, // Animation duration
-        useNativeDriver: true,
-      }).start();
-      Animated.timing(animatedWidth, {
-        toValue: 40,
+      // Expand button and fade in
+      animatedWidth.value = withTiming(selectedTag.label.length * 12 + 40, {
         duration: 300,
-        useNativeDriver: false,
-      }).start();
+      });
+      opacityAnim.value = withTiming(1, { duration: 400 });
+    } else {
+      // Shrink button and fade out
+      animatedWidth.value = withTiming(40, { duration: 300 });
+      opacityAnim.value = withTiming(0, { duration: 300 });
     }
   }, [selectedTag]);
 
+  const containerAnimatedStyle = useAnimatedStyle(() => ({
+    width: animatedWidth.value,
+    backgroundColor: selectedTag
+      ? selectedTag.colour
+      : ThemeColoursPrimary.LogoColour,
+  }));
+
+  const taggedButtonAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: opacityAnim.value,
+  }));
+
   return (
-    <Animated.View
-      style={[
-        styles.container,
-        {
-          width: animatedWidth,
-          backgroundColor: selectedTag
-            ? selectedTag.colour
-            : ThemeColoursPrimary.LogoColour,
-        },
-      ]}
-    >
+    <Animated.View style={[styles.container, containerAnimatedStyle]}>
       {!selectedTag ? (
         <TouchableOpacity
           style={styles.buttonBase}
@@ -66,7 +57,7 @@ const FilterButton = ({
         </TouchableOpacity>
       ) : (
         <Animated.View
-          style={[styles.taggedButtonContainer, { opacity: opacityAnim }]}
+          style={[styles.taggedButtonContainer, taggedButtonAnimatedStyle]}
         >
           <TouchableOpacity onPressIn={onFilterButtonPress}>
             <Text style={styles.tagLabelText}>{selectedTag.label}</Text>
