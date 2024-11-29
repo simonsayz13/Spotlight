@@ -65,7 +65,6 @@ const Content = (props: any) => {
         content === "following"
           ? await getPostsByUserIds(userFollowings, lastVisible)
           : await getPaginatedPosts(lastVisible);
-
       fetchedPosts.posts.length < 10
         ? setLastVisible(null)
         : setLastVisible(fetchedPosts.lastVisible);
@@ -74,8 +73,8 @@ const Content = (props: any) => {
         otherUsers,
         dispatch
       );
-      dispatch(appendPosts(postsWithUserDetails));
       setDisplayPosts((prevPosts) => [...prevPosts, ...postsWithUserDetails]);
+      dispatch(appendPosts(postsWithUserDetails));
     } catch (error) {
       console.log("loadmore: ould not fetch any posts");
     } finally {
@@ -147,9 +146,9 @@ const Content = (props: any) => {
           data={displayPosts}
           keyExtractor={(item) => item.id}
           renderItem={renderItem}
-          estimatedItemSize={300}
+          estimatedItemSize={200}
           numColumns={2}
-          showsVerticalScrollIndicator={true}
+          showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.flashListContainer}
           onScroll={onScroll}
           ListFooterComponent={renderBottomLoader}
@@ -160,7 +159,7 @@ const Content = (props: any) => {
               colors={[ThemeColoursPrimary.LogoColour]} // Optional: Refresh spinner color
             />
           }
-          onEndReachedThreshold={0.000001}
+          onEndReachedThreshold={0.02}
           onEndReached={onReachedEnd}
           scrollEventThrottle={16}
         />

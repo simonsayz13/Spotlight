@@ -75,6 +75,8 @@ export const userSlice = createSlice({
         location,
         followers,
         followings,
+        favourites,
+        liked,
       } = action.payload;
 
       state.userDisplayName = display_name;
@@ -86,6 +88,8 @@ export const userSlice = createSlice({
       state.userLocation = location;
       state.userFollowers = followers;
       state.userFollowings = followings;
+      state.userFavourites = favourites;
+      state.userLiked = liked;
     },
     setUserLiked: (state, action) => {
       const { postId } = action.payload;

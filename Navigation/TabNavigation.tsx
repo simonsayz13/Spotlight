@@ -137,7 +137,7 @@ const TabNavigation = ({ navigation }: any) => {
 
 const styles = StyleSheet.create({
   customPostButton: {
-    bottom: 8,
+    bottom: 4,
     backgroundColor: ThemeColoursPrimary.PrimaryColour,
     borderRadius: 35,
     width: 56,

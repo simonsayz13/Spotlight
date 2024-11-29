@@ -53,25 +53,32 @@ const PostCard = ({ postId, navigation }: any) => {
     >
       {imageUrl ? (
         // <View style={[styles.image, { height: imageHeight }]}></View>
-        Platform.OS === "android" ? (
-          <ExpoImage
-            style={[styles.image, { height: imageHeight }]} // Dynamic height
-            source={{
-              uri: imageUrl,
-            }}
-            contentFit="cover"
-          />
-        ) : (
-          <Image
-            style={[styles.image, { height: imageHeight }]} // Dynamic height
-            source={{
-              uri: imageUrl,
-              cache: "force-cache",
-            }}
-            resizeMode="cover"
-          />
-        )
+        <ExpoImage
+          style={[styles.image, { height: imageHeight }]} // Dynamic height
+          source={{
+            uri: imageUrl,
+          }}
+          contentFit="cover"
+        />
       ) : (
+        // Platform.OS === "android" ? (
+        //   <ExpoImage
+        //     style={[styles.image, { height: imageHeight }]} // Dynamic height
+        //     source={{
+        //       uri: imageUrl,
+        //     }}
+        //     contentFit="cover"
+        //   />
+        // ) : (
+        //   <Image
+        //     style={[styles.image, { height: imageHeight }]} // Dynamic height
+        //     source={{
+        //       uri: imageUrl,
+        //       cache: "force-cache",
+        //     }}
+        //     resizeMode="cover"
+        //   />
+        // )
         <NoPhotoPlaceHolder title={title} description={description} />
       )}
 
