@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, Pressable } from "react-native";
 import { Tags, ThemeColoursPrimary } from "../Constants/UI";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
@@ -17,20 +17,17 @@ const MapFilters = ({ selectTag, closeFilter }: any) => {
         >
           Filters
         </Text>
-        <TouchableOpacity
-          onPress={closeFilter}
-          style={{ alignSelf: "flex-end", paddingRight: 8 }}
-        >
+        <Pressable onPress={closeFilter} style={styles.closeButton}>
           <Ionicons
             name="close"
             size={28}
             color={ThemeColoursPrimary.SecondaryColour}
           />
-        </TouchableOpacity>
+        </Pressable>
       </View>
       <View>
         {Tags.map((tag) => (
-          <TouchableOpacity
+          <Pressable
             key={tag.id}
             style={[styles.tagButton]}
             onPress={() => {
@@ -38,28 +35,12 @@ const MapFilters = ({ selectTag, closeFilter }: any) => {
               closeFilter();
             }}
           >
-            <View
-              style={{
-                width: 46,
-                height: 46,
-                backgroundColor: tag.colour,
-                borderRadius: 50,
-                justifyContent: "center",
-                alignItems: "center",
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.2,
-                shadowRadius: 2,
-                elevation: 5,
-              }}
-            >
+            <View style={[styles.tagIcon, { backgroundColor: tag.colour }]}>
               <Text style={{ fontSize: 18 }}>{tag.icon}</Text>
             </View>
             <View
               style={{
                 marginLeft: 10,
-                gap: 4,
-                flex: 1,
                 justifyContent: "space-between",
               }}
             >
@@ -70,7 +51,7 @@ const MapFilters = ({ selectTag, closeFilter }: any) => {
                 {tag.examples.join(", ")}
               </Text>
             </View>
-          </TouchableOpacity>
+          </Pressable>
         ))}
       </View>
     </View>
@@ -81,13 +62,26 @@ const styles = StyleSheet.create({
   bottomDrawerTopContainer: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: "center",
   },
   tagButton: {
     flexDirection: "row",
     margin: 8,
     alignItems: "center",
   },
+  tagIcon: {
+    width: 38,
+    height: 38,
+    borderRadius: 50,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 5,
+  },
+  closeButton: { position: "absolute", right: 8 },
 });
 
 export default MapFilters;

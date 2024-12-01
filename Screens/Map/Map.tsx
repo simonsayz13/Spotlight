@@ -31,7 +31,6 @@ const { width: windowWidth, height: windowHeight } = Dimensions.get("window");
 const Map = ({ navigation }: any) => {
   const [selectedPost, setSelectedPost] = useState<any>(null);
   const [currentCoordinate, setCurrentCoordinate] = useState<any>(null);
-  const [gotLocation, setGotLocation] = useState(false);
   const [posts, setPosts] = useState([]);
   const slideAnim = useRef(new Animated.Value(300)).current;
   const [mapRegion, setMapRegion] = useState<any>(null);
@@ -66,9 +65,7 @@ const Map = ({ navigation }: any) => {
     if (permission !== "OK") {
       return Alert.alert("Error", permission);
     }
-    setGotLocation(true);
     await getLocation(setCurrentCoordinate);
-    setGotLocation(false);
     getPostData();
     setMapRegion(currentCoordinate);
   };
@@ -178,8 +175,7 @@ const Map = ({ navigation }: any) => {
         style={styles.container}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        {/* <ActivityLoader indicator={isRefreshing} text={"Refreshing..."} /> */}
-        {/* <ActivityLoader indicator={gotLocation} text={"Locating..."} /> */}
+        <ActivityLoader indicator={isRefreshing} text={"Loading..."} />
         {currentCoordinate && (
           <MapView
             ref={mapRef}
@@ -195,7 +191,6 @@ const Map = ({ navigation }: any) => {
               setMapRegion(region);
               onRegionChangeComplete();
             }}
-            showsUserLocation={true}
             showsPointsOfInterest={false}
             showsMyLocationButton={false}
             showsCompass={false}
@@ -212,7 +207,9 @@ const Map = ({ navigation }: any) => {
                     latitude: post.coordinates.latitude,
                     longitude: post.coordinates.longitude,
                   }}
-                  onPress={() => handleMarkerPress(post)}
+                  onPress={() =>
+                    isCollapsed ? undefined : handleMarkerPress(post)
+                  }
                 >
                   <MapMarker tag={tag} collapsed={isCollapsed} />
                 </Marker>
@@ -260,9 +257,9 @@ const Map = ({ navigation }: any) => {
         </View>
 
         <BottomDrawer
-          heightPercentage={0.5}
+          heightPercentage={0.44}
           ref={activityFilterDrawerRef}
-          isPannable={false}
+          isPannable={true}
           isAbsolute
         >
           <MapFilters selectTag={selectTag} closeFilter={closeFilter} />

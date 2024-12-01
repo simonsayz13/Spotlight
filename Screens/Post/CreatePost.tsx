@@ -254,7 +254,7 @@ const CreatePost = ({ navigation, route }: any) => {
                 <View style={styles.selectedTags}>
                   {tags.map((tag, index) => (
                     <TouchableOpacity
-                      key={index}
+                      key={tag}
                       style={[styles.tagChip, { backgroundColor: tag.colour }]}
                       activeOpacity={1}
                       onPressIn={handleShowDrawer}
@@ -284,7 +284,7 @@ const CreatePost = ({ navigation, route }: any) => {
         {options}
       </BottomSheet>
       <BottomDrawer
-        heightPercentage={0.5}
+        heightPercentage={0.448}
         ref={bottomDrawerRef}
         isPannable={true}
       >
@@ -385,13 +385,13 @@ const styles = StyleSheet.create({
   tagChip: {
     borderRadius: 6,
     paddingVertical: 6,
-    paddingHorizontal: 4,
+    paddingHorizontal: 8,
     marginRight: 4,
     marginBottom: 4,
   },
   tagText: {
     color: ThemeColoursPrimary.PrimaryColour,
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: "bold",
   },
   selectedTags: {

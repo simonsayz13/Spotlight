@@ -194,7 +194,7 @@ const Contacts = ({ navigation }: any) => {
         <ActivityLoader indicator={loading} text={"Loading..."} />
       ) : (
         searchQuery.length === 0 && (
-          <ScrollView bounces={false}>
+          <ScrollView>
             {conversations.map((conversation) => {
               const userId = conversation.participants.find(
                 (userId: string) => userId != currentUserId

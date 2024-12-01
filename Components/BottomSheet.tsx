@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
     padding: 10,
     elevation: 10, // For Android shadow
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: -1 },
+    shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.2,
     shadowRadius: 2,
   },

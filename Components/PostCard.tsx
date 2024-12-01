@@ -43,7 +43,6 @@ const PostCard = ({ postId, navigation }: any) => {
       postData: postData,
     });
   };
-
   return (
     <Pressable
       style={styles.card}
@@ -53,32 +52,34 @@ const PostCard = ({ postId, navigation }: any) => {
     >
       {imageUrl ? (
         // <View style={[styles.image, { height: imageHeight }]}></View>
-        <ExpoImage
-          style={[styles.image, { height: imageHeight }]} // Dynamic height
-          source={{
-            uri: imageUrl,
-          }}
-          contentFit="cover"
-        />
+
+        Platform.OS === "android" ? (
+          <ExpoImage
+            style={[styles.image, { height: imageHeight }]} // Dynamic height
+            source={{
+              uri: imageUrl,
+            }}
+            contentFit="cover"
+          />
+        ) : (
+          <Image
+            style={[styles.image, { height: imageHeight }]} // Dynamic height
+            source={{
+              uri: imageUrl,
+              cache: "force-cache",
+            }}
+            resizeMode="cover"
+          />
+        )
       ) : (
-        // Platform.OS === "android" ? (
-        //   <ExpoImage
-        //     style={[styles.image, { height: imageHeight }]} // Dynamic height
-        //     source={{
-        //       uri: imageUrl,
-        //     }}
-        //     contentFit="cover"
-        //   />
-        // ) : (
-        //   <Image
-        //     style={[styles.image, { height: imageHeight }]} // Dynamic height
-        //     source={{
-        //       uri: imageUrl,
-        //       cache: "force-cache",
-        //     }}
-        //     resizeMode="cover"
-        //   />
-        // )
+        // <ExpoImage
+        //   style={[styles.image, { height: imageHeight }]} // Dynamic height
+        //   source={{
+        //     uri: imageUrl,
+        //   }}
+        //   contentFit="cover"
+        // />
+
         <NoPhotoPlaceHolder title={title} description={description} />
       )}
 

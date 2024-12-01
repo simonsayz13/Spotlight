@@ -1,11 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import {
-  Alert,
-  RefreshControl,
-  ScrollView,
-  StyleSheet,
-  View,
-} from "react-native";
+import { RefreshControl, ScrollView, StyleSheet, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../Redux/store";
 import {
@@ -76,7 +70,7 @@ const Content = (props: any) => {
       setDisplayPosts((prevPosts) => [...prevPosts, ...postsWithUserDetails]);
       dispatch(appendPosts(postsWithUserDetails));
     } catch (error) {
-      console.log("loadmore: ould not fetch any posts");
+      console.log("loadmore: could not fetch any posts");
     } finally {
       setLdgContentComplete(true);
       setBottomLoader(false);
@@ -191,6 +185,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   flashListContainer: {
+    paddingTop: 2,
     paddingHorizontal: 2, // Padding on the sides
   },
   cardContainer: {

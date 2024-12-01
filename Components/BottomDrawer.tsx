@@ -106,8 +106,11 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     elevation: 10, // For Android shadow
     zIndex: 100,
-    overflow: "hidden", // Add this line
     width: "100%",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.18, // Opacity of the shadow
+    shadowRadius: 4, // Blur radius of the shadow
   },
   panIndicator: {
     alignSelf: "center",

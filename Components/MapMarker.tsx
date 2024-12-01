@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
+import { StyleSheet, View, Pressable } from "react-native";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -60,7 +60,7 @@ const MapMarker = ({ tag, collapsed }: any) => {
   });
 
   return (
-    <TouchableOpacity>
+    <Pressable>
       <View style={styles.container}>
         <Animated.View style={[styles.bubble, bubbleStyle]}>
           <Animated.Text style={[styles.iconContent, textStyle]}>
@@ -68,7 +68,7 @@ const MapMarker = ({ tag, collapsed }: any) => {
           </Animated.Text>
         </Animated.View>
       </View>
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 

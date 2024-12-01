@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   Text,
   Platform,
+  Pressable,
 } from "react-native";
 import { Tags, ThemeColoursPrimary } from "../Constants/UI";
 import { Tag } from "../type/General";
@@ -49,26 +50,39 @@ const TagSelection = ({ handleSetTags }: any) => {
       </View>
       <View>
         {tags.map((tag: Tag) => (
-          <TouchableOpacity
+          <Pressable
             key={tag.id}
             style={styles.tagItem}
             onPressIn={() => handleTagToggle(tag.id)}
-            activeOpacity={1}
           >
             <View style={styles.tagRow}>
-              <Text style={styles.tagIcon}>{tag.icon}</Text>
-              <Text style={styles.tagLabel}>{tag.label}</Text>
+              <View style={[styles.tagIcon, { backgroundColor: tag.colour }]}>
+                <Text style={{ fontSize: 18 }}>{tag.icon}</Text>
+              </View>
+              <View
+                style={{
+                  marginLeft: 10,
+                  justifyContent: "space-between",
+                }}
+              >
+                <Text style={{ fontSize: 18, fontWeight: "bold" }}>
+                  {tag.label}
+                </Text>
+                <Text style={{ marginTop: "auto" }}>
+                  {tag.examples.join(", ")}
+                </Text>
+              </View>
             </View>
             <View style={styles.checkBox}>
               {tag.checked && (
                 <AntDesign
                   name="check"
-                  size={24}
+                  size={30}
                   color={ThemeColoursPrimary.LogoColour}
                 />
               )}
             </View>
-          </TouchableOpacity>
+          </Pressable>
         ))}
       </View>
     </View>
@@ -91,18 +105,24 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: 10,
+    paddingVertical: 6,
     marginHorizontal: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
   },
   tagRow: {
     flexDirection: "row",
     alignItems: "center",
   },
   tagIcon: {
-    fontSize: Platform.OS === "android" ? 20 : 30,
-    marginRight: 10,
+    width: 38,
+    height: 38,
+    borderRadius: 50,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 5,
   },
   tagLabel: {
     fontSize: 18,
@@ -114,7 +134,7 @@ const styles = StyleSheet.create({
     backgroundColor: ThemeColoursPrimary.LogoColour, // Use your theme color
     paddingVertical: 6,
     paddingHorizontal: 10,
-    borderRadius: 16,
+    borderRadius: 8,
   },
   confirmButtonText: {
     color: "#fff",

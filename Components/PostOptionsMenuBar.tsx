@@ -1,5 +1,5 @@
 import React from "react";
-import { TouchableOpacity, View, StyleSheet } from "react-native";
+import { View, StyleSheet, Pressable } from "react-native";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 const PostOptionsMenuBar = ({
   goToCamera,
@@ -10,24 +10,24 @@ const PostOptionsMenuBar = ({
     <View style={{ flexDirection: "row", alignItems: "center" }}>
       <View style={styles.menuBarContainer}>
         {goToCamera && (
-          <TouchableOpacity onPressIn={goToCamera}>
+          <Pressable onPressIn={goToCamera}>
             <MaterialCommunityIcons name="camera" size={34} color="black" />
-          </TouchableOpacity>
+          </Pressable>
         )}
         {goToPhotoBrowser && (
-          <TouchableOpacity onPressIn={goToPhotoBrowser}>
+          <Pressable onPressIn={goToPhotoBrowser}>
             <MaterialCommunityIcons name="image-plus" size={32} color="black" />
-          </TouchableOpacity>
+          </Pressable>
         )}
         {handleShowDrawer && (
-          <TouchableOpacity onPressIn={handleShowDrawer}>
+          <Pressable onPressIn={handleShowDrawer}>
             <MaterialCommunityIcons name="tag-text" size={30} color="black" />
-          </TouchableOpacity>
+          </Pressable>
         )}
       </View>
-      <TouchableOpacity style={{ marginLeft: 4 }}>
+      {/* <Pressable style={{ marginLeft: 4 }}>
         <MaterialCommunityIcons name="map-marker" size={30} color="black" />
-      </TouchableOpacity>
+      </Pressable> */}
     </View>
   );
 };
