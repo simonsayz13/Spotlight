@@ -212,7 +212,7 @@ const CreatePost = ({ navigation, route }: any) => {
       </View>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
           style={{ flex: 1 }}
         >
           <ScrollView onScrollEndDrag={Keyboard.dismiss}>
@@ -270,6 +270,7 @@ const CreatePost = ({ navigation, route }: any) => {
           </ScrollView>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
+
       <BottomSheet
         menuBar={
           <PostOptionsMenuBar

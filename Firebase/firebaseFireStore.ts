@@ -9,7 +9,6 @@ import {
   getDoc,
   orderBy,
   increment,
-  Timestamp,
   deleteDoc,
   arrayUnion,
   arrayRemove,
@@ -71,40 +70,57 @@ export const getUserDetails = async (
 ) => {
   try {
     const userProfileCollection = doc(db, FireStoreCollections.Users, userId);
+    const subcollectionLikesRef = collection(userProfileCollection, "likes");
+    const subcollectionFavouritesRef = collection(
+      userProfileCollection,
+      "favourites"
+    );
+
     const userDoc = await getDoc(userProfileCollection);
-    // if (userDoc.exists()) return userDoc.data();
-    if (userDoc.exists()) {
-      if (!hasFollowInfo) {
-        return { ...userDoc.data(), followers: [], followings: [] };
-      }
-      const { followers: followersRef, followings: followingsRef } =
-        userDoc.data();
+    const likedSnapshot = await getDocs(subcollectionLikesRef);
+    const liked = likedSnapshot.docs.map((doc) => doc.id);
+    const favouritesSnapshot = await getDocs(subcollectionFavouritesRef);
+    const favourites = favouritesSnapshot.docs.map((doc) => doc.id);
 
-      let followers = [];
-      let followings = [];
-
-      //* Retrieve followers array
-      if (followersRef && followersRef.length > 0) {
-        // Retrieve all the users being followed
-        followers = await Promise.all(
-          followersRef.map(async (userRef: any) => {
-            const followerSnap: any = await getDoc(userRef);
-            return followerSnap.data().user_id;
-          })
-        );
-      }
-      //* Retrieve followings array
-      if (followingsRef && followingsRef.length > 0) {
-        // Retrieve all the users being followed
-        followings = await Promise.all(
-          followingsRef.map(async (userRef: any) => {
-            const followingSnap: any = await getDoc(userRef);
-            return followingSnap.data().user_id;
-          })
-        );
-      }
-      return { ...userDoc.data(), followers, followings };
+    if (!userDoc.exists()) {
+      throw new Error("User not found");
     }
+    if (!hasFollowInfo) {
+      return { ...userDoc.data(), followers: [], followings: [] };
+    }
+    const { followers: followersRef, followings: followingsRef } =
+      userDoc.data();
+
+    let followers = [];
+    let followings = [];
+
+    //* Retrieve followers array
+    if (followersRef && followersRef.length > 0) {
+      // Retrieve all the users being followed
+      followers = await Promise.all(
+        followersRef.map(async (userRef: any) => {
+          const followerSnap: any = await getDoc(userRef);
+          return followerSnap.data().user_id;
+        })
+      );
+    }
+    //* Retrieve followings array
+    if (followingsRef && followingsRef.length > 0) {
+      // Retrieve all the users being followed
+      followings = await Promise.all(
+        followingsRef.map(async (userRef: any) => {
+          const followingSnap: any = await getDoc(userRef);
+          return followingSnap.data().user_id;
+        })
+      );
+    }
+    return {
+      ...userDoc.data(),
+      followers,
+      followings,
+      liked,
+      favourites,
+    };
   } catch (error) {
     Alert.alert("Error", "Error fetching user profile");
   }

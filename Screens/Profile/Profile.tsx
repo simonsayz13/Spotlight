@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -9,28 +9,21 @@ import {
   Pressable,
   RefreshControl,
 } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { RootState } from "../../Redux/store";
 import {
   FollowStackScreens,
   Gender,
-  HomeStackScreens,
   ImageType,
   ProfileStackScreens,
   ThemeColoursPrimary,
-  userContentSelectorButtons,
 } from "../../Constants/UI";
-import PostCard from "../../Components/PostCard";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import {
-  getUserDetails,
-  getPostsByUserId,
-} from "../../Firebase/firebaseFireStore";
+import { getUserDetails } from "../../Firebase/firebaseFireStore";
 import { MasonryFlashList } from "@shopify/flash-list";
 import ProfilePicture from "../../Components/ProfilePicture";
 import ImageModal from "../../Components/ImageModal";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { appendPosts } from "../../Redux/Slices/postsSlices";
 import {
   getTotalLikesForUserPosts,
   getTotalNumberOfPosts,
@@ -42,17 +35,16 @@ import Animated, {
 } from "react-native-reanimated";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { ScrollView } from "react-native-gesture-handler";
-import EmptyContent from "../../Components/EmptyContent";
-import Loader from "../../Components/Loader";
+import ProfileContents from "../../Components/ProfileContents";
 const Profile = ({ navigation }: any) => {
   const {
     userId,
     userBio,
     userFollowings: followings,
+    userLiked,
+    userFavourites,
   } = useSelector((state: RootState) => state.user);
   const insets = useSafeAreaInsets();
-  const [buttonStates, setButtonStates] = useState(userContentSelectorButtons);
-  const [postsData, setPostsData] = useState<Array<any>>([]);
   const [displayName, setDisplayName] = useState("");
   const [profilePicUrl, setProfilePicUrl] = useState("");
   const [bio, setBio] = useState(userBio);
@@ -63,10 +55,9 @@ const Profile = ({ navigation }: any) => {
   const [isGalleryVisible, setIsGalleryVisible] = useState(false);
   const [userLikesCount, setUserLikesCount] = useState(0);
   const [postsCount, setPostsCount] = useState(0);
-  const dispatch = useDispatch();
   const heightAnim = useSharedValue(200);
   const [refreshing, setRefreshing] = useState(false);
-  const [ldgContentComplete, setLdgContentComplete] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(false);
 
   useEffect(() => {
     if (ldgSuccUserDetails) {
@@ -85,28 +76,6 @@ const Profile = ({ navigation }: any) => {
       height: heightAnim.value,
     };
   });
-
-  const fetchPosts = async () => {
-    try {
-      const fetchedPosts = await getPostsByUserId(userId!);
-      const postsWithUserDetails = await Promise.all(
-        fetchedPosts.map(async (post: any) => {
-          const userDetails = await getUserDetails(post.user_id); // Assuming user_id is available in post
-          return {
-            ...post,
-            userDisplayName: userDetails.display_name,
-            userProfilePic: userDetails.profile_picture_url,
-          };
-        })
-      );
-      setPostsData(postsWithUserDetails);
-      dispatch(appendPosts(postsWithUserDetails));
-    } catch (error) {
-      Alert.alert("Error", "Error fetching posts");
-    } finally {
-      setLdgContentComplete(true);
-    }
-  };
 
   const fetchUser = async () => {
     setLdgUserDetails(true);
@@ -139,33 +108,14 @@ const Profile = ({ navigation }: any) => {
   };
 
   useEffect(() => {
-    fetchPosts();
     fetchUser();
   }, []);
-
-  const handlePress = (id: number) => {
-    setButtonStates((prevStates) =>
-      prevStates.map((button) =>
-        button.id === id
-          ? button.clicked
-            ? button
-            : { ...button, clicked: true }
-          : { ...button, clicked: false }
-      )
-    );
-  };
 
   const handleEdit = () => {
     navigation.navigate(ProfileStackScreens.EditProfile);
   };
 
-  const openPost = (postData: any) => {
-    navigation.navigate(HomeStackScreens.Post, {
-      postData: postData,
-    });
-  };
-
-  const openFollowerScreen = (tabIndex) => {
+  const openFollowerScreen = (tabIndex: number) => {
     navigation.navigate("FollowStack", {
       screen: FollowStackScreens.FollowerList,
       params: {
@@ -183,17 +133,9 @@ const Profile = ({ navigation }: any) => {
 
   const onRefresh = () => {
     setRefreshing(true);
-    setLdgContentComplete(false);
+    setRefreshTrigger((prev) => !prev);
     fetchUser();
-
-    fetchPosts();
   };
-
-  const renderItem = ({ item }: any) => (
-    <View style={styles.cardContainer}>
-      <PostCard postId={item.id} openPost={openPost} navigation={navigation} />
-    </View>
-  );
 
   return (
     <View
@@ -305,51 +247,13 @@ const Profile = ({ navigation }: any) => {
           </View>
         </Animated.View>
         {/* Posts */}
-        <View style={styles.userContentContainer}>
-          <View style={styles.contentContainerSelectorBar}>
-            {buttonStates.map((button: any) => (
-              <TouchableOpacity
-                key={button.id}
-                onPress={() => handlePress(button.id)}
-              >
-                {button.clicked ? (
-                  <View style={styles.textWrapper}>
-                    <Text style={styles.menuButtonClicked}>{button.label}</Text>
-                    <View style={styles.customUnderline} />
-                  </View>
-                ) : (
-                  <Text style={styles.menuButton}>{button.label}</Text>
-                )}
-              </TouchableOpacity>
-            ))}
-          </View>
-
-          {ldgContentComplete ? (
-            postsData.length > 0 ? (
-              <View
-                style={{
-                  flex: 1,
-                  backgroundColor: ThemeColoursPrimary.LightGreyBackground,
-                }}
-              >
-                <MasonryFlashList
-                  data={postsData}
-                  keyExtractor={(post) => post.id}
-                  renderItem={renderItem}
-                  estimatedItemSize={200} // Estimated size for optimal performance
-                  numColumns={2} // Setting 2 columns for masonry layout
-                  showsVerticalScrollIndicator={false}
-                  contentContainerStyle={styles.flashListContainer}
-                  scrollEnabled={false}
-                />
-              </View>
-            ) : (
-              <EmptyContent />
-            )
-          ) : (
-            <Loader size={"medium"} />
-          )}
-        </View>
+        <ProfileContents
+          navigation={navigation}
+          userId={userId}
+          userLiked={userLiked}
+          userFavourites={userFavourites}
+          refreshTrigger={refreshTrigger}
+        />
       </ScrollView>
     </View>
   );
@@ -417,59 +321,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     color: ThemeColoursPrimary.PrimaryColour,
-  },
-  userContentContainer: {
-    height: "100%",
-    marginTop: 10,
-    borderTopLeftRadius: 14,
-    borderTopRightRadius: 14,
-  },
-  contentContainerSelectorBar: {
-    height: 34,
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 12,
-    borderBottomWidth: 0.4,
-    borderBottomColor: ThemeColoursPrimary.GreyColour,
-    backgroundColor: ThemeColoursPrimary.PrimaryColour,
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 5, // For Android shadow
-  },
-
-  menuButton: {
-    fontSize: 16,
-    fontWeight: "normal",
-    color: ThemeColoursPrimary.SecondaryColour,
-  },
-  menuButtonClicked: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: ThemeColoursPrimary.SecondaryColour,
-  },
-  textWrapper: {
-    position: "relative",
-    alignItems: "center",
-  },
-  customUnderline: {
-    position: "absolute",
-    bottom: -4, // Adjust this value to control the gap between the text and underline
-    height: 3,
-    width: "70%",
-    backgroundColor: ThemeColoursPrimary.LogoColour, // Set the underline color
-    borderRadius: 18,
-  },
-  flashListContainer: {
-    paddingHorizontal: 2, // Padding on the sides
-  },
-  cardContainer: {
-    flex: 1,
-    marginHorizontal: 2, // Horizontal gap between the cards
-    marginVertical: 4,
   },
   profileAndActionContainer: {
     flexDirection: "row",

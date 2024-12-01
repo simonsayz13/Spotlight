@@ -159,7 +159,7 @@ const HomeTopTabNavigation = ({ navigation }: any) => {
           />
 
           <Tab.Navigator
-            tabBar={(props) => (
+            tabBar={(props: any) => (
               <Animated.View
                 style={[
                   styles.tabContainer,
