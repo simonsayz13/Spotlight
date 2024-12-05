@@ -304,7 +304,6 @@ const PostInteractionBar = forwardRef((props: any, ref) => {
 
 const styles = StyleSheet.create({
   container: {
-    // flex: 1,
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: ThemeColoursPrimary.PrimaryColour,
@@ -315,8 +314,8 @@ const styles = StyleSheet.create({
     elevation: 20,
     borderTopLeftRadius: 8,
     borderTopRightRadius: 8,
-    zIndex: 10,
     padding: 4,
+    zIndex: 1,
   },
   commentBar: {
     backgroundColor: "#f1f1f1",

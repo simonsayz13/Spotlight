@@ -4,7 +4,7 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
-  TouchableOpacity,
+  Pressable,
 } from "react-native";
 import TopNavigationBarPost from "../../Components/TopNavigationBarPost";
 import PostInteractionBar from "../../Components/PostInteractionBar";
@@ -29,11 +29,12 @@ const Post = ({ navigation, route }: any) => {
   const [isCommentActive, setIsCommentActive] = useState(false);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [modalMessage, setModalMessage] = useState<string | null>(null);
+  const insets = useSafeAreaInsets();
   const overlayOpacity = useSharedValue(0); // Replace with a shared value
   const overlayAnimatedStyle = useAnimatedStyle(() => ({
     opacity: overlayOpacity.value,
   }));
-  const insets = useSafeAreaInsets();
+
   const openKeyboard = () => {
     if (postInteractionBarRef.current)
       postInteractionBarRef.current.showKeyboard();
@@ -63,35 +64,26 @@ const Post = ({ navigation, route }: any) => {
   }, [isOptionsDrawer, isShareDrawer, isCommentActive]);
 
   return (
-    <View
-      style={[
-        styles.container,
-        { paddingTop: insets.top, paddingBottom: insets.bottom },
-      ]}
-    >
-      <TopNavigationBarPost
-        navigation={navigation}
-        postData={postData}
-        onPressPostSetting={setIsOptionsDrawer}
-        onPressSharePost={setIsShareDrawer}
-      />
-
+    <View style={[styles.container, { paddingBottom: insets.bottom }]}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={{ flex: 1, overflow: "hidden" }}
       >
+        <TopNavigationBarPost
+          navigation={navigation}
+          postData={postData}
+          onPressPostSetting={setIsOptionsDrawer}
+          onPressSharePost={setIsShareDrawer}
+        />
         {isDrawerOpen && (
-          <Animated.View
-            style={[styles.overlay, overlayAnimatedStyle]}
-            pointerEvents="auto"
-          >
-            <TouchableOpacity
+          <Animated.View style={[styles.overlay, overlayAnimatedStyle]}>
+            <Pressable
               style={styles.overlayTouchable}
-              activeOpacity={1}
               onPress={hideSettingDrawer} // Close drawer on overlay press
             />
           </Animated.View>
         )}
+
         <MainPost
           postData={postData}
           navigation={navigation}
@@ -100,21 +92,19 @@ const Post = ({ navigation, route }: any) => {
         />
 
         <MessageModal
-          message={modalMessage} // Adjust this message as needed
+          message={modalMessage}
           visible={modalVisible}
           setModalVisible={setModalVisible}
         />
 
         {!isOptionsDrawer && !isShareDrawer && (
-          <View style={[styles.bottomView]}>
-            <PostInteractionBar
-              ref={postInteractionBarRef}
-              postData={postData}
-              replyingTo={replyingTo}
-              setReplyingTo={setReplyingTo}
-              setIsCommentActive={setIsCommentActive}
-            />
-          </View>
+          <PostInteractionBar
+            ref={postInteractionBarRef}
+            postData={postData}
+            replyingTo={replyingTo}
+            setReplyingTo={setReplyingTo}
+            setIsCommentActive={setIsCommentActive}
+          />
         )}
 
         {isOptionsDrawer && (
@@ -150,12 +140,11 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.5)", // Adjust opacity as needed
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
     zIndex: 1,
   },
   overlayTouchable: {
     flex: 1,
   },
-  bottomView: {},
 });
 export default Post;

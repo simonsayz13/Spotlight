@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   View,
   StyleSheet,
@@ -20,6 +20,7 @@ import { RootState } from "../Redux/store";
 import Feather from "@expo/vector-icons/Feather";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
 import { addFollower, removeFollower } from "../Firebase/firebaseFireStore";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 const TopNavigationBarPost = ({
   navigation,
   postData,
@@ -27,6 +28,7 @@ const TopNavigationBarPost = ({
   onPressSharePost,
 }: any) => {
   const { userDisplayName, userProfilePic, user_id: userId } = postData;
+  const insets = useSafeAreaInsets();
   const { userId: appUserId, userFollowings } = useSelector(
     (state: RootState) => {
       return state.user;
@@ -73,7 +75,7 @@ const TopNavigationBarPost = ({
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.leftWrapper}>
         <TouchableOpacity
           onPress={() => {
