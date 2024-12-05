@@ -23,7 +23,6 @@ const Post = ({ navigation, route }: any) => {
   const { postData } = route.params;
   const postInteractionBarRef = useRef<any>(null);
   const [replyingTo, setReplyingTo] = useState(null);
-  const [bottomHeight, setBottomHeight] = useState(50); // Default height
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isOptionsDrawer, setIsOptionsDrawer] = useState(false);
   const [isShareDrawer, setIsShareDrawer] = useState(false);
@@ -107,13 +106,12 @@ const Post = ({ navigation, route }: any) => {
         />
 
         {!isOptionsDrawer && !isShareDrawer && (
-          <View style={[styles.bottomView, { height: bottomHeight }]}>
+          <View style={[styles.bottomView]}>
             <PostInteractionBar
               ref={postInteractionBarRef}
               postData={postData}
               replyingTo={replyingTo}
               setReplyingTo={setReplyingTo}
-              setBottomHeight={setBottomHeight}
               setIsCommentActive={setIsCommentActive}
             />
           </View>

@@ -29,7 +29,6 @@ import { clusterMessages } from "../../Util/utility";
 import { FlashList } from "@shopify/flash-list";
 import ProfilePicture from "../../Components/ProfilePicture";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Feather from "@expo/vector-icons/Feather";
 const Chat = ({ route, navigation }: any) => {
   const { userId: currentUserId } = useSelector(
     (state: RootState) => state.user
@@ -38,7 +37,6 @@ const Chat = ({ route, navigation }: any) => {
   const FlatListRef = useRef<any>(null);
   const [chatRoomId, setChatRoomId] = useState(conversationId);
   const [message, setMessage] = useState<string>("");
-  const [inputHeight, setInputHeight] = useState(40);
   const textInputRef = useRef<TextInput>(null);
   const isFocused = useIsFocused();
   const messages = useSelector(selectMessagesByChatRoomId(chatRoomId));
@@ -72,7 +70,6 @@ const Chat = ({ route, navigation }: any) => {
   const handleSendMessage = async () => {
     if (message) {
       setMessage("");
-      setInputHeight(40);
       await sendMessage(chatRoomId, currentUserId!, message);
       if (textInputRef.current) {
         textInputRef.current.clear();
@@ -82,11 +79,6 @@ const Chat = ({ route, navigation }: any) => {
 
   const scrollToTop = () => {
     FlatListRef.current?.scrollToOffset({ animated: true, offset: 0 });
-  };
-
-  const handleContentSizeChange = (event: any) => {
-    const { height } = event.nativeEvent.contentSize;
-    setInputHeight(Math.min(Math.max(40, height), 120)); // Min height 40, Max height 120
   };
 
   const goToProfile = () => {
@@ -150,13 +142,12 @@ const Chat = ({ route, navigation }: any) => {
           <View style={styles.messageBar}>
             <TextInput
               ref={textInputRef}
-              style={[styles.input, { height: inputHeight }]}
+              style={styles.input}
               placeholder="Send message..."
               placeholderTextColor={ThemeColoursPrimary.SecondaryColour}
               onChangeText={setMessage}
               value={message}
               multiline
-              onContentSizeChange={handleContentSizeChange}
             />
           </View>
           <Pressable onPressIn={handleSendMessage}>
@@ -241,6 +232,7 @@ const styles = StyleSheet.create({
     color: ThemeColoursPrimary.SecondaryColour,
     paddingVertical: Platform.OS === "ios" ? 10 : 0,
     height: "100%",
+    maxHeight: 100,
   },
   profileContainer: {
     flexDirection: "row",
