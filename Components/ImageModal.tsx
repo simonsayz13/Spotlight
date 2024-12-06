@@ -8,7 +8,6 @@ import {
   Platform,
 } from "react-native";
 import Gallery from "react-native-awesome-gallery";
-import { Image } from "expo-image";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { ThemeColoursPrimary } from "../Constants/UI";
 

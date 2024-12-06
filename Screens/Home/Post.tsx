@@ -67,7 +67,10 @@ const Post = ({ navigation, route }: any) => {
     <View style={[styles.container, { paddingBottom: insets.bottom }]}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
-        style={{ flex: 1, overflow: "hidden" }}
+        style={{
+          flex: 1,
+          backgroundColor: ThemeColoursPrimary.LightGreyBackground,
+        }}
       >
         <TopNavigationBarPost
           navigation={navigation}

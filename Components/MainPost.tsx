@@ -1,12 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
-
 import { ThemeColoursPrimary } from "../Constants/UI";
-import CommentCard from "./CommentCard";
 import { formatRelativeTime } from "../Util/utility";
 import { useSelector } from "react-redux";
 import { selectCommentsByPostId } from "../Redux/Selectors/postSelector";
 import ImageCarousel from "./ImageCarousel";
+import PostAdBar from "./PostAdBar";
+import PostCommentsSection from "./PostCommentsSection";
 
 const MainPost = ({
   postData,
@@ -14,46 +14,17 @@ const MainPost = ({
   openKeyboard,
   setReplyingTo,
 }: any) => {
-  const { title, description, timeStamp, id: postId } = postData;
-
+  const {
+    title,
+    description,
+    timeStamp,
+    id: postId,
+    isComment: allowComment,
+  } = postData;
+  const [hideAd, setHideAd] = useState(false);
   const comments = useSelector(selectCommentsByPostId(postId));
-
-  const renderCommentsWithReplies = (
-    comments: any[],
-    navigation: any,
-    openKeyboard: any,
-    setReplyingTo: any
-  ) => {
-    const renderCommentThread = (
-      parentCommentId: string | null,
-      isTopLevel: boolean = false
-    ) => {
-      return comments
-        .filter((comment) => comment.parentCommentId === parentCommentId)
-        .sort(
-          (a, b) =>
-            new Date(a.timeStamp).getTime() - new Date(b.timeStamp).getTime()
-        ) // Sort by timestamp
-        .map((comment, index, array) => (
-          <View key={comment.commentId + "_view"}>
-            {/* Render the comment */}
-            <CommentCard
-              key={comment.commentId}
-              commentData={comment}
-              navigation={navigation}
-              openKeyboard={openKeyboard}
-              setReplyingTo={setReplyingTo}
-              reply={!!parentCommentId} // Pass 'reply' prop to style replies differently
-              postId={postId}
-            />
-            {renderCommentThread(comment.commentId)}
-            {isTopLevel && <View style={styles.divider} />}
-          </View>
-        ));
-    };
-
-    // Start rendering from the top-level comments (where parentCommentId is null)
-    return renderCommentThread(null, true); // Pass 'true' to indicate top-level comments
+  const onClickCloseAd = () => {
+    setHideAd((prev) => !prev);
   };
 
   return (
@@ -61,6 +32,7 @@ const MainPost = ({
       contentContainerStyle={styles.scrollView}
       overScrollMode="never"
       showsVerticalScrollIndicator={false}
+      bounces={false}
     >
       {postData.media.length > 0 && <ImageCarousel images={postData.media} />}
       <View style={styles.postContentContainer}>
@@ -79,40 +51,16 @@ const MainPost = ({
         </View>
       </View>
 
-      {/* Comment Count */}
-      {comments.length > 0 ? (
-        <View>
-          <View style={styles.commentCountContainer}>
-            <Text
-              style={{
-                color: ThemeColoursPrimary.SecondaryColour,
-                fontWeight: "500",
-              }}
-            >
-              Comments
-            </Text>
-          </View>
-          <View>
-            {renderCommentsWithReplies(
-              comments,
-              navigation,
-              openKeyboard,
-              setReplyingTo
-            )}
-          </View>
-        </View>
-      ) : (
-        <View style={styles.commentCountContainer}>
-          <Text
-            style={{
-              color: ThemeColoursPrimary.SecondaryColour,
-              fontWeight: "500",
-            }}
-          >
-            No comments
-          </Text>
-        </View>
-      )}
+      {!hideAd && <PostAdBar onClickClose={onClickCloseAd} />}
+
+      <PostCommentsSection
+        comments={comments}
+        navigation={navigation}
+        openKeyboard={openKeyboard}
+        setReplyingTo={setReplyingTo}
+        postId={postId}
+        allowComment={allowComment}
+      />
 
       <View
         style={{ alignItems: "center", paddingTop: 30, paddingBottom: 400 }}
@@ -124,6 +72,7 @@ const MainPost = ({
     </ScrollView>
   );
 };
+
 const styles = StyleSheet.create({
   scrollView: {
     flexGrow: 1,
@@ -158,9 +107,8 @@ const styles = StyleSheet.create({
     right: 0,
   },
   postContentContainer: {
-    borderBottomWidth: 1,
-    borderBottomColor: "#D3D3D3",
-    marginHorizontal: 14,
+    paddingHorizontal: 10,
+    backgroundColor: ThemeColoursPrimary.PrimaryColour,
   },
   commentCountContainer: {
     marginTop: 6,

@@ -52,15 +52,16 @@ const ImageCarousel = ({ images }: any) => {
   };
 
   const renderImage = ({ item, index }: any) => {
-    // Calculate dimensions for each image
-    const { width, height } = item;
-    let calculatedHeight = (windowWidth / width) * height; // Calculate height based on aspect ratio
-    let calculatedWidth = windowWidth;
+    const { width: originalWidth, height: originalHeight } = item;
 
-    // If height exceeds max height, adjust the dimensions to fit within max height
-    if (calculatedHeight > MAX_HEIGHT) {
-      calculatedHeight = MAX_HEIGHT;
-      calculatedWidth = (MAX_HEIGHT / height) * width;
+    // Calculate the scaled dimensions
+    const aspectRatio = originalWidth / originalHeight;
+    let scaledWidth = windowWidth;
+    let scaledHeight = windowWidth / aspectRatio;
+
+    // Restrict the height to MAX_HEIGHT if necessary
+    if (scaledHeight > MAX_HEIGHT) {
+      scaledWidth = MAX_HEIGHT * aspectRatio;
     }
 
     return (
@@ -73,8 +74,8 @@ const ImageCarousel = ({ images }: any) => {
           <Image
             source={{ uri: item.media_url }}
             style={{
-              width: calculatedWidth,
-              height: calculatedHeight,
+              width: scaledWidth,
+              height: originalHeight,
             }}
             contentFit="contain"
             cachePolicy="memory-disk"
@@ -143,6 +144,7 @@ const styles = StyleSheet.create({
   container: {
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: ThemeColoursPrimary.PrimaryColour,
   },
   imageContainer: {
     justifyContent: "center",

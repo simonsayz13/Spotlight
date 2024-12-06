@@ -20,7 +20,6 @@ import {
 } from "../../Constants/UI";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { getUserDetails } from "../../Firebase/firebaseFireStore";
-import { MasonryFlashList } from "@shopify/flash-list";
 import ProfilePicture from "../../Components/ProfilePicture";
 import ImageModal from "../../Components/ImageModal";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
