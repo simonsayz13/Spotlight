@@ -9,7 +9,7 @@ import {
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import HomeStack from "./Stacks/HomeStack";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { Map } from "../Screens/Map/Map";
+import Map from "../Screens/Map/Map";
 import ProfileStack from "./Stacks/ProfileStack";
 import {
   NavigationTabs,
@@ -21,7 +21,6 @@ import Feather from "@expo/vector-icons/Feather";
 import { CreatePost } from "../Screens/Post/CreatePost";
 
 const Tab = createBottomTabNavigator();
-const { width, height } = Dimensions.get("window");
 
 const TabNavigation = ({ navigation }: any) => {
   return (

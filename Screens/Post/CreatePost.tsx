@@ -12,10 +12,10 @@ import {
   Switch,
   Platform,
   KeyboardAvoidingView,
+  Pressable,
 } from "react-native";
 import {
   MiscStackScreens,
-  NavigationTabs,
   PostStackScreens,
   ThemeColoursPrimary,
 } from "../../Constants/UI";
@@ -34,8 +34,9 @@ import TagSelection from "../../Components/TagSelection";
 import PostOptionsMenuBar from "../../Components/PostOptionsMenuBar";
 import { ScrollView } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAppContext } from "../../Context/AppContext";
 
-const { width, height } = Dimensions.get("window");
+const { width } = Dimensions.get("window");
 
 const CreatePost = ({ navigation, route }: any) => {
   const { userId } = useSelector((state: RootState) => state.user);
@@ -49,6 +50,9 @@ const CreatePost = ({ navigation, route }: any) => {
   const [tags, setTags] = useState<Array<any>>([]);
   const bottomDrawerRef = useRef<any>(null);
   const insets = useSafeAreaInsets();
+
+  const { setModalMessage } = useAppContext();
+
   const goBack = () => {
     resetStates();
     navigation.goBack();
@@ -71,6 +75,7 @@ const CreatePost = ({ navigation, route }: any) => {
 
   const resetStates = () => {
     navigation.setParams({ photoURI: undefined });
+    Keyboard.dismiss();
     setPhotoArray([]);
     setDescription("");
     setTitle("");
@@ -81,9 +86,6 @@ const CreatePost = ({ navigation, route }: any) => {
 
   const post = async () => {
     let coordinates = {};
-    if (!userId) {
-      return Alert.alert("Not Signed in", "Please sign in to make a post");
-    }
     if (isLocation) {
       coordinates = await getLocation();
     }
@@ -105,16 +107,16 @@ const CreatePost = ({ navigation, route }: any) => {
       isPrivate,
       tags: tags.map((tag) => tag.label),
     };
-    await createPost(userId, postData);
+    await createPost(userId!, postData);
     resetStates();
     navigation.goBack();
+    setModalMessage("Successfully Posted 🎉");
   };
 
   const togglePrivateSwitch = () =>
     setIsPrivate((previousState) => !previousState);
   const toggleCommentSwitch = () =>
     setIsComment((previousState) => !previousState);
-
   const toggleLocationSwitch = async () => {
     const locationServicePermission = await getLocationPermission();
     if (locationServicePermission !== "OK") {
@@ -210,7 +212,7 @@ const CreatePost = ({ navigation, route }: any) => {
           <Text style={styles.buttonText}>Post</Text>
         </TouchableOpacity>
       </View>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <Pressable onPress={Keyboard.dismiss}>
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : undefined}
           style={{ flex: 1 }}
@@ -269,7 +271,7 @@ const CreatePost = ({ navigation, route }: any) => {
             )}
           </ScrollView>
         </KeyboardAvoidingView>
-      </TouchableWithoutFeedback>
+      </Pressable>
 
       <BottomSheet
         menuBar={

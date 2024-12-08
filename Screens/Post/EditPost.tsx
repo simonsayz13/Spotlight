@@ -22,7 +22,6 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { uploadImages } from "../../Firebase/firebaseStorage";
 
 import { updatePost } from "../../Firebase/firebaseFireStore";
-import ActivityLoader from "../../Components/ActivityLoader";
 import BottomSheet from "../../Components/BottomSheet";
 import { getLocation, getLocationPermission } from "../../Util/LocationService";
 import ImagePreviewCarousel from "../../Components/ImagePreviewCarousel";
@@ -31,8 +30,9 @@ import BottomDrawer from "../../Components/BottomDrawer";
 import TagSelection from "../../Components/TagSelection";
 import PostOptionsMenuBar from "../../Components/PostOptionsMenuBar";
 import { ScrollView } from "react-native-gesture-handler";
+import { useAppContext } from "../../Context/AppContext";
 
-const { width, height } = Dimensions.get("window");
+const { width } = Dimensions.get("window");
 
 const EditPost = ({ navigation, route }: any) => {
   const {
@@ -56,7 +56,7 @@ const EditPost = ({ navigation, route }: any) => {
   const [photoArray, setPhotoArray] = useState<Array<string>>(mediaUrls);
   const [newPhotoArray, setNewPhotoArray] = useState<Array<string>>([]);
   const [tags, setTags] = useState<Array<any>>(processedTags);
-  const [saving, setSaving] = useState<boolean>(false);
+  const { setModalMessage } = useAppContext();
   const bottomDrawerRef = useRef<any>(null);
   const goBack = () => {
     resetStates();
@@ -82,7 +82,6 @@ const EditPost = ({ navigation, route }: any) => {
     setPhotoArray([]);
     setDescription("");
     setTitle("");
-    setSaving(false);
     setIsComment(false);
     setIsLocation(false);
     setIsPrivate(false);
@@ -90,7 +89,6 @@ const EditPost = ({ navigation, route }: any) => {
 
   const post = async () => {
     let coordinates = {};
-    setSaving(true);
     if (isLocation) {
       coordinates = await getLocation();
     }
@@ -100,7 +98,6 @@ const EditPost = ({ navigation, route }: any) => {
       photoArray.includes(item.media_url)
     );
     const media = [...originalMediaData, ...newMediaData];
-
     const updatedData = {
       media,
       title,
@@ -112,9 +109,9 @@ const EditPost = ({ navigation, route }: any) => {
       updatedTimeStamp: new Date().toISOString(),
       tags: tags.map((tag) => tag.label),
     };
-    setSaving(false);
     await updatePost(postId, updatedData);
-    navigation.goBack(); //navigate(NavigationTabs.Home);
+    navigation.goBack();
+    setModalMessage("Post updated.");
   };
 
   const togglePrivateSwitch = () =>
@@ -197,7 +194,6 @@ const EditPost = ({ navigation, route }: any) => {
   return (
     <View style={[styles.container]}>
       <View style={styles.topBarContainer}>
-        <ActivityLoader indicator={saving} text={"Saving..."} />
         <TouchableOpacity onPressIn={goBack} style={styles.closeButton}>
           <Ionicons
             name="close"
@@ -238,7 +234,7 @@ const EditPost = ({ navigation, route }: any) => {
                 onChangeText={(text) => {
                   setTitle(text);
                 }}
-                placeholderTextColor="rgba(0, 0, 0, 1)"
+                // placeholderTextColor="rgba(0, 0, 0, 1)"
               >
                 {title}
               </TextInput>

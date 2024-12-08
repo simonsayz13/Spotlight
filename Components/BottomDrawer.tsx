@@ -108,9 +108,9 @@ const styles = StyleSheet.create({
     zIndex: 100,
     width: "100%",
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.18, // Opacity of the shadow
-    shadowRadius: 4, // Blur radius of the shadow
+    shadowOffset: { width: 0, height: -6 },
+    shadowOpacity: 0.06, // Opacity of the shadow
+    shadowRadius: 6, // Blur radius of the shadow
   },
   panIndicator: {
     alignSelf: "center",

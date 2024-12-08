@@ -28,7 +28,7 @@ import Feather from "@expo/vector-icons/Feather";
 
 const { width: windowWidth, height: windowHeight } = Dimensions.get("window");
 
-const Map = ({ navigation }: any) => {
+const MapScreen = ({ navigation }: any) => {
   const [selectedPost, setSelectedPost] = useState<any>(null);
   const [currentCoordinate, setCurrentCoordinate] = useState<any>(null);
   const [posts, setPosts] = useState([]);
@@ -350,4 +350,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export { Map };
+export default MapScreen;

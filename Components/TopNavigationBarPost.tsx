@@ -121,7 +121,7 @@ const TopNavigationBarPost = ({
           </Pressable>
         </View>
       ) : (
-        <View style={styles.followShareWrapper}>
+        <View style={[styles.followShareWrapper, { paddingRight: 6 }]}>
           <Pressable onPressIn={onSettingsClicked}>
             <Feather name="more-horizontal" size={26} color="black" />
           </Pressable>

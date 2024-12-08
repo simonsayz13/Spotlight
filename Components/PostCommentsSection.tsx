@@ -84,7 +84,14 @@ const PostCommentsSection = (props: any) => {
     </View>
   ) : (
     <View style={styles.noCommentContainer}>
-      <Text style={[styles.noCommentText]}>No comments</Text>
+      <MaterialCommunityIcons
+        name="comment-off-outline"
+        size={24}
+        color="black"
+      />
+      <Text style={styles.noCommentText}>
+        No comments, be the first to comment!
+      </Text>
     </View>
   );
 };

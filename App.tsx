@@ -13,6 +13,8 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { conversationListener } from "./Firebase/FirebaseChat";
 import { LogBox, StatusBar } from "react-native";
 import DrawerNavigation from "./Navigation/DrawerNavigation";
+import { AppProvider } from "./Context/AppContext";
+import MessageModal from "./Components/MessageModal";
 
 LogBox.ignoreLogs(["@firebase/firestore: Firestore"]);
 
@@ -42,14 +44,17 @@ const MainApp = () => {
   }
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaProvider>
-        <NavigationContainer theme={DefaultTheme}>
-          <StatusBar barStyle="dark-content" />
-          <DrawerNavigation />
-        </NavigationContainer>
-      </SafeAreaProvider>
-    </GestureHandlerRootView>
+    <AppProvider>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <SafeAreaProvider>
+          <NavigationContainer theme={DefaultTheme}>
+            <MessageModal />
+            <StatusBar barStyle="dark-content" />
+            <DrawerNavigation />
+          </NavigationContainer>
+        </SafeAreaProvider>
+      </GestureHandlerRootView>
+    </AppProvider>
   );
 };
 

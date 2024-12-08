@@ -12,13 +12,13 @@ import MainPost from "../../Components/MainPost";
 import { ThemeColoursPrimary } from "../../Constants/UI";
 import PostOptions from "../../Components/PostOptions";
 import SharePost from "../../Components/SharePost";
-import MessageModal from "../../Components/MessageModal";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+
 const Post = ({ navigation, route }: any) => {
   const { postData } = route.params;
   const postInteractionBarRef = useRef<any>(null);
@@ -27,8 +27,6 @@ const Post = ({ navigation, route }: any) => {
   const [isOptionsDrawer, setIsOptionsDrawer] = useState(false);
   const [isShareDrawer, setIsShareDrawer] = useState(false);
   const [isCommentActive, setIsCommentActive] = useState(false);
-  const [modalVisible, setModalVisible] = useState<boolean>(false);
-  const [modalMessage, setModalMessage] = useState<string | null>(null);
   const insets = useSafeAreaInsets();
   const overlayOpacity = useSharedValue(0); // Replace with a shared value
   const overlayAnimatedStyle = useAnimatedStyle(() => ({
@@ -94,12 +92,6 @@ const Post = ({ navigation, route }: any) => {
           setReplyingTo={setReplyingTo}
         />
 
-        <MessageModal
-          message={modalMessage}
-          visible={modalVisible}
-          setModalVisible={setModalVisible}
-        />
-
         {!isOptionsDrawer && !isShareDrawer && (
           <PostInteractionBar
             ref={postInteractionBarRef}
@@ -122,8 +114,6 @@ const Post = ({ navigation, route }: any) => {
             setIsDrawerOpen={setIsShareDrawer}
             navigation={navigation}
             postData={postData}
-            setModalVisible={setModalVisible}
-            setModalMessage={setModalMessage}
             isShareDrawer={isShareDrawer}
           />
         )}
