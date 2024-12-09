@@ -18,7 +18,9 @@ import MessageModal from "./Components/MessageModal";
 import { getLocationPermission } from "./Util/LocationService";
 
 LogBox.ignoreLogs(["@firebase/firestore: Firestore"]);
-
+LogBox.ignoreLogs([
+  'Warning: A props object containing a "key" prop is being spread into JSX',
+]);
 const Stack = createStackNavigator();
 
 const MainApp = () => {

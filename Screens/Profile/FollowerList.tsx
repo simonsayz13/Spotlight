@@ -202,16 +202,18 @@ const FollowerList = ({ navigation, route }: any) => {
     }
   };
 
-  const renderTabBar = (props: any) => (
-    <TabBar
-      {...props}
-      indicatorStyle={styles.indicator} // Style the underline indicator
-      style={styles.tabBar} // Style the tab bar container
-      labelStyle={styles.label} // Style the tab text
-      activeColor={ThemeColoursPrimary.SecondaryColour} // Active tab text color
-      inactiveColor="#888" // Inactive tab text color
-    />
-  );
+  const renderTabBar = (props: any) => {
+    return (
+      <TabBar
+        {...props}
+        indicatorStyle={styles.indicator} // Style the underline indicator
+        style={styles.tabBar} // Style the tab bar container
+        labelStyle={styles.label} // Style the tab text
+        activeColor={ThemeColoursPrimary.SecondaryColour} // Active tab text color
+        inactiveColor="#888" // Inactive tab text color
+      />
+    );
+  };
 
   return (
     <TabView

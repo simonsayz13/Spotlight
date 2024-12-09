@@ -7,6 +7,7 @@ import {
   TextInputChangeEventData,
   Alert,
   Keyboard,
+  Platform,
 } from "react-native";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import { ThemeColoursPrimary } from "../Constants/UI";
@@ -26,7 +27,6 @@ import Animated, {
 import PostSearchView from "../Components/PostSearchView";
 import { appendPosts } from "../Redux/Slices/postsSlices";
 import EmptyContent from "../Components/EmptyContent";
-
 const Tab = createMaterialTopTabNavigator();
 
 const PlaceHolderScreen = () => (
@@ -117,11 +117,17 @@ const HomeTopTabNavigation = ({ navigation }: any) => {
   };
 
   const translateY = useSharedValue(isDropDownMenuVisible ? 0 : -50); // Initial position (hidden)
-  const paddingTop = useSharedValue(isDropDownMenuVisible ? 40 : 0);
+  const paddingTop = useSharedValue(
+    isDropDownMenuVisible ? (Platform.OS === "android" ? 50 : 40) : 0
+  );
 
   useEffect(() => {
     translateY.value = isDropDownMenuVisible ? 0 : -50; // Animate up when hidden
-    paddingTop.value = isDropDownMenuVisible ? 40 : 0;
+    paddingTop.value = isDropDownMenuVisible
+      ? Platform.OS === "android"
+        ? 50
+        : 40
+      : 0;
   }, [isDropDownMenuVisible]);
 
   const animatedTabBarStyle = useAnimatedStyle(() => ({
@@ -157,7 +163,6 @@ const HomeTopTabNavigation = ({ navigation }: any) => {
             searchText={searchText}
             navigation={navigation}
           />
-
           <Tab.Navigator
             tabBar={(props: any) => (
               <Animated.View
@@ -166,25 +171,20 @@ const HomeTopTabNavigation = ({ navigation }: any) => {
                   animatedTabBarStyle, // Apply animated height
                 ]}
               >
-                <TopTabBar {...props} isVisible={isDropDownMenuVisible} />
+                <TopTabBar {...props} />
               </Animated.View>
             )}
             initialRouteName="Discover"
-            screenOptions={{
-              tabBarStyle: {
-                position: "relative", // Keep it in the layout flow
-              },
-            }}
           >
-            <Tab.Screen name="Following" options={{ tabBarLabel: "Following" }}>
+            <Tab.Screen
+              name="Following"
+              options={{
+                tabBarLabel: "Following",
+              }}
+            >
               {() => (
                 <Animated.View
-                  style={[
-                    {
-                      flex: 1,
-                    },
-                    animatedContentStyle,
-                  ]}
+                  style={[styles.contentWrapper, animatedContentStyle]}
                 >
                   <Content
                     navigation={navigation}
@@ -198,12 +198,7 @@ const HomeTopTabNavigation = ({ navigation }: any) => {
             <Tab.Screen name="Discover" options={{ tabBarLabel: "Discover" }}>
               {() => (
                 <Animated.View
-                  style={[
-                    {
-                      flex: 1,
-                    },
-                    animatedContentStyle,
-                  ]}
+                  style={[styles.contentWrapper, animatedContentStyle]}
                 >
                   <Content
                     navigation={navigation}
@@ -238,7 +233,6 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    backgroundColor: "white",
     zIndex: 1, // Ensure it's above other content
   },
 });

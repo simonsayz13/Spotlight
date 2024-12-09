@@ -136,9 +136,10 @@ const Content = (props: any) => {
       <FadeInWrapper delay={1500}>
         <MasonryFlashList
           data={displayPosts}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.id.toString()}
           renderItem={renderItem}
-          estimatedItemSize={200}
+          estimatedItemSize={255}
+          disableAutoLayout
           numColumns={2}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.flashListContainer}
@@ -187,7 +188,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 2, // Padding on the sides
   },
   cardContainer: {
-    flex: 1,
+    // flex: 1,
     marginHorizontal: 2, // Horizontal gap between the cards
     marginBottom: 4, // Vertical gap between rows
   },
