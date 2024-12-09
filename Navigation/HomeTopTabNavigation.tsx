@@ -214,9 +214,9 @@ const HomeTopTabNavigation = ({ navigation }: any) => {
               )}
             </Tab.Screen>
             <Tab.Screen
-              name="Nearby"
+              name="Trending"
               component={PlaceHolderScreen}
-              options={{ tabBarLabel: "Nearby" }}
+              options={{ tabBarLabel: "Trending" }}
             />
           </Tab.Navigator>
         </View>

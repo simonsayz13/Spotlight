@@ -2,10 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { RefreshControl, ScrollView, StyleSheet, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../Redux/store";
-import {
-  getPaginatedPosts,
-  getPostsByUserIds,
-} from "../Firebase/firebaseFireStore";
+import { getPostsByUserIds } from "../Firebase/firebaseFireStore";
 import { fetchUserDetailOnPosts } from "../Util/Services";
 import PostCard from "./PostCard";
 import FadeInWrapper from "./FadeInWrapper";
@@ -15,6 +12,7 @@ import Loader from "./Loader";
 import { appendPosts } from "../Redux/Slices/postsSlices";
 import { useFocusEffect } from "@react-navigation/native";
 import EmptyContent from "./EmptyContent";
+import { getPaginatedPosts } from "../Firebase/FirebasePosts";
 
 const Content = (props: any) => {
   const { navigation, onScroll, content } = props;

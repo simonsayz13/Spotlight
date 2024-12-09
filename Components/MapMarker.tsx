@@ -28,7 +28,7 @@ const MapMarker = ({ tag, collapsed }: any) => {
     return {
       width: animatedSize.value,
       height: animatedSize.value,
-      backgroundColor: tag.colour,
+      backgroundColor: tag ? tag.colour : "#FFEB3B",
       borderTopLeftRadius: interpolate(
         animatedSize.value,
         [CollapsedSize, Size],
@@ -64,7 +64,7 @@ const MapMarker = ({ tag, collapsed }: any) => {
       <View style={styles.container}>
         <Animated.View style={[styles.bubble, bubbleStyle]}>
           <Animated.Text style={[styles.iconContent, textStyle]}>
-            {tag.icon}
+            {tag ? tag.icon : "📄"}
           </Animated.Text>
         </Animated.View>
       </View>

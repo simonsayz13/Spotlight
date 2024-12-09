@@ -5,7 +5,7 @@ import { Float } from "react-native/Libraries/Types/CodegenTypes";
 export const getLocationPermission = async () => {
   const { status } = await Location.requestForegroundPermissionsAsync();
   if (status !== "granted") {
-    return "Permission to access location was denied";
+    return "Please allow location service for the app.";
   }
   return "OK";
 };

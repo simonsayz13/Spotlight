@@ -44,7 +44,7 @@ const CreatePost = ({ navigation, route }: any) => {
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [isComment, setIsComment] = useState<boolean>(true);
-  const [isLocation, setIsLocation] = useState<boolean>(false);
+  const [isLocation, setIsLocation] = useState<boolean>(true);
   const [isPrivate, setIsPrivate] = useState<boolean>(false);
   const [photoArray, setPhotoArray] = useState<Array<string>>([]);
   const [tags, setTags] = useState<Array<any>>([]);

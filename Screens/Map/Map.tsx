@@ -61,10 +61,6 @@ const MapScreen = ({ navigation }: any) => {
   };
 
   const initialise = async () => {
-    const permission = await getLocationPermission();
-    if (permission !== "OK") {
-      return Alert.alert("Error", permission);
-    }
     await getLocation(setCurrentCoordinate);
     getPostData();
     setMapRegion(currentCoordinate);
