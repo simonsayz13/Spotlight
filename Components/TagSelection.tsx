@@ -4,13 +4,12 @@ import {
   StyleSheet,
   TouchableOpacity,
   Text,
-  Platform,
   Pressable,
 } from "react-native";
 import { Tags, ThemeColoursPrimary } from "../Constants/UI";
 import { Tag } from "../type/General";
 import AntDesign from "@expo/vector-icons/AntDesign";
-
+import Feather from "@expo/vector-icons/Feather";
 const TagSelection = ({ handleSetTags }: any) => {
   const [tags, setTags] = useState(Tags);
 
@@ -75,11 +74,9 @@ const TagSelection = ({ handleSetTags }: any) => {
             </View>
             <View style={styles.checkBox}>
               {tag.checked && (
-                <AntDesign
-                  name="check"
-                  size={30}
-                  color={ThemeColoursPrimary.LogoColour}
-                />
+                <View style={styles.checkIcon}>
+                  <Feather name="check" size={20} color="white" />
+                </View>
               )}
             </View>
           </Pressable>
@@ -140,6 +137,14 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  checkIcon: {
+    justifyContent: "center",
+    alignItems: "center",
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    backgroundColor: ThemeColoursPrimary.LogoColour,
   },
 });
 export default TagSelection;

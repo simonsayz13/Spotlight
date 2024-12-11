@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
-import { ThemeColoursPrimary } from "../Constants/UI";
+import { Tags, ThemeColoursPrimary } from "../Constants/UI";
 import { formatRelativeTime } from "../Util/utility";
 import { useSelector } from "react-redux";
 import { selectCommentsByPostId } from "../Redux/Selectors/postSelector";
@@ -20,6 +20,7 @@ const MainPost = ({
     timeStamp,
     id: postId,
     isComment: allowComment,
+    tags,
   } = postData;
   const [hideAd, setHideAd] = useState(false);
   const comments = useSelector(selectCommentsByPostId(postId));
@@ -44,6 +45,24 @@ const MainPost = ({
             <Text style={styles.postDescriptionText}>{description}</Text>
           </View>
         )}
+        <View style={styles.tagsContainer}>
+          <View style={styles.tagsView}>
+            {tags.map((tag: any) => {
+              const postTag = Tags.find((t) => t.label === tag); // Fixed equality check
+              if (!postTag) return null; // Ensure `postTag` exists
+              return (
+                <View
+                  key={postTag.id} // Use a unique identifier for the key
+                  style={[styles.tagChip, { backgroundColor: postTag.colour }]}
+                >
+                  <Text style={styles.tagText}>
+                    {postTag.icon} {postTag.label}
+                  </Text>
+                </View>
+              );
+            })}
+          </View>
+        </View>
         <View style={styles.userMetaDataContainer}>
           <Text style={styles.userMetaDataText}>
             Posted {formatRelativeTime(timeStamp)}
@@ -95,8 +114,8 @@ const styles = StyleSheet.create({
     color: ThemeColoursPrimary.SecondaryColour,
   },
   userMetaDataContainer: {
-    marginVertical: 6,
-    height: 11,
+    marginTop: 8,
+    marginBottom: 6,
   },
   userMetaDataText: {
     fontSize: 11,
@@ -110,45 +129,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     backgroundColor: ThemeColoursPrimary.PrimaryColour,
   },
-  commentCountContainer: {
-    marginTop: 6,
-    marginHorizontal: 14,
+  tagsContainer: {
+    marginTop: 10,
   },
-  searchBar: {
-    backgroundColor: "#f1f1f1",
-    borderRadius: 20,
-    borderColor: "black",
-    borderWidth: 1.2,
-    flex: 1,
+  tagsView: {
     flexDirection: "row",
-    alignItems: "center",
-    paddingLeft: 10,
-    height: 36,
-    justifyContent: "space-between",
+    flexWrap: "wrap",
   },
-  input: {
-    height: 20,
-    marginLeft: 4,
+  tagChip: {
+    borderRadius: 100,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    marginRight: 4,
+    marginBottom: 4,
+  },
+  tagText: {
+    color: ThemeColoursPrimary.PrimaryColour,
     fontSize: 16,
-  },
-  commentContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginHorizontal: 12,
-  },
-  iconContainer: {
-    flexDirection: "row",
-    paddingRight: 10,
-    gap: 10,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  commentStyle: { flexDirection: "row" },
-
-  divider: {
-    borderBottomWidth: 0.6,
-    borderColor: ThemeColoursPrimary.SecondaryColour + "20",
-    marginHorizontal: 14,
+    fontWeight: "bold",
   },
 });
 export default MainPost;

@@ -34,9 +34,7 @@ const BottomDrawer = forwardRef(
         onMoveShouldSetPanResponder: () => true,
         onPanResponderMove: (_, gestureState) => {
           const { dy } = gestureState;
-          // Allow movement only downwards (dy > 0), and stop at original position (translateY 0)
           if (dy > 0) {
-            // slideAnim.setValue(dy);
             slideAnim.value = dy;
           }
         },
@@ -52,7 +50,6 @@ const BottomDrawer = forwardRef(
         },
       })
     ).current;
-
     const showDrawer = () => {
       slideAnim.value = withTiming(0, {
         duration: 300,

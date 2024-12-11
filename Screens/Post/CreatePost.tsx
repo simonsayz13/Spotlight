@@ -255,16 +255,15 @@ const CreatePost = ({ navigation, route }: any) => {
               <View style={styles.tagsContainer}>
                 <View style={styles.selectedTags}>
                   {tags.map((tag, index) => (
-                    <TouchableOpacity
+                    <Pressable
                       key={tag}
                       style={[styles.tagChip, { backgroundColor: tag.colour }]}
-                      activeOpacity={1}
                       onPressIn={handleShowDrawer}
                     >
                       <Text style={styles.tagText}>
                         {tag.icon} {tag.label}
                       </Text>
-                    </TouchableOpacity>
+                    </Pressable>
                   ))}
                 </View>
               </View>
@@ -285,10 +284,12 @@ const CreatePost = ({ navigation, route }: any) => {
       >
         {options}
       </BottomSheet>
+
       <BottomDrawer
         heightPercentage={0.448}
         ref={bottomDrawerRef}
-        isPannable={true}
+        isPannable={false}
+        isAbsolute={true}
       >
         <TagSelection handleSetTags={handleSetTags} />
       </BottomDrawer>
@@ -385,9 +386,9 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   tagChip: {
-    borderRadius: 6,
-    paddingVertical: 6,
-    paddingHorizontal: 8,
+    borderRadius: 100,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
     marginRight: 4,
     marginBottom: 4,
   },
