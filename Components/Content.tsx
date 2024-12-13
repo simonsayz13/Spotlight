@@ -15,7 +15,7 @@ import EmptyContent from "./EmptyContent";
 import { getPaginatedPosts } from "../Firebase/FirebasePosts";
 
 const Content = (props: any) => {
-  const { navigation, onScroll, content } = props;
+  const { navigation, onScroll, content, setIsDropDownMenuVisible } = props;
   const [refreshing, setRefreshing] = useState(false);
   const otherUsers = useSelector((state: RootState) => state.otherUsers);
   const userFollowings = useSelector(
@@ -96,6 +96,7 @@ const Content = (props: any) => {
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
+    setIsDropDownMenuVisible(true);
     setTimeout(() => {
       if (userFollowings.length === 0) {
         setRefreshing(false);

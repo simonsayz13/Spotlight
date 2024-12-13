@@ -41,11 +41,9 @@ const TopNavigationBarPost = ({
   );
 
   const goToProfile = () => {
-    userId === appUserId
-      ? navigation.navigate(NavigationTabs.Me)
-      : navigation.navigate(ProfileStackScreens.ViewProfile, {
-          userId,
-        });
+    navigation.navigate(ProfileStackScreens.ViewProfile, {
+      userId,
+    });
   };
 
   const onSettingsClicked = () => {

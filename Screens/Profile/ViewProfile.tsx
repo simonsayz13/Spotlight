@@ -126,6 +126,7 @@ const ViewProfile = ({ navigation, route }: any) => {
         biography,
         gender,
         followers,
+        followings,
       }: any = await getUserDetails(userId!);
       setPostsCount(postsCount);
       setUserLikesCount(likesCount);
@@ -341,26 +342,28 @@ const ViewProfile = ({ navigation, route }: any) => {
               <Text style={styles.statsFont}>Followers</Text>
             </Pressable>
 
-            <View style={styles.interactionContainer}>
-              <TouchableOpacity
-                style={[styles.button, styles.followButton]}
-                onPress={
-                  isFollowed ? handlePressUnfollowBtn : handlePressFollowBtn
-                }
-              >
-                <Text style={styles.buttonText}>
-                  {isFollowed ? "Unfollow" : "Follow"}
-                </Text>
-              </TouchableOpacity>
+            {appUserId !== userId && (
+              <View style={styles.interactionContainer}>
+                <TouchableOpacity
+                  style={[styles.button, styles.followButton]}
+                  onPress={
+                    isFollowed ? handlePressUnfollowBtn : handlePressFollowBtn
+                  }
+                >
+                  <Text style={styles.buttonText}>
+                    {isFollowed ? "Unfollow" : "Follow"}
+                  </Text>
+                </TouchableOpacity>
 
-              <TouchableOpacity onPressIn={openChat} style={styles.button}>
-                <AntDesign
-                  name="message1"
-                  size={18}
-                  color={ThemeColoursPrimary.PrimaryColour}
-                />
-              </TouchableOpacity>
-            </View>
+                <TouchableOpacity onPressIn={openChat} style={styles.button}>
+                  <AntDesign
+                    name="message1"
+                    size={18}
+                    color={ThemeColoursPrimary.PrimaryColour}
+                  />
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
         </Animated.View>
         {/* Posts */}

@@ -190,6 +190,7 @@ const HomeTopTabNavigation = ({ navigation }: any) => {
                     navigation={navigation}
                     onScroll={handleScroll}
                     content={"following"}
+                    setIsDropDownMenuVisible={setIsDropDownMenuVisible}
                   />
                 </Animated.View>
               )}
@@ -204,6 +205,7 @@ const HomeTopTabNavigation = ({ navigation }: any) => {
                     navigation={navigation}
                     onScroll={handleScroll}
                     content={"discover"}
+                    setIsDropDownMenuVisible={setIsDropDownMenuVisible}
                   />
                 </Animated.View>
               )}

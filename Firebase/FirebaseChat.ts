@@ -86,7 +86,7 @@ export const sendMessage = async (
     // Update the chat room's last message field
     await updateDoc(chatRoomRef, {
       lastMessage: {
-        text: text,
+        text: postId && !text ? "[Shared Post]" : text,
         timestamp: new Date().toISOString(),
         senderId: senderId,
       },

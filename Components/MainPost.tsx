@@ -45,24 +45,29 @@ const MainPost = ({
             <Text style={styles.postDescriptionText}>{description}</Text>
           </View>
         )}
-        <View style={styles.tagsContainer}>
-          <View style={styles.tagsView}>
-            {tags.map((tag: any) => {
-              const postTag = Tags.find((t) => t.label === tag); // Fixed equality check
-              if (!postTag) return null; // Ensure `postTag` exists
-              return (
-                <View
-                  key={postTag.id} // Use a unique identifier for the key
-                  style={[styles.tagChip, { backgroundColor: postTag.colour }]}
-                >
-                  <Text style={styles.tagText}>
-                    {postTag.icon} {postTag.label}
-                  </Text>
-                </View>
-              );
-            })}
+        {tags && (
+          <View style={styles.tagsContainer}>
+            <View style={styles.tagsView}>
+              {tags.map((tag: any) => {
+                const postTag = Tags.find((t) => t.label === tag); // Fixed equality check
+                if (!postTag) return null; // Ensure `postTag` exists
+                return (
+                  <View
+                    key={postTag.id} // Use a unique identifier for the key
+                    style={[
+                      styles.tagChip,
+                      { backgroundColor: postTag.colour },
+                    ]}
+                  >
+                    <Text style={styles.tagText}>
+                      {postTag.icon} {postTag.label}
+                    </Text>
+                  </View>
+                );
+              })}
+            </View>
           </View>
-        </View>
+        )}
         <View style={styles.userMetaDataContainer}>
           <Text style={styles.userMetaDataText}>
             Posted {formatRelativeTime(timeStamp)}
