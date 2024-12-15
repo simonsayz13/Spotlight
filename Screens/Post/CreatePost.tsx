@@ -142,6 +142,16 @@ const CreatePost = ({ navigation, route }: any) => {
     handleHideDrawer();
   };
 
+  const handleSetTitle = (text: string) => {
+    if (text.length <= 140) {
+      setTitle(text); // Only update state if text is within limit
+    }
+  };
+
+  const handleSetDescription = (text: string) => {
+    setDescription(text);
+  };
+
   const options = (
     <View>
       <View style={styles.optionsItemContainer}>
@@ -212,12 +222,12 @@ const CreatePost = ({ navigation, route }: any) => {
           <Text style={styles.buttonText}>Post</Text>
         </TouchableOpacity>
       </View>
-      <Pressable onPress={Keyboard.dismiss}>
+      <Pressable onPress={() => Keyboard.dismiss()}>
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : undefined}
           style={{ flex: 1 }}
         >
-          <ScrollView onScrollEndDrag={Keyboard.dismiss}>
+          <ScrollView onScrollEndDrag={() => Keyboard.dismiss()}>
             {photoArray.length > 0 && (
               <ImagePreviewCarousel
                 photoArray={photoArray}
@@ -229,10 +239,10 @@ const CreatePost = ({ navigation, route }: any) => {
               <TextInput
                 style={styles.titleTextInput}
                 placeholder="Title"
-                onChangeText={(text) => {
-                  setTitle(text);
-                }}
-                placeholderTextColor="rgba(0, 0, 0, 1)"
+                onChangeText={handleSetTitle}
+                placeholderTextColor={ThemeColoursPrimary.SecondaryColour}
+                multiline
+                maxLength={140}
               >
                 {title}
               </TextInput>
@@ -241,11 +251,8 @@ const CreatePost = ({ navigation, route }: any) => {
               <TextInput
                 style={styles.descriptionTextInput}
                 placeholder="body text (optional)"
-                multiline={true}
-                onChangeText={(text) => {
-                  setDescription(text);
-                }}
-                scrollEnabled={false}
+                multiline
+                onChangeText={handleSetDescription}
               >
                 {description}
               </TextInput>
@@ -350,6 +357,7 @@ const styles = StyleSheet.create({
   titleTextInput: {
     fontSize: 26,
     fontWeight: "700",
+    maxHeight: 100,
   },
   descriptionInputContainer: {
     width: width,
@@ -357,6 +365,7 @@ const styles = StyleSheet.create({
   },
   descriptionTextInput: {
     fontSize: 18,
+    maxHeight: 300,
   },
   divider: {
     width: width * 0.95,

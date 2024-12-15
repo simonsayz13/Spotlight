@@ -163,3 +163,9 @@ export const getBoundingBox = async (raidus: number) => {
     maxLon,
   };
 };
+
+export const sortPostsByDate = (posts: any) => {
+  return posts.sort(
+    (a: any, b: any) => new Date(b.timeStamp) - new Date(a.timeStamp)
+  );
+};

@@ -13,6 +13,7 @@ import { appendPosts } from "../Redux/Slices/postsSlices";
 import { useFocusEffect } from "@react-navigation/native";
 import EmptyContent from "./EmptyContent";
 import { getPaginatedPosts } from "../Firebase/FirebasePosts";
+import { sortPostsByDate } from "../Util/utility";
 
 const Content = (props: any) => {
   const { navigation, onScroll, content, setIsDropDownMenuVisible } = props;
@@ -40,8 +41,9 @@ const Content = (props: any) => {
         otherUsers,
         dispatch
       );
+
       dispatch(appendPosts(postsWithUserDetails));
-      setDisplayPosts(postsWithUserDetails);
+      setDisplayPosts(sortPostsByDate(postsWithUserDetails));
       setLastVisible(fetchedPosts.lastVisible);
     } catch (error) {
       console.log("initial: could not fetch any posts");
@@ -65,7 +67,10 @@ const Content = (props: any) => {
         otherUsers,
         dispatch
       );
-      setDisplayPosts((prevPosts) => [...prevPosts, ...postsWithUserDetails]);
+      setDisplayPosts((prevPosts) => [
+        ...prevPosts,
+        ...sortPostsByDate(postsWithUserDetails),
+      ]);
       dispatch(appendPosts(postsWithUserDetails));
     } catch (error) {
       console.log("loadmore: could not fetch any posts");

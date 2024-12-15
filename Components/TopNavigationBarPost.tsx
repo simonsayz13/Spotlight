@@ -75,7 +75,7 @@ const TopNavigationBarPost = ({
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.leftWrapper}>
-        <TouchableOpacity
+        <Pressable
           onPress={() => {
             navigation.goBack();
           }}
@@ -85,37 +85,30 @@ const TopNavigationBarPost = ({
             size={32}
             color={ThemeColoursPrimary.SecondaryColour}
           />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.userWrapper} onPress={goToProfile}>
+        </Pressable>
+        <Pressable style={styles.userWrapper} onPress={goToProfile}>
           <ProfilePicture
             uri={userProfilePic}
             userDisplayName={userDisplayName}
             type={ImageType.Post}
           />
           <Text style={styles.usernameText}>{userDisplayName}</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
 
       {userId !== appUserId ? (
         <View style={styles.followShareWrapper}>
           {isFollowed ? (
-            <TouchableOpacity
-              style={styles.button}
-              onPressIn={handlePressUnfollowBtn}
-            >
+            <Pressable style={styles.button} onPress={handlePressUnfollowBtn}>
               <Text style={styles.buttonText}>Following</Text>
-            </TouchableOpacity>
+            </Pressable>
           ) : (
-            <TouchableOpacity
-              style={styles.button}
-              onPressIn={handlePressFollowBtn}
-            >
+            <Pressable style={styles.button} onPress={handlePressFollowBtn}>
               <Text style={styles.buttonText}>Follow</Text>
-            </TouchableOpacity>
+            </Pressable>
           )}
-
           <Pressable onPressIn={onShareClicked}>
-            <EvilIcons name="share-apple" size={44} color="black" />
+            <EvilIcons name="share-apple" size={34} color="black" />
           </Pressable>
         </View>
       ) : (
@@ -164,16 +157,18 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   button: {
-    padding: 8,
-    backgroundColor: ThemeColoursPrimary.LogoColour,
-    borderRadius: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 8,
+    borderColor: ThemeColoursPrimary.LogoColour,
+    borderWidth: 0.8,
+    borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
   },
   buttonText: {
     fontSize: 16,
     fontWeight: "bold",
-    color: ThemeColoursPrimary.PrimaryColour,
+    color: ThemeColoursPrimary.LogoColour,
   },
 });
 

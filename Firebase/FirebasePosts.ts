@@ -2,6 +2,7 @@ import {
   collection,
   getDocs,
   limit,
+  orderBy,
   query,
   startAfter,
   where,
@@ -22,6 +23,10 @@ export const getPaginatedPosts = async (lastVisible?: any) => {
           where("coordinates.latitude", "<=", maxLat),
           where("coordinates.longitude", ">=", minLon),
           where("coordinates.longitude", "<=", maxLon),
+          orderBy("isPrivate", "asc"),
+          orderBy("coordinates.latitude", "asc"),
+          orderBy("coordinates.longitude", "asc"),
+          orderBy("timeStamp", "desc"),
           startAfter(lastVisible),
           limit(10)
         )
@@ -32,10 +37,15 @@ export const getPaginatedPosts = async (lastVisible?: any) => {
           where("coordinates.latitude", "<=", maxLat),
           where("coordinates.longitude", ">=", minLon),
           where("coordinates.longitude", "<=", maxLon),
+          orderBy("isPrivate", "asc"),
+          orderBy("coordinates.latitude", "asc"),
+          orderBy("coordinates.longitude", "asc"),
+          orderBy("timeStamp", "desc"),
           limit(10)
         );
 
     const snapshot = await getDocs(q);
+    console.log(snapshot);
     const posts = snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
