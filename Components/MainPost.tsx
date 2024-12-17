@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
     backgroundColor: ThemeColoursPrimary.PrimaryColour,
   },
   tagsContainer: {
-    marginTop: 10,
+    marginTop: 8,
   },
   tagsView: {
     flexDirection: "row",
@@ -143,14 +143,14 @@ const styles = StyleSheet.create({
   },
   tagChip: {
     borderRadius: 100,
-    paddingVertical: 8,
-    paddingHorizontal: 14,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
     marginRight: 4,
     marginBottom: 4,
   },
   tagText: {
     color: ThemeColoursPrimary.PrimaryColour,
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: "bold",
   },
 });

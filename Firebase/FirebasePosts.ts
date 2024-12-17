@@ -45,7 +45,6 @@ export const getPaginatedPosts = async (lastVisible?: any) => {
         );
 
     const snapshot = await getDocs(q);
-    console.log(snapshot);
     const posts = snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
