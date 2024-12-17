@@ -47,13 +47,7 @@ import Animated, {
 
 const screenWidth = Dimensions.get("window").width;
 const PostInteractionBar = forwardRef((props: any, ref) => {
-  const {
-    postData,
-    replyingTo,
-    setReplyingTo,
-    setBottomHeight,
-    setIsCommentActive,
-  } = props;
+  const { postData, replyingTo, setReplyingTo, setIsCommentActive } = props;
   const {
     userId,
     userLiked,
@@ -71,7 +65,6 @@ const PostInteractionBar = forwardRef((props: any, ref) => {
   const liked = userLiked.includes(postId);
   //@ts-ignore
   const favourited = userFavourites.includes(postId);
-  const [inputHeight, setInputHeight] = useState(34);
   const textInputRef = useRef<TextInput>(null);
   const isFirstRender = useRef(true);
   useEffect(() => {
@@ -108,9 +101,9 @@ const PostInteractionBar = forwardRef((props: any, ref) => {
     inputWidth.value = withTiming(screenWidth * 0.5, { duration: 200 });
     setInputActive(false);
     setReplyingTo(null);
-    setBottomHeight(50);
     setCommentInput("");
     setIsCommentActive(false);
+    textInputRef.current?.clear();
     Keyboard.dismiss();
   };
 
@@ -237,9 +230,7 @@ const PostInteractionBar = forwardRef((props: any, ref) => {
     <View
       style={[styles.container, { gap: Platform.OS === "android" ? 4 : 0 }]}
     >
-      <Animated.View
-        style={[styles.commentBar, animatedInputWidth, { height: inputHeight }]}
-      >
+      <Animated.View style={[styles.commentBar, animatedInputWidth]}>
         <View style={styles.commentStyle}>
           <TextInput
             multiline={true}
@@ -253,16 +244,6 @@ const PostInteractionBar = forwardRef((props: any, ref) => {
             onFocus={showKeyboard}
             onBlur={handleKeyboardDidHide}
             onChangeText={(text) => setCommentInput(text)}
-            onContentSizeChange={(event) => {
-              const { contentSize } = event.nativeEvent; // Correctly accessing the contentSize
-              if (contentSize) {
-                setInputHeight(Math.min(contentSize.height + 20, 100)); // Add extra padding
-                if (Math.min(contentSize.height + 20, 100) < 50)
-                  setBottomHeight(50);
-                if (Math.min(contentSize.height + 20, 100) > 50)
-                  setBottomHeight(Math.min(contentSize.height + 30, 110));
-              }
-            }}
           />
         </View>
       </Animated.View>
@@ -323,7 +304,6 @@ const PostInteractionBar = forwardRef((props: any, ref) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: ThemeColoursPrimary.PrimaryColour,
@@ -334,29 +314,30 @@ const styles = StyleSheet.create({
     elevation: 20,
     borderTopLeftRadius: 8,
     borderTopRightRadius: 8,
-    zIndex: 10,
+    padding: 4,
+    zIndex: 1,
   },
   commentBar: {
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#f1f1f1",
     borderRadius: 8,
     flexDirection: "row",
     alignItems: "center",
     paddingLeft: 10,
-    marginLeft: 8,
+    marginLeft: 4,
   },
   input: {
-    width: "100%", // Full width
+    flex: 1,
+    maxHeight: 100,
+    height: "100%",
     color: "#333",
     fontSize: 16, // Font size
-    paddingVertical: 0, // Reset default padding
-    paddingHorizontal: 4, // Add horizontal padding
+    paddingVertical: Platform.OS === "ios" ? 10 : 0,
   },
   actionsContainer: {
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    marginLeft: 10,
   },
   actionWrapper: {
     alignItems: "center",

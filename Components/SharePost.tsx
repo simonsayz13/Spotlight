@@ -22,6 +22,7 @@ import Feather from "@expo/vector-icons/Feather";
 import Loader from "./Loader";
 import { copyShareLink, sharePost } from "../Util/Services";
 import Animated, { SlideInDown } from "react-native-reanimated";
+import { useAppContext } from "../Context/AppContext";
 
 const Participant = memo(({ user, onPressConversation }: any) => {
   const [isSelected, setIsSelected] = useState(false);
@@ -54,19 +55,14 @@ const Participant = memo(({ user, onPressConversation }: any) => {
   );
 });
 
-const SharePost = ({
-  setIsDrawerOpen,
-  postData,
-  setModalVisible,
-  setModalMessage,
-}: any) => {
+const SharePost = ({ setIsDrawerOpen, postData }: any) => {
   const { userId: appUserId } = useSelector((state: RootState) => {
     return state.user;
   });
   const { conversations } = useSelector(
     (state: RootState) => state.conversations
   );
-
+  const { setModalMessage } = useAppContext();
   const otherUsers = useSelector((state: RootState) => state.otherUsers);
   const sharePostDrawer = useRef<any>(null);
   const [conversationUsers, setConversationUsers] = useState<any>(null);
@@ -121,7 +117,6 @@ const SharePost = ({
   const closeShareSheet = () => {
     setSelectedConversation([]);
     onPressClose();
-    setModalVisible(true);
   };
 
   const onPressConversation = (user: any) => {
@@ -189,7 +184,7 @@ const SharePost = ({
           </ScrollView>
         ) : (
           <View style={styles.usersContainer}>
-            <Loader size="small" color={ThemeColoursPrimary.LogoColour} />
+            <Loader size="small" />
           </View>
         )}
         <View style={styles.divider} />

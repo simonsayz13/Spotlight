@@ -12,10 +12,10 @@ import {
   Switch,
   Platform,
   KeyboardAvoidingView,
+  Pressable,
 } from "react-native";
 import {
   MiscStackScreens,
-  NavigationTabs,
   PostStackScreens,
   ThemeColoursPrimary,
 } from "../../Constants/UI";
@@ -34,8 +34,9 @@ import TagSelection from "../../Components/TagSelection";
 import PostOptionsMenuBar from "../../Components/PostOptionsMenuBar";
 import { ScrollView } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAppContext } from "../../Context/AppContext";
 
-const { width, height } = Dimensions.get("window");
+const { width } = Dimensions.get("window");
 
 const CreatePost = ({ navigation, route }: any) => {
   const { userId } = useSelector((state: RootState) => state.user);
@@ -43,12 +44,15 @@ const CreatePost = ({ navigation, route }: any) => {
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [isComment, setIsComment] = useState<boolean>(true);
-  const [isLocation, setIsLocation] = useState<boolean>(false);
+  const [isLocation, setIsLocation] = useState<boolean>(true);
   const [isPrivate, setIsPrivate] = useState<boolean>(false);
   const [photoArray, setPhotoArray] = useState<Array<string>>([]);
   const [tags, setTags] = useState<Array<any>>([]);
   const bottomDrawerRef = useRef<any>(null);
   const insets = useSafeAreaInsets();
+
+  const { setModalMessage } = useAppContext();
+
   const goBack = () => {
     resetStates();
     navigation.goBack();
@@ -71,6 +75,7 @@ const CreatePost = ({ navigation, route }: any) => {
 
   const resetStates = () => {
     navigation.setParams({ photoURI: undefined });
+    Keyboard.dismiss();
     setPhotoArray([]);
     setDescription("");
     setTitle("");
@@ -81,9 +86,6 @@ const CreatePost = ({ navigation, route }: any) => {
 
   const post = async () => {
     let coordinates = {};
-    if (!userId) {
-      return Alert.alert("Not Signed in", "Please sign in to make a post");
-    }
     if (isLocation) {
       coordinates = await getLocation();
     }
@@ -105,16 +107,16 @@ const CreatePost = ({ navigation, route }: any) => {
       isPrivate,
       tags: tags.map((tag) => tag.label),
     };
-    await createPost(userId, postData);
+    await createPost(userId!, postData);
     resetStates();
     navigation.goBack();
+    setModalMessage("Successfully Posted 🎉");
   };
 
   const togglePrivateSwitch = () =>
     setIsPrivate((previousState) => !previousState);
   const toggleCommentSwitch = () =>
     setIsComment((previousState) => !previousState);
-
   const toggleLocationSwitch = async () => {
     const locationServicePermission = await getLocationPermission();
     if (locationServicePermission !== "OK") {
@@ -138,6 +140,16 @@ const CreatePost = ({ navigation, route }: any) => {
   const handleSetTags = (tags: Array<string>) => {
     setTags(tags);
     handleHideDrawer();
+  };
+
+  const handleSetTitle = (text: string) => {
+    if (text.length <= 140) {
+      setTitle(text); // Only update state if text is within limit
+    }
+  };
+
+  const handleSetDescription = (text: string) => {
+    setDescription(text);
   };
 
   const options = (
@@ -210,12 +222,12 @@ const CreatePost = ({ navigation, route }: any) => {
           <Text style={styles.buttonText}>Post</Text>
         </TouchableOpacity>
       </View>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <Pressable onPress={() => Keyboard.dismiss()}>
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : undefined}
           style={{ flex: 1 }}
         >
-          <ScrollView onScrollEndDrag={Keyboard.dismiss}>
+          <ScrollView onScrollEndDrag={() => Keyboard.dismiss()}>
             {photoArray.length > 0 && (
               <ImagePreviewCarousel
                 photoArray={photoArray}
@@ -227,10 +239,10 @@ const CreatePost = ({ navigation, route }: any) => {
               <TextInput
                 style={styles.titleTextInput}
                 placeholder="Title"
-                onChangeText={(text) => {
-                  setTitle(text);
-                }}
-                placeholderTextColor="rgba(0, 0, 0, 1)"
+                onChangeText={handleSetTitle}
+                placeholderTextColor={ThemeColoursPrimary.SecondaryColour}
+                multiline
+                maxLength={140}
               >
                 {title}
               </TextInput>
@@ -239,11 +251,8 @@ const CreatePost = ({ navigation, route }: any) => {
               <TextInput
                 style={styles.descriptionTextInput}
                 placeholder="body text (optional)"
-                multiline={true}
-                onChangeText={(text) => {
-                  setDescription(text);
-                }}
-                scrollEnabled={false}
+                multiline
+                onChangeText={handleSetDescription}
               >
                 {description}
               </TextInput>
@@ -253,23 +262,22 @@ const CreatePost = ({ navigation, route }: any) => {
               <View style={styles.tagsContainer}>
                 <View style={styles.selectedTags}>
                   {tags.map((tag, index) => (
-                    <TouchableOpacity
-                      key={index}
+                    <Pressable
+                      key={tag}
                       style={[styles.tagChip, { backgroundColor: tag.colour }]}
-                      activeOpacity={1}
                       onPressIn={handleShowDrawer}
                     >
                       <Text style={styles.tagText}>
                         {tag.icon} {tag.label}
                       </Text>
-                    </TouchableOpacity>
+                    </Pressable>
                   ))}
                 </View>
               </View>
             )}
           </ScrollView>
         </KeyboardAvoidingView>
-      </TouchableWithoutFeedback>
+      </Pressable>
 
       <BottomSheet
         menuBar={
@@ -283,10 +291,12 @@ const CreatePost = ({ navigation, route }: any) => {
       >
         {options}
       </BottomSheet>
+
       <BottomDrawer
-        heightPercentage={0.5}
+        heightPercentage={0.448}
         ref={bottomDrawerRef}
-        isPannable={true}
+        isPannable={false}
+        isAbsolute={true}
       >
         <TagSelection handleSetTags={handleSetTags} />
       </BottomDrawer>
@@ -347,6 +357,7 @@ const styles = StyleSheet.create({
   titleTextInput: {
     fontSize: 26,
     fontWeight: "700",
+    maxHeight: 100,
   },
   descriptionInputContainer: {
     width: width,
@@ -354,6 +365,7 @@ const styles = StyleSheet.create({
   },
   descriptionTextInput: {
     fontSize: 18,
+    maxHeight: 300,
   },
   divider: {
     width: width * 0.95,
@@ -383,15 +395,15 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   tagChip: {
-    borderRadius: 6,
-    paddingVertical: 6,
-    paddingHorizontal: 4,
+    borderRadius: 100,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
     marginRight: 4,
     marginBottom: 4,
   },
   tagText: {
     color: ThemeColoursPrimary.PrimaryColour,
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: "bold",
   },
   selectedTags: {

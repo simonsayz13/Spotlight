@@ -1,9 +1,7 @@
 import {
-  Button,
   Dimensions,
   Platform,
   StyleSheet,
-  Text,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -13,7 +11,7 @@ import {
   CameraType,
   FlashMode,
 } from "expo-camera";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {
   PostStackScreens,
@@ -21,7 +19,7 @@ import {
   ThemeColoursPrimary,
 } from "../../Constants/UI";
 import { StatusBar } from "expo-status-bar";
-const { width: windowWidth, height: windowHeight } = Dimensions.get("window");
+const { width: windowWidth } = Dimensions.get("window");
 const Camera = ({ navigation }: any) => {
   const [facing, setFacing] = useState<CameraType>("back");
   const [flash, setFlash] = useState<FlashMode>("off");
@@ -29,10 +27,11 @@ const Camera = ({ navigation }: any) => {
   const [isCameraReady, setIsCameraReady] = useState(false);
   const cameraRef = useRef<ExpoCamera>(null);
 
-  if (!permission) {
-    // Camera permissions are still loading.
-    return <View />;
-  }
+  useEffect(() => {
+    if (!permission || permission.status !== "granted") {
+      requestPermission();
+    }
+  }, []);
 
   const onCameraReady = () => {
     setIsCameraReady(true);
@@ -42,16 +41,8 @@ const Camera = ({ navigation }: any) => {
     navigation.goBack();
   };
 
-  if (!permission.granted) {
-    // Camera permissions are not granted yet.
-    return (
-      <View style={styles.container}>
-        <Text style={styles.message}>
-          We need your permission to show the camera
-        </Text>
-        <Button onPress={requestPermission} title="grant permission" />
-      </View>
-    );
+  if (!permission?.granted) {
+    return <View style={{ flex: 1, backgroundColor: "black" }} />;
   }
 
   const toggleCameraFacing = () => {
@@ -68,7 +59,6 @@ const Camera = ({ navigation }: any) => {
         navigation.navigate(PostStackScreens.ViewPhoto, {
           photoURI: photo?.uri,
         });
-        // Do something with the photo, e.g., save it, navigate, etc.
       } catch (error) {
         console.error("Error taking picture:", error);
       }

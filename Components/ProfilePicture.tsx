@@ -29,6 +29,9 @@ const ProfilePicture = React.memo(
       <>
         {uri ? (
           type === ImageType.PostCard && Platform.OS === "ios" ? (
+            // <View
+            //   style={{ width: size, height: size, borderRadius: size / 2 }}
+            // />
             <Image
               source={{ uri, cache: "force-cache" }}
               style={{ width: size, height: size, borderRadius: size / 2 }}

@@ -20,7 +20,6 @@ import {
 } from "../../Constants/UI";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { getUserDetails } from "../../Firebase/firebaseFireStore";
-import { MasonryFlashList } from "@shopify/flash-list";
 import ProfilePicture from "../../Components/ProfilePicture";
 import ImageModal from "../../Components/ImageModal";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -46,6 +45,7 @@ const Profile = ({ navigation }: any) => {
   } = useSelector((state: RootState) => state.user);
   const insets = useSafeAreaInsets();
   const [displayName, setDisplayName] = useState("");
+  const [userLocation, setUserLocation] = useState("");
   const [profilePicUrl, setProfilePicUrl] = useState("");
   const [bio, setBio] = useState(userBio);
   const [gender, setGender] = useState("");
@@ -89,6 +89,7 @@ const Profile = ({ navigation }: any) => {
         biography,
         gender,
         followers,
+        location,
       }: any = await getUserDetails(userId!);
       setPostsCount(postsCount);
       setUserLikesCount(likesCount);
@@ -97,6 +98,7 @@ const Profile = ({ navigation }: any) => {
       setBio(biography);
       setGender(gender);
       setFollowers(followers);
+      setUserLocation(location);
       setLdgUserDetails(false);
       setLdgSuccUserDetails(true);
     } catch (error) {
@@ -202,7 +204,10 @@ const Profile = ({ navigation }: any) => {
                 <Ionicons name="female" size={20} color="#f268df" />
               )}
             </View>
-            <Text style={styles.metaDataFont}>IP Address: United Kingdom</Text>
+            <Text style={styles.metaDataFont}>
+              Location:{" "}
+              {ldgUserDetails ? "-" : userLocation ?? "Somewhere on Earth 🌍"}
+            </Text>
           </View>
           <View style={styles.bio}>
             {!ldgUserDetails && (
@@ -277,7 +282,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
   },
   metaDataFont: {
-    fontSize: 10,
+    fontSize: 12,
     color: ThemeColoursPrimary.SecondaryColour,
     opacity: 0.6,
   },

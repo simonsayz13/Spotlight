@@ -14,7 +14,7 @@ import {
   MessagingStackScreens,
   ThemeColoursPrimary,
 } from "../../Constants/UI";
-import { ScrollView } from "react-native-gesture-handler";
+import { Pressable, ScrollView, Swipeable } from "react-native-gesture-handler";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../Redux/store";
 import { useEffect, useRef, useState } from "react";
@@ -26,6 +26,8 @@ import ActivityLoader from "../../Components/ActivityLoader";
 import ProfilePicture from "../../Components/ProfilePicture";
 import { getUserProfileDetails } from "../../Firebase/FirebaseUsers";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { deleteChatRoom } from "../../Redux/Slices/chatSlices";
+import { removeConversation } from "../../Redux/Slices/conversationSlice";
 
 const { width: windowWidth, height: windowHeight } = Dimensions.get("window");
 
@@ -37,7 +39,6 @@ const Contacts = ({ navigation }: any) => {
     (state: RootState) => state.conversations
   );
   const otherUsers = useSelector((state: RootState) => state.otherUsers);
-  // const [conversations, setConversations] = useState<Array<any>>([]);
 
   const [userDetails, setUserDetails] = useState<{
     [key: string]: UserDetails;
@@ -127,6 +128,18 @@ const Contacts = ({ navigation }: any) => {
     return map;
   };
 
+  const renderRightActions = (chatId: string) => (
+    <Pressable
+      style={styles.deleteButton}
+      onPress={() => {
+        dispatch(removeConversation(chatId));
+        dispatch(deleteChatRoom(chatId));
+      }}
+    >
+      <Text style={styles.deleteText}>Delete</Text>
+    </Pressable>
+  );
+
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.searchBarContainer}>
@@ -194,7 +207,7 @@ const Contacts = ({ navigation }: any) => {
         <ActivityLoader indicator={loading} text={"Loading..."} />
       ) : (
         searchQuery.length === 0 && (
-          <ScrollView bounces={false}>
+          <ScrollView>
             {conversations.map((conversation) => {
               const userId = conversation.participants.find(
                 (userId: string) => userId != currentUserId
@@ -202,44 +215,48 @@ const Contacts = ({ navigation }: any) => {
               const { displayName, profilePictureUrl } =
                 userDetails[userId || ""] || {};
               return (
-                <TouchableOpacity
+                <Swipeable
                   key={`key_${userId}`}
-                  onPress={() => {
-                    goToChat(
-                      userId!,
-                      displayName!,
-                      profilePictureUrl!,
-                      conversation.id
-                    );
-                  }}
+                  renderRightActions={() => renderRightActions(conversation.id)}
                 >
-                  <View style={styles.messageCardContainer}>
-                    <ProfilePicture
-                      uri={profilePictureUrl}
-                      userDisplayName={displayName}
-                      type={ImageType.Contacts}
-                    />
-                    <View style={{ marginLeft: 6, gap: 6 }}>
-                      <View style={styles.usernameTimeStampContainer}>
-                        <Text style={styles.usernameText}>{displayName}</Text>
-                        <Text style={styles.timeStamp}>
-                          {formatRelativeTime(
-                            conversation.lastMessage.timestamp
-                          )}
+                  <Pressable
+                    onPress={() => {
+                      goToChat(
+                        userId!,
+                        displayName!,
+                        profilePictureUrl!,
+                        conversation.id
+                      );
+                    }}
+                  >
+                    <View style={styles.messageCardContainer}>
+                      <ProfilePicture
+                        uri={profilePictureUrl}
+                        userDisplayName={displayName}
+                        type={ImageType.Contacts}
+                      />
+                      <View style={{ marginLeft: 6, gap: 6 }}>
+                        <View style={styles.usernameTimeStampContainer}>
+                          <Text style={styles.usernameText}>{displayName}</Text>
+                          <Text style={styles.timeStamp}>
+                            {formatRelativeTime(
+                              conversation.lastMessage.timestamp
+                            )}
+                          </Text>
+                        </View>
+                        <Text
+                          style={styles.lastMessageText}
+                          numberOfLines={1}
+                          ellipsizeMode="tail"
+                        >
+                          {conversation.lastMessage.text}
                         </Text>
                       </View>
-                      <Text
-                        style={styles.lastMessageText}
-                        numberOfLines={1}
-                        ellipsizeMode="tail"
-                      >
-                        {conversation.lastMessage.text}
-                      </Text>
                     </View>
-                  </View>
 
-                  <View style={styles.divider} />
-                </TouchableOpacity>
+                    <View style={styles.divider} />
+                  </Pressable>
+                </Swipeable>
               );
             })}
           </ScrollView>
@@ -318,13 +335,23 @@ const styles = StyleSheet.create({
     borderBottomColor: "#f1f1f1",
     gap: 6,
   },
-
   divider: {
     borderBottomWidth: 0.6,
     borderColor: ThemeColoursPrimary.SecondaryColour + "20",
     marginLeft: 76,
     width: "100%",
     height: 0.8,
+  },
+  deleteButton: {
+    backgroundColor: "red",
+    justifyContent: "center",
+    alignItems: "center",
+    width: 80,
+    zIndex: 100,
+  },
+  deleteText: {
+    color: "white",
+    fontWeight: "bold",
   },
 });
 

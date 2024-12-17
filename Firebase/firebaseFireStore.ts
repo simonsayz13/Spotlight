@@ -193,31 +193,6 @@ export const getPostsByUserId = async (userId: string) => {
   }
 };
 
-export const getPaginatedPosts = async (lastVisible?: any) => {
-  try {
-    const postsCollection = collection(db, FireStoreCollections.Posts);
-    const q = lastVisible
-      ? query(
-          postsCollection,
-          where("isPrivate", "==", false),
-          startAfter(lastVisible),
-          limit(10)
-        )
-      : query(postsCollection, where("isPrivate", "==", false), limit(10));
-
-    const snapshot = await getDocs(q);
-    const posts = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-    const newLastVisible = snapshot.docs[snapshot.docs.length - 1];
-    if (!newLastVisible) throw Error;
-    return { posts, lastVisible: newLastVisible };
-  } catch (error) {
-    return { posts: [], lastVisible: null };
-  }
-};
-
 //TODO - apply a proper partial match search
 export const getPostsBySearch = async (searchText: string = "") => {
   try {

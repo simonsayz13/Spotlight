@@ -95,6 +95,7 @@ const MainNavigationStack = () => {
           animation: "slide_from_bottom",
         }}
       />
+      <MainStack.Screen name={"appUserProfileView"} component={Profile} />
     </MainStack.Navigator>
   );
 };

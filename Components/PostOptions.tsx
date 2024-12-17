@@ -8,6 +8,7 @@ import { ScrollView } from "react-native-gesture-handler";
 import { deletePost } from "../Firebase/firebaseFireStore";
 import { useSelector } from "react-redux";
 import { RootState } from "../Redux/store";
+import { useAppContext } from "../Context/AppContext";
 
 const PostOptions = ({ setIsDrawerOpen, navigation, postData }: any) => {
   const { userId: appUserId } = useSelector((state: RootState) => {
@@ -15,6 +16,8 @@ const PostOptions = ({ setIsDrawerOpen, navigation, postData }: any) => {
   });
   const postId = postData?.id;
   const postSettingDrawer = useRef<any>(null);
+  const { setModalMessage } = useAppContext();
+
   useEffect(() => {
     postSettingDrawer.current.showDrawer();
   }, []);
@@ -32,6 +35,7 @@ const PostOptions = ({ setIsDrawerOpen, navigation, postData }: any) => {
     hideDrawer();
     await deletePost(postId, appUserId!);
     navigation.goBack();
+    setModalMessage("Post Deleted");
   };
 
   const handleDeletePress = () => {

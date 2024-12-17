@@ -10,7 +10,7 @@ type ComponentProps = {
 const ActivityLoader = (props: ComponentProps) => {
   const { indicator, text } = props;
   return (
-    <Modal transparent={true} animationType="fade" visible={indicator}>
+    <Modal transparent={true} visible={indicator}>
       <View style={styles.loadingModal}>
         <View style={styles.activityIndicatorWrapper}>
           <ActivityIndicator

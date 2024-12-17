@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   View,
   StyleSheet,
@@ -20,6 +20,7 @@ import { RootState } from "../Redux/store";
 import Feather from "@expo/vector-icons/Feather";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
 import { addFollower, removeFollower } from "../Firebase/firebaseFireStore";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 const TopNavigationBarPost = ({
   navigation,
   postData,
@@ -27,6 +28,7 @@ const TopNavigationBarPost = ({
   onPressSharePost,
 }: any) => {
   const { userDisplayName, userProfilePic, user_id: userId } = postData;
+  const insets = useSafeAreaInsets();
   const { userId: appUserId, userFollowings } = useSelector(
     (state: RootState) => {
       return state.user;
@@ -39,11 +41,9 @@ const TopNavigationBarPost = ({
   );
 
   const goToProfile = () => {
-    userId === appUserId
-      ? navigation.navigate(NavigationTabs.Me)
-      : navigation.navigate(ProfileStackScreens.ViewProfile, {
-          userId,
-        });
+    navigation.navigate(ProfileStackScreens.ViewProfile, {
+      userId,
+    });
   };
 
   const onSettingsClicked = () => {
@@ -73,9 +73,9 @@ const TopNavigationBarPost = ({
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.leftWrapper}>
-        <TouchableOpacity
+        <Pressable
           onPress={() => {
             navigation.goBack();
           }}
@@ -85,41 +85,34 @@ const TopNavigationBarPost = ({
             size={32}
             color={ThemeColoursPrimary.SecondaryColour}
           />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.userWrapper} onPress={goToProfile}>
+        </Pressable>
+        <Pressable style={styles.userWrapper} onPress={goToProfile}>
           <ProfilePicture
             uri={userProfilePic}
             userDisplayName={userDisplayName}
             type={ImageType.Post}
           />
           <Text style={styles.usernameText}>{userDisplayName}</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
 
       {userId !== appUserId ? (
         <View style={styles.followShareWrapper}>
           {isFollowed ? (
-            <TouchableOpacity
-              style={styles.button}
-              onPressIn={handlePressUnfollowBtn}
-            >
+            <Pressable style={styles.button} onPress={handlePressUnfollowBtn}>
               <Text style={styles.buttonText}>Following</Text>
-            </TouchableOpacity>
+            </Pressable>
           ) : (
-            <TouchableOpacity
-              style={styles.button}
-              onPressIn={handlePressFollowBtn}
-            >
+            <Pressable style={styles.button} onPress={handlePressFollowBtn}>
               <Text style={styles.buttonText}>Follow</Text>
-            </TouchableOpacity>
+            </Pressable>
           )}
-
           <Pressable onPressIn={onShareClicked}>
-            <EvilIcons name="share-apple" size={44} color="black" />
+            <EvilIcons name="share-apple" size={34} color="black" />
           </Pressable>
         </View>
       ) : (
-        <View style={styles.followShareWrapper}>
+        <View style={[styles.followShareWrapper, { paddingRight: 6 }]}>
           <Pressable onPressIn={onSettingsClicked}>
             <Feather name="more-horizontal" size={26} color="black" />
           </Pressable>
@@ -164,16 +157,18 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   button: {
-    padding: 8,
-    backgroundColor: ThemeColoursPrimary.LogoColour,
-    borderRadius: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 8,
+    borderColor: ThemeColoursPrimary.LogoColour,
+    borderWidth: 0.8,
+    borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
   },
   buttonText: {
     fontSize: 16,
     fontWeight: "bold",
-    color: ThemeColoursPrimary.PrimaryColour,
+    color: ThemeColoursPrimary.LogoColour,
   },
 });
 

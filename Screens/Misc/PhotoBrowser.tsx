@@ -44,7 +44,7 @@ const PhotoBrowser = ({ navigation, route }: any) => {
 
   const handlePhotoPress = (uri: string) => {
     if (route.params?.postData) {
-      navigation.navigate(PostStackScreens.EditPost, {
+      navigation.popTo(PostStackScreens.EditPost, {
         postData: route.params.postData,
         photoURI: uri,
       });

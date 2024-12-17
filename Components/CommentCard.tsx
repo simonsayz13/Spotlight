@@ -26,7 +26,7 @@ const CommentCard = ({
 
   const goToProfile = (commentUserId: string) => {
     userId === commentUserId
-      ? navigation.navigate(NavigationTabs.Me)
+      ? navigation.navigate("appUserProfileView")
       : navigation.navigate(ProfileStackScreens.ViewProfile, {
           userId: commentUserId,
         });
@@ -36,7 +36,7 @@ const CommentCard = ({
     <View
       style={[
         styles.container,
-        { marginLeft: commentData.parentCommentId ? 54 : 14 },
+        { paddingLeft: commentData.parentCommentId ? 50 : 10 },
       ]}
     >
       <View style={styles.userContainer}>
@@ -145,10 +145,10 @@ const CommentCard = ({
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    backgroundColor: ThemeColoursPrimary.PrimaryColour,
     gap: 2,
-    marginRight: 14,
-    marginVertical: 6,
+    paddingRight: 10,
+    paddingVertical: 6,
   },
   userContainer: {
     flexDirection: "row",
@@ -157,14 +157,13 @@ const styles = StyleSheet.create({
   },
   userNameFont: {
     fontSize: 14,
-    fontWeight: "bold",
+    fontWeight: "600",
     color: ThemeColoursPrimary.SecondaryColour,
   },
   timeStampFont: {
     fontSize: 12,
   },
   commentContainer: {
-    // flex: 1,
     marginTop: 2,
     flexDirection: "row",
     alignItems: "center",
@@ -175,6 +174,7 @@ const styles = StyleSheet.create({
     width: 3.5,
     backgroundColor: ThemeColoursPrimary.SecondaryColour,
     borderRadius: 50,
+    opacity: 0.7,
   },
   commentText: {
     color: ThemeColoursPrimary.SecondaryColour,

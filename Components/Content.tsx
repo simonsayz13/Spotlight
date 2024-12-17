@@ -1,17 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
-import {
-  Alert,
-  RefreshControl,
-  ScrollView,
-  StyleSheet,
-  View,
-} from "react-native";
+import { RefreshControl, ScrollView, StyleSheet, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../Redux/store";
-import {
-  getPaginatedPosts,
-  getPostsByUserIds,
-} from "../Firebase/firebaseFireStore";
+import { getPostsByUserIds } from "../Firebase/firebaseFireStore";
 import { fetchUserDetailOnPosts } from "../Util/Services";
 import PostCard from "./PostCard";
 import FadeInWrapper from "./FadeInWrapper";
@@ -21,9 +12,11 @@ import Loader from "./Loader";
 import { appendPosts } from "../Redux/Slices/postsSlices";
 import { useFocusEffect } from "@react-navigation/native";
 import EmptyContent from "./EmptyContent";
+import { getPaginatedPosts } from "../Firebase/FirebasePosts";
+import { sortPostsByDate } from "../Util/utility";
 
 const Content = (props: any) => {
-  const { navigation, onScroll, content } = props;
+  const { navigation, onScroll, content, setIsDropDownMenuVisible } = props;
   const [refreshing, setRefreshing] = useState(false);
   const otherUsers = useSelector((state: RootState) => state.otherUsers);
   const userFollowings = useSelector(
@@ -48,8 +41,9 @@ const Content = (props: any) => {
         otherUsers,
         dispatch
       );
+
       dispatch(appendPosts(postsWithUserDetails));
-      setDisplayPosts(postsWithUserDetails);
+      setDisplayPosts(sortPostsByDate(postsWithUserDetails));
       setLastVisible(fetchedPosts.lastVisible);
     } catch (error) {
       console.log("initial: could not fetch any posts");
@@ -73,10 +67,13 @@ const Content = (props: any) => {
         otherUsers,
         dispatch
       );
-      setDisplayPosts((prevPosts) => [...prevPosts, ...postsWithUserDetails]);
+      setDisplayPosts((prevPosts) => [
+        ...prevPosts,
+        ...sortPostsByDate(postsWithUserDetails),
+      ]);
       dispatch(appendPosts(postsWithUserDetails));
     } catch (error) {
-      console.log("loadmore: ould not fetch any posts");
+      console.log("loadmore: could not fetch any posts");
     } finally {
       setLdgContentComplete(true);
       setBottomLoader(false);
@@ -104,6 +101,7 @@ const Content = (props: any) => {
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
+    setIsDropDownMenuVisible(true);
     setTimeout(() => {
       if (userFollowings.length === 0) {
         setRefreshing(false);
@@ -144,9 +142,10 @@ const Content = (props: any) => {
       <FadeInWrapper delay={1500}>
         <MasonryFlashList
           data={displayPosts}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.id.toString()}
           renderItem={renderItem}
-          estimatedItemSize={200}
+          estimatedItemSize={255}
+          disableAutoLayout
           numColumns={2}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.flashListContainer}
@@ -191,10 +190,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   flashListContainer: {
+    paddingTop: 2,
     paddingHorizontal: 2, // Padding on the sides
   },
   cardContainer: {
-    flex: 1,
+    // flex: 1,
     marginHorizontal: 2, // Horizontal gap between the cards
     marginBottom: 4, // Vertical gap between rows
   },

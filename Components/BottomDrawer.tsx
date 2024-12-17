@@ -34,9 +34,7 @@ const BottomDrawer = forwardRef(
         onMoveShouldSetPanResponder: () => true,
         onPanResponderMove: (_, gestureState) => {
           const { dy } = gestureState;
-          // Allow movement only downwards (dy > 0), and stop at original position (translateY 0)
           if (dy > 0) {
-            // slideAnim.setValue(dy);
             slideAnim.value = dy;
           }
         },
@@ -52,7 +50,6 @@ const BottomDrawer = forwardRef(
         },
       })
     ).current;
-
     const showDrawer = () => {
       slideAnim.value = withTiming(0, {
         duration: 300,
@@ -106,8 +103,11 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     elevation: 10, // For Android shadow
     zIndex: 100,
-    overflow: "hidden", // Add this line
     width: "100%",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: -6 },
+    shadowOpacity: 0.06, // Opacity of the shadow
+    shadowRadius: 6, // Blur radius of the shadow
   },
   panIndicator: {
     alignSelf: "center",

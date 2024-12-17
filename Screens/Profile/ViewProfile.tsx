@@ -53,6 +53,7 @@ const ViewProfile = ({ navigation, route }: any) => {
   );
   const [buttonStates, setButtonStates] = useState(guestContentSelectorButtons);
   const userId = route?.params?.userId;
+  const [userLocation, setUserLocation] = useState("");
   const [profileUserId, setProfileUserId] = useState(null);
   const [postsData, setPostsData] = useState<Array<any>>([]);
   const [displayName, setDisplayName] = useState("");
@@ -126,6 +127,8 @@ const ViewProfile = ({ navigation, route }: any) => {
         biography,
         gender,
         followers,
+        followings,
+        location,
       }: any = await getUserDetails(userId!);
       setPostsCount(postsCount);
       setUserLikesCount(likesCount);
@@ -136,6 +139,7 @@ const ViewProfile = ({ navigation, route }: any) => {
       setFollowers(followers);
       setFollowings(followings);
       setProfileUserId(user_id);
+      setUserLocation(location);
       followers?.find((followerId: string) => followerId === appUserId) &&
         setIsFollowed(true);
       setLdgUserDetails(false);
@@ -301,7 +305,10 @@ const ViewProfile = ({ navigation, route }: any) => {
                 <Ionicons name="female" size={20} color="#f268df" />
               )}
             </View>
-            <Text style={styles.metaDataFont}>Location: United Kingdom</Text>
+            <Text style={styles.metaDataFont}>
+              Location:{" "}
+              {ldgUserDetails ? "-" : userLocation ?? "Somewhere on Earth 🌍"}
+            </Text>
           </View>
           <View style={styles.bio}>
             {!ldgUserDetails && (
@@ -341,26 +348,28 @@ const ViewProfile = ({ navigation, route }: any) => {
               <Text style={styles.statsFont}>Followers</Text>
             </Pressable>
 
-            <View style={styles.interactionContainer}>
-              <TouchableOpacity
-                style={[styles.button, styles.followButton]}
-                onPress={
-                  isFollowed ? handlePressUnfollowBtn : handlePressFollowBtn
-                }
-              >
-                <Text style={styles.buttonText}>
-                  {isFollowed ? "Unfollow" : "Follow"}
-                </Text>
-              </TouchableOpacity>
+            {appUserId !== userId && (
+              <View style={styles.interactionContainer}>
+                <TouchableOpacity
+                  style={[styles.button, styles.followButton]}
+                  onPress={
+                    isFollowed ? handlePressUnfollowBtn : handlePressFollowBtn
+                  }
+                >
+                  <Text style={styles.buttonText}>
+                    {isFollowed ? "Unfollow" : "Follow"}
+                  </Text>
+                </TouchableOpacity>
 
-              <TouchableOpacity onPressIn={openChat} style={styles.button}>
-                <AntDesign
-                  name="message1"
-                  size={18}
-                  color={ThemeColoursPrimary.PrimaryColour}
-                />
-              </TouchableOpacity>
-            </View>
+                <TouchableOpacity onPressIn={openChat} style={styles.button}>
+                  <AntDesign
+                    name="message1"
+                    size={18}
+                    color={ThemeColoursPrimary.PrimaryColour}
+                  />
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
         </Animated.View>
         {/* Posts */}
@@ -431,7 +440,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
   },
   metaDataFont: {
-    fontSize: 10,
+    fontSize: 12,
     color: ThemeColoursPrimary.SecondaryColour,
     opacity: 0.6,
   },

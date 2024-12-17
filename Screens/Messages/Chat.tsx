@@ -5,8 +5,8 @@ import {
   StyleSheet,
   TextInput,
   KeyboardAvoidingView,
-  TouchableOpacity,
   Platform,
+  Pressable,
 } from "react-native";
 import {
   ImageType,
@@ -29,7 +29,6 @@ import { clusterMessages } from "../../Util/utility";
 import { FlashList } from "@shopify/flash-list";
 import ProfilePicture from "../../Components/ProfilePicture";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
 const Chat = ({ route, navigation }: any) => {
   const { userId: currentUserId } = useSelector(
     (state: RootState) => state.user
@@ -38,7 +37,6 @@ const Chat = ({ route, navigation }: any) => {
   const FlatListRef = useRef<any>(null);
   const [chatRoomId, setChatRoomId] = useState(conversationId);
   const [message, setMessage] = useState<string>("");
-  const [inputHeight, setInputHeight] = useState(40);
   const textInputRef = useRef<TextInput>(null);
   const isFocused = useIsFocused();
   const messages = useSelector(selectMessagesByChatRoomId(chatRoomId));
@@ -72,7 +70,6 @@ const Chat = ({ route, navigation }: any) => {
   const handleSendMessage = async () => {
     if (message) {
       setMessage("");
-      setInputHeight(40);
       await sendMessage(chatRoomId, currentUserId!, message);
       if (textInputRef.current) {
         textInputRef.current.clear();
@@ -82,11 +79,6 @@ const Chat = ({ route, navigation }: any) => {
 
   const scrollToTop = () => {
     FlatListRef.current?.scrollToOffset({ animated: true, offset: 0 });
-  };
-
-  const handleContentSizeChange = (event: any) => {
-    const { height } = event.nativeEvent.contentSize;
-    setInputHeight(Math.min(Math.max(40, height), 120)); // Min height 40, Max height 120
   };
 
   const goToProfile = () => {
@@ -107,18 +99,14 @@ const Chat = ({ route, navigation }: any) => {
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         <View style={styles.topBarContainer}>
-          <TouchableOpacity onPress={goBack}>
+          <Pressable onPress={goBack}>
             <Ionicons
               name="chevron-back"
               size={32}
               color={ThemeColoursPrimary.SecondaryColour}
             />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPressIn={goToProfile}
-            activeOpacity={1}
-            style={styles.profileContainer}
-          >
+          </Pressable>
+          <Pressable onPressIn={goToProfile} style={styles.profileContainer}>
             <ProfilePicture
               uri={profilePicUrl}
               userDisplayName={userName}
@@ -128,7 +116,7 @@ const Chat = ({ route, navigation }: any) => {
               <Text style={styles.userNameText}>{userName}</Text>
               {/* <Text style={styles.activityStatusText}>Active Today</Text> */}
             </View>
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         <View style={styles.messagContainer}>
@@ -147,29 +135,32 @@ const Chat = ({ route, navigation }: any) => {
             onLayout={scrollToTop}
             estimatedItemSize={50}
             inverted={true}
-            bounces={false}
           />
         </View>
+
         <View style={styles.messageBarContainer}>
           <View style={styles.messageBar}>
             <TextInput
               ref={textInputRef}
-              style={[styles.input, { height: inputHeight }]}
+              style={styles.input}
               placeholder="Send message..."
               placeholderTextColor={ThemeColoursPrimary.SecondaryColour}
               onChangeText={setMessage}
               value={message}
               multiline
-              onContentSizeChange={handleContentSizeChange}
             />
           </View>
-          <TouchableOpacity onPressIn={handleSendMessage}>
-            <FontAwesome
-              name="send"
-              size={28}
-              color={ThemeColoursPrimary.LogoColour}
-            />
-          </TouchableOpacity>
+          <Pressable onPressIn={handleSendMessage}>
+            <View style={styles.sendButtonView}>
+              <View style={{ marginLeft: -2 }}>
+                <FontAwesome
+                  name="send"
+                  size={20}
+                  color={ThemeColoursPrimary.PrimaryColour}
+                />
+              </View>
+            </View>
+          </Pressable>
         </View>
       </KeyboardAvoidingView>
     </View>
@@ -195,7 +186,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.4,
     borderBottomColor: ThemeColoursPrimary.GreyColour,
     paddingTop: Platform.OS === "android" ? 4 : 0,
-    paddingBottom: 4,
+    paddingBottom: 6,
+    gap: 6,
+    marginLeft: 4,
   },
   userNameText: {
     fontSize: 20,
@@ -224,12 +217,11 @@ const styles = StyleSheet.create({
   },
   messageBar: {
     flex: 1,
-    borderRadius: 20,
+    borderRadius: 12,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#f1f1f1",
-    borderWidth: 1,
     marginRight: 8,
     paddingHorizontal: 12,
   },
@@ -240,9 +232,19 @@ const styles = StyleSheet.create({
     color: ThemeColoursPrimary.SecondaryColour,
     paddingVertical: Platform.OS === "ios" ? 10 : 0,
     height: "100%",
+    maxHeight: 100,
   },
   profileContainer: {
     flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  sendButtonView: {
+    width: 38,
+    height: 38,
+    backgroundColor: ThemeColoursPrimary.LogoColour,
+    borderRadius: 19,
+    justifyContent: "center",
     alignItems: "center",
   },
 });

@@ -4,4 +4,5 @@ export type Tag = {
   icon: string;
   checked: boolean;
   colour: string;
+  examples: Array<string>;
 };

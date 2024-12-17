@@ -1,6 +1,7 @@
 import { Image } from "react-native";
 import * as MediaLibrary from "expo-media-library";
 import { format, isToday, isSameMinute } from "date-fns";
+import { getLocation } from "./LocationService";
 
 export const formatRelativeTime = (timeStamp: string) => {
   const givenDate = new Date(timeStamp);
@@ -138,4 +139,33 @@ export const getOtherParticipants = (conversations: any, userId: any) => {
 
 export const createTimeStamp = () => {
   return new Date().toString();
+};
+
+export const getBoundingBox = async (raidus: number) => {
+  const coordinates = await getLocation();
+  const earthRadius = 6371;
+  const lat = coordinates.latitude;
+  const lon = coordinates.longitude;
+  const radius = raidus; // in km
+
+  const latDelta = radius / earthRadius;
+  const lonDelta = radius / (earthRadius * Math.cos((Math.PI * lat) / 180));
+
+  const minLat = lat - latDelta;
+  const maxLat = lat + latDelta;
+  const minLon = lon - lonDelta;
+  const maxLon = lon + lonDelta;
+
+  return {
+    minLat,
+    maxLat,
+    minLon,
+    maxLon,
+  };
+};
+
+export const sortPostsByDate = (posts: any) => {
+  return posts.sort(
+    (a: any, b: any) => new Date(b.timeStamp) - new Date(a.timeStamp)
+  );
 };
