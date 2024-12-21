@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
     color: ThemeColoursPrimary.PrimaryColour,
   },
   userContentContainer: {
-    height: "100%",
+    height: "auto",
     marginTop: 10,
     borderTopLeftRadius: 14,
     borderTopRightRadius: 14,

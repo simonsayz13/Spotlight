@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   Alert,
   Pressable,
   RefreshControl,
+  // ScrollView,
 } from "react-native";
 import { useSelector } from "react-redux";
 import { RootState } from "../../Redux/store";
@@ -35,6 +36,7 @@ import Animated, {
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { ScrollView } from "react-native-gesture-handler";
 import ProfileContents from "../../Components/ProfileContents";
+import ProfileTabView from "../../Components/ProfileTabView";
 const Profile = ({ navigation }: any) => {
   const {
     userId,
@@ -58,10 +60,10 @@ const Profile = ({ navigation }: any) => {
   const heightAnim = useSharedValue(200);
   const [refreshing, setRefreshing] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(false);
-
+  const scrollViewRef = useRef(null);
   useEffect(() => {
     if (ldgSuccUserDetails) {
-      heightAnim.value = withTiming(250, { duration: 200 });
+      heightAnim.value = withTiming(240, { duration: 200 });
     }
   }, [ldgSuccUserDetails]);
 
@@ -157,6 +159,8 @@ const Profile = ({ navigation }: any) => {
       )}
 
       <ScrollView
+        ref={scrollViewRef}
+        bounces={false}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
@@ -165,9 +169,11 @@ const Profile = ({ navigation }: any) => {
             colors={[ThemeColoursPrimary.LogoColour]} // Optional: Refresh spinner color
           />
         }
+        contentContainerStyle={{ flexGrow: 1 }}
+        nestedScrollEnabled={true}
         scrollEventThrottle={16}
       >
-        <Animated.View style={(styles.profileContainer, animatedStyleHeight)}>
+        <Animated.View style={animatedStyleHeight}>
           <View style={styles.profileDetails}>
             <View style={styles.profileAndActionContainer}>
               <ProfilePicture
@@ -186,14 +192,7 @@ const Profile = ({ navigation }: any) => {
                 </TouchableOpacity>
               </View>
             </View>
-            <View
-              style={{
-                flexDirection: "row",
-                gap: 4,
-                alignItems: "center",
-                marginVertical: 4,
-              }}
-            >
+            <View style={styles.userDetailsView}>
               <Text style={styles.userNameFont}>
                 {ldgUserDetails ? "-" : displayName}
               </Text>
@@ -251,14 +250,9 @@ const Profile = ({ navigation }: any) => {
             </Pressable>
           </View>
         </Animated.View>
+
         {/* Posts */}
-        <ProfileContents
-          navigation={navigation}
-          userId={userId}
-          userLiked={userLiked}
-          userFavourites={userFavourites}
-          refreshTrigger={refreshTrigger}
-        />
+        <ProfileTabView />
       </ScrollView>
     </View>
   );
@@ -266,11 +260,16 @@ const Profile = ({ navigation }: any) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     backgroundColor: ThemeColoursPrimary.PrimaryColour,
     paddingTop: Platform.OS === "android" ? 8 : 0,
   },
-  profileContainer: {},
+  userDetailsView: {
+    flexDirection: "row",
+    gap: 4,
+    alignItems: "center",
+    marginVertical: 4,
+  },
   profileDetails: {
     alignItems: "center",
     marginBottom: 10,
@@ -293,11 +292,11 @@ const styles = StyleSheet.create({
   bioText: {
     color: ThemeColoursPrimary.SecondaryColour,
     fontSize: 16,
-    lineHeight: 24,
-    minHeight: 48,
+    textAlign: "center",
   },
   userStatsContainer: {
-    flex: 1,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
     flexDirection: "row",
     marginHorizontal: 8,
     alignItems: "center",
@@ -309,7 +308,7 @@ const styles = StyleSheet.create({
   statsCount: {
     color: ThemeColoursPrimary.SecondaryColour,
     fontWeight: "bold",
-    fontSize: 24,
+    fontSize: 22,
   },
   statsFont: {
     color: ThemeColoursPrimary.SecondaryColour,
