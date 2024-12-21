@@ -265,7 +265,7 @@ const PostInteractionBar = forwardRef((props: any, ref) => {
                 size={28}
                 color={
                   liked
-                    ? ThemeColoursPrimary.LogoColour
+                    ? ThemeColoursPrimary.LikeColour
                     : ThemeColoursPrimary.SecondaryColour
                 }
               />

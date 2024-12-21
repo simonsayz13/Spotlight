@@ -98,7 +98,7 @@ const PostCard = ({ postId, navigation }: any) => {
               size={12}
               color={
                 liked
-                  ? ThemeColoursPrimary.LogoColour
+                  ? ThemeColoursPrimary.LikeColour
                   : ThemeColoursPrimary.SecondaryColour
               }
             />
