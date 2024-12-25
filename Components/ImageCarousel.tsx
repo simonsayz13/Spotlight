@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Dimensions, StyleSheet, View, Text, FlatList } from "react-native";
 import { Image } from "expo-image";
 import { ThemeColoursPrimary } from "../Constants/UI";

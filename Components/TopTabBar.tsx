@@ -1,7 +1,7 @@
-import { Text, StyleSheet, Platform } from "react-native";
+import { Text, StyleSheet, Platform, Dimensions } from "react-native";
 import { ThemeColoursPrimary } from "../Constants/UI";
 import { TabBar } from "react-native-tab-view";
-
+const { width } = Dimensions.get("window");
 const CustomTabBar = (props: any) => {
   return (
     <TabBar
@@ -20,7 +20,7 @@ const CustomTabBar = (props: any) => {
           {route.name}
         </Text>
       )}
-      indicatorStyle={styles.indicatorStyle}
+      indicatorStyle={styles.indicator}
     />
   );
 };
@@ -34,10 +34,13 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "600",
   },
-  indicatorStyle: {
+  indicator: {
     backgroundColor: ThemeColoursPrimary.LogoColour,
     height: 3,
     bottom: 2,
+    width: 100,
+    left: (width / 3 - 100) / 2,
+    borderRadius: 10,
   },
 });
 
