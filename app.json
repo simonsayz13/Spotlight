@@ -11,7 +11,8 @@
       "resizeMode": "contain"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.project1337.spotlight"
     },
     "android": {
       "adaptiveIcon": {
@@ -38,11 +39,12 @@
       ],
       "expo-font"
     ],
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "extra": {
       "eas": {
-        "projectId": "ad31a95f-0e00-41fb-a3da-a2fe4283af51"
+        "projectId": "195979bb-0221-4c3f-a768-65b08e6db965"
       }
-    }
+    },
+    "owner": "jtan1024"
   }
 }
